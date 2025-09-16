@@ -7,6 +7,8 @@ const ENTITY_LABELS: Record<SearchEntityType, { singular: string; plural: string
   Bill: { singular: 'Bill', plural: 'Bills' },
   Receipt: { singular: 'Receipt', plural: 'Receipts' },
   Payment: { singular: 'Payment', plural: 'Payments' },
+  Person: { singular: 'Person', plural: 'People' },
+  Organization: { singular: 'Organization', plural: 'Organizations' },
 };
 
 export function formatEntityType(type: SearchEntityType, options?: { plural?: boolean }): string {

@@ -1,4 +1,11 @@
-import { SearchGroup, SearchRecord, SearchResponse } from '../types';
+import {
+  SearchGroup,
+  SearchRecord,
+  SearchResponse,
+  isFinancialRecord,
+  isOrganizationRecord,
+  isPersonRecord,
+} from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
@@ -55,18 +62,43 @@ export function createSearchDialog(
 
   host.append(dialog);
 
-  const setState = (state: SearchDialogState) => {
-    dialog.hidden = !state.visible;
-    dialog.classList.toggle('monetary-search', state.isMonetarySearch || false);
+  // Track previous state to avoid unnecessary re-renders
+  let previousState: SearchDialogState | null = null;
 
-    if (dialog.hidden) {
-      dialog.innerHTML = '';
-      dialog.style.display = 'none';
-      return;
+  const setState = (state: SearchDialogState) => {
+    // Only update visibility if it changed
+    const visibilityChanged = !previousState || previousState.visible !== state.visible;
+    if (visibilityChanged) {
+      dialog.hidden = !state.visible;
+      if (dialog.hidden) {
+        dialog.innerHTML = '';
+        dialog.style.display = 'none';
+        previousState = state;
+        return;
+      }
+      dialog.style.display = 'flex';
     }
 
-    dialog.style.display = 'flex';
-    renderDialogContents(dialog, state, options);
+    // Only update monetary search class if it changed
+    if (!previousState || previousState.isMonetarySearch !== state.isMonetarySearch) {
+      dialog.classList.toggle('monetary-search', state.isMonetarySearch || false);
+    }
+
+    // Re-render content if visibility changed OR if relevant state changed
+    const contentChanged = visibilityChanged ||
+      !previousState ||
+      previousState.status !== state.status ||
+      previousState.query !== state.query ||
+      previousState.response !== state.response;
+
+    if (contentChanged) {
+      // Use requestAnimationFrame to defer heavy DOM operations
+      requestAnimationFrame(() => {
+        renderDialogContents(dialog, state, options);
+      });
+    }
+
+    previousState = state;
   };
 
   return {
@@ -94,7 +126,7 @@ function renderDialogContents(
 
   const effectiveLength = getEffectiveQueryLength(state.query);
 
-  if (effectiveLength === 0 && state.status === 'idle') {
+  if (effectiveLength === 0) {
     container.append(renderEmptyState());
     return;
   }
@@ -227,7 +259,7 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
   }
 
   // Add line item matches for non-Document entities
-  if (item.entityType !== 'Document' && query) {
+  if (query && isFinancialRecord(item)) {
     const lineItemsMatch = renderMiniLineItems(item, query, isMonetarySearch);
     if (lineItemsMatch) {
       li.append(lineItemsMatch);
@@ -244,22 +276,43 @@ function buildItemMeta(item: SearchRecord, query?: string, isMonetarySearch?: bo
   if (item.entityType === 'Document') {
     parts.push((item as any).documentType);
     parts.push(`Updated ${formatDate(item.updatedAt)}`);
-  } else {
-    const financialItem = item as any;
-    if (typeof financialItem.totalValue === 'number') {
-      parts.push(formatCurrency(financialItem.totalValue));
+    return parts.filter(Boolean).join(' • ');
+  }
+
+  if (isFinancialRecord(item)) {
+    parts.push(formatCurrency(item.totalValue));
+    if (item.status) {
+      parts.push(item.status);
     }
-    if (financialItem.status) {
-      parts.push(financialItem.status);
+    return parts.filter(Boolean).join(' • ');
+  }
+
+  if (isPersonRecord(item)) {
+    parts.push(item.personType);
+    parts.push(item.jobTitle);
+    if (item.associatedOrganization) {
+      parts.push(item.associatedOrganization);
     }
+    parts.push(item.location);
+    return parts.filter(Boolean).join(' • ');
+  }
+
+  if (isOrganizationRecord(item)) {
+    parts.push(item.organizationType);
+    parts.push(item.tradeFocus);
+    parts.push(item.serviceArea);
+    return parts.filter(Boolean).join(' • ');
   }
 
   return parts.filter(Boolean).join(' • ');
 }
 
 function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch?: boolean): HTMLElement | null {
-  const financial = item as any;
-  const items = financial.lineItems ?? [];
+  if (!isFinancialRecord(item)) {
+    return null;
+  }
+
+  const items = item.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }

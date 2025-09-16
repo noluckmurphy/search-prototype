@@ -68,10 +68,7 @@ export function createSettingsView(): SettingsViewHandles {
   resultsSection.append(lineItemsContextField);
 
   const showLineItemsField = document.createElement('div');
-  showLineItemsField.className = 'settings-field';
-  showLineItemsField.innerHTML = `
-    <label for="show-line-items-default">Show line items by default</label>
-  `;
+  showLineItemsField.className = 'settings-field settings-field--checkbox';
 
   const showLineItemsCheckbox = document.createElement('input');
   showLineItemsCheckbox.id = 'show-line-items-default';
@@ -83,6 +80,38 @@ export function createSettingsView(): SettingsViewHandles {
 
   showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
   resultsSection.append(showLineItemsField);
+
+  const collapseLineItemsField = document.createElement('div');
+  collapseLineItemsField.className = 'settings-field settings-field--checkbox';
+
+  const collapseLineItemsCheckbox = document.createElement('input');
+  collapseLineItemsCheckbox.id = 'collapse-irrelevant-line-items';
+  collapseLineItemsCheckbox.type = 'checkbox';
+
+  const collapseLineItemsLabel = document.createElement('label');
+  collapseLineItemsLabel.htmlFor = 'collapse-irrelevant-line-items';
+  collapseLineItemsLabel.textContent = 'Collapse irrelevant line items between results (shows "..." for large gaps between matches)';
+
+  collapseLineItemsField.append(collapseLineItemsCheckbox, collapseLineItemsLabel);
+  resultsSection.append(collapseLineItemsField);
+
+  const collapseThresholdField = document.createElement('div');
+  collapseThresholdField.className = 'settings-field';
+  collapseThresholdField.innerHTML = `
+    <label for="line-items-collapse-threshold">Collapse threshold</label>
+  `;
+
+  const collapseThresholdSelect = document.createElement('select');
+  collapseThresholdSelect.id = 'line-items-collapse-threshold';
+  collapseThresholdSelect.innerHTML = `
+    <option value="3">3 items</option>
+    <option value="5">5 items</option>
+    <option value="7">7 items</option>
+    <option value="10">10 items</option>
+  `;
+
+  collapseThresholdField.append(collapseThresholdSelect);
+  resultsSection.append(collapseThresholdField);
 
   const groupSection = document.createElement('fieldset');
   groupSection.className = 'settings-group';
@@ -144,6 +173,8 @@ export function createSettingsView(): SettingsViewHandles {
     delayInput.value = String(state.searchDelayMs);
     lineItemsContextSelect.value = String(state.lineItemsContextCount);
     showLineItemsCheckbox.checked = state.showLineItemsByDefault;
+    collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
+    collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
     renderGroupInputs(state.groupLimits);
   };
 
@@ -156,6 +187,9 @@ export function createSettingsView(): SettingsViewHandles {
     const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
     const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
 
+    const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
+    const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
+
     const groupLimits: Record<string, number> = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -166,6 +200,8 @@ export function createSettingsView(): SettingsViewHandles {
       searchDelayMs: resolvedDelay,
       lineItemsContextCount: resolvedLineItemsContext,
       showLineItemsByDefault: showLineItemsCheckbox.checked,
+      collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
+      lineItemsCollapseThreshold: resolvedCollapseThreshold,
       groupLimits,
     });
 

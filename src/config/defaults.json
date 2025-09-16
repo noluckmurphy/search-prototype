@@ -6,8 +6,12 @@
     "PurchaseOrder": 4,
     "Bill": 4,
     "Receipt": 4,
-    "Payment": 4
+    "Payment": 4,
+    "Person": 4,
+    "Organization": 4
   },
   "lineItemsContextCount": 3,
-  "showLineItemsByDefault": true
+  "showLineItemsByDefault": true,
+  "collapseIrrelevantLineItems": true,
+  "lineItemsCollapseThreshold": 5
 }

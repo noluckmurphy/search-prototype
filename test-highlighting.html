@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlighting Test</title>
+    <style>
+        .monetary-highlight {
+            background-color: #90EE90;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .search-highlight {
+            background-color: #FFFF00;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .original {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .highlighted {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monetary Search Highlighting Test</h1>
+    <p>This page tests the highlighting behavior for monetary searches.</p>
+
+    <div class="test-case">
+        <h3>Test Case 1: $22 Query (Explicit Monetary)</h3>
+        <p><strong>Query:</strong> $22</p>
+        <p><strong>Expected:</strong> Should only highlight monetary values with $, not quantities or descriptions</p>
+        
+        <div class="original">
+            <strong>Original text:</strong><br>
+            Bathroom plumbing rough-in - 22 bathrooms<br>
+            Quantity: 22 hours<br>
+            Unit Price: $43<br>
+            Total: $946
+        </div>
+        
+        <div class="highlighted" id="test1">
+            <strong>Highlighted text:</strong><br>
+            <span id="highlighted1"></span>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test Case 2: 22 Query (Non-Explicit)</h3>
+        <p><strong>Query:</strong> 22</p>
+        <p><strong>Expected:</strong> Should highlight all instances of "22"</p>
+        
+        <div class="original">
+            <strong>Original text:</strong><br>
+            Bathroom plumbing rough-in - 22 bathrooms<br>
+            Quantity: 22 hours<br>
+            Unit Price: $43<br>
+            Total: $946
+        </div>
+        
+        <div class="highlighted" id="test2">
+            <strong>Highlighted text:</strong><br>
+            <span id="highlighted2"></span>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test Case 3: $43 Query (Explicit Monetary)</h3>
+        <p><strong>Query:</strong> $43</p>
+        <p><strong>Expected:</strong> Should only highlight $43, not other instances of 43</p>
+        
+        <div class="original">
+            <strong>Original text:</strong><br>
+            Bathroom plumbing rough-in - 22 bathrooms<br>
+            Quantity: 22 hours<br>
+            Unit Price: $43<br>
+            Total: $946
+        </div>
+        
+        <div class="highlighted" id="test3">
+            <strong>Highlighted text:</strong><br>
+            <span id="highlighted3"></span>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the highlighting functions
+        import { highlightMonetaryValues, highlightHybrid } from './public/assets/main.js';
+
+        // Test data
+        const testText = `Bathroom plumbing rough-in - 22 bathrooms
+Quantity: 22 hours
+Unit Price: $43
+Total: $946`;
+
+        // Test Case 1: $22 Query (Explicit Monetary)
+        const result1 = highlightMonetaryValues(testText, '$22');
+        document.getElementById('highlighted1').innerHTML = result1.replace(/\n/g, '<br>');
+
+        // Test Case 2: 22 Query (Non-Explicit)
+        const result2 = highlightHybrid(testText, '22');
+        document.getElementById('highlighted2').innerHTML = result2.replace(/\n/g, '<br>');
+
+        // Test Case 3: $43 Query (Explicit Monetary)
+        const result3 = highlightMonetaryValues(testText, '$43');
+        document.getElementById('highlighted3').innerHTML = result3.replace(/\n/g, '<br>');
+
+        console.log('Test Case 1 ($22):', result1);
+        console.log('Test Case 2 (22):', result2);
+        console.log('Test Case 3 ($43):', result3);
+    </script>
+</body>
+</html>

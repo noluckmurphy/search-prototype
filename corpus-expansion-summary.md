@@ -3,6 +3,21 @@
 ## Overview
 Successfully expanded the search corpus with creative construction-related line items using the provided terms. The expansion includes realistic quantities, descriptions, and pricing for residential construction and remodeling projects.
 
+## People & Organization Metadata Plan
+
+- **People (entityType: Person)**
+  - Core fields: `personType` (Client | Contact), `jobTitle`, `associatedOrganization`, `location`, `email`, `phone`, optional `tradeFocus`
+  - Search tags capture relationship context (e.g. homeowner, architect, procurement)
+  - Metadata keys extend discoverability: `relationshipDepth`, `preferredContactMethod`, `projectPortfolio`
+  - Projects reference their primary engagement so existing facet flows remain useful
+
+- **Organizations (entityType: Organization)**
+  - Core fields: `organizationType` (Subcontractor | Vendor), `tradeFocus`, `serviceArea`, `primaryContact`, `email`, `phone`, optional `website`
+  - Metadata keys include compliance info (`licenseStatus`), diversity certifications, and capacity signals (`crewSize`, `avgProjectValue`)
+  - Contacts cross-link via `contactOrganization` facet so users can pivot between people and companies during search
+
+These structures surface in new facets (`personType`, `contactOrganization`, `organizationType`, `tradeFocus`) and populate summary metadata in both the quick-search dialog and full results experience.
+
 ## Key Features Implemented
 
 ### 1. Corpus Generator Script (`corpus-generator.js`)

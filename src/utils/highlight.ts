@@ -1,4 +1,4 @@
-import { SearchRecord } from '../types';
+import { SearchRecord, isFinancialRecord, isOrganizationRecord, isPersonRecord } from '../types';
 
 export interface HighlightMatch {
   field: string;
@@ -72,11 +72,29 @@ export function findBestMatch(record: SearchRecord, query: string): HighlightMat
     }
   }
 
-  // Add financial record fields
-  if (record.entityType !== 'Document') {
-    const financialRecord = record as any;
-    if (financialRecord.lineItems) {
-      financialRecord.lineItems.forEach((item: any, index: number) => {
+  if (isPersonRecord(record)) {
+    searchableFields.push(
+      { field: 'personType', content: record.personType },
+      { field: 'jobTitle', content: record.jobTitle },
+      { field: 'organization', content: record.associatedOrganization ?? '' },
+      { field: 'email', content: record.email },
+      { field: 'phone', content: record.phone },
+      { field: 'location', content: record.location },
+      { field: 'tradeFocus', content: record.tradeFocus ?? '' },
+    );
+  } else if (isOrganizationRecord(record)) {
+    searchableFields.push(
+      { field: 'organizationType', content: record.organizationType },
+      { field: 'tradeFocus', content: record.tradeFocus },
+      { field: 'serviceArea', content: record.serviceArea },
+      { field: 'primaryContact', content: record.primaryContact },
+      { field: 'phone', content: record.phone },
+      { field: 'email', content: record.email },
+      { field: 'website', content: record.website ?? '' },
+    );
+  } else if (isFinancialRecord(record)) {
+    if (record.lineItems) {
+      record.lineItems.forEach((item, index) => {
         searchableFields.push(
           { field: `lineItem${index}_title`, content: item.lineItemTitle },
           { field: `lineItem${index}_description`, content: item.lineItemDescription },
@@ -196,17 +214,30 @@ export function highlightHybrid(text: string, query: string): string {
   if (amounts.length > 0 || textTokens.length > 0 || range) {
     // Apply monetary highlighting logic directly to avoid double-escaping
     if (amounts.length > 0) {
+      // For explicit monetary searches (queries starting with $), be more restrictive
+      const isExplicitMonetary = query.trim().startsWith('$');
+      
       for (const amount of amounts) {
         const amountStr = amount.toString();
         const amountWithCommas = amount.toLocaleString();
         
-        // Create a pattern that matches the amount with or without currency symbol and commas
-        const pattern = new RegExp(
-          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
-          'g'
-        );
-        
-        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+        if (isExplicitMonetary) {
+          // For explicit monetary searches, only highlight values that are clearly monetary
+          const monetaryPattern = new RegExp(
+            `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+            'g'
+          );
+          
+          highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight">$1</mark>');
+        } else {
+          // For non-explicit monetary searches, use the original broader pattern
+          const pattern = new RegExp(
+            `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+            'g'
+          );
+          
+          highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+        }
       }
     }
     
@@ -252,6 +283,9 @@ export function highlightMonetaryValues(text: string, query: string): string {
 
   let highlightedText = escapeHtml(text);
   
+  // For explicit monetary searches (queries starting with $), be more restrictive
+  const isExplicitMonetary = query.trim().startsWith('$');
+  
   // Highlight numeric values that match the query amounts
   if (amounts.length > 0) {
     for (const amount of amounts) {
@@ -260,36 +294,49 @@ export function highlightMonetaryValues(text: string, query: string): string {
       const amountStr = amount.toString();
       const amountWithCommas = amount.toLocaleString();
       
-      // Create a pattern that matches the amount with or without currency symbol and commas
-      const pattern = new RegExp(
-        `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
-        'g'
-      );
-      
-      highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+      if (isExplicitMonetary) {
+        // For explicit monetary searches, only highlight values that are clearly monetary
+        // Look for patterns that indicate monetary values: $X, $X,XXX, $X.XX, etc.
+        const monetaryPattern = new RegExp(
+          `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+          'g'
+        );
+        
+        highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight">$1</mark>');
+      } else {
+        // For non-explicit monetary searches, use the original broader pattern
+        const pattern = new RegExp(
+          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+          'g'
+        );
+        
+        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+      }
     }
     
-    // Additionally, handle partial matches for monetary values
-    // This handles cases like searching for "$127" and highlighting "$1,275"
-    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
-    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
-      // Only process if not already highlighted
-      if (match.includes('<mark')) {
-        return match;
-      }
-      
-      // Extract the numeric value from the match
-      const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
-      
-      // Check if any query amount is a partial match of this value
-      for (const queryAmount of amounts) {
-        if (isPartialMonetaryMatch(queryAmount, numericValue)) {
-          return `<mark class="monetary-highlight">${match}</mark>`;
+    if (!isExplicitMonetary) {
+      // Additionally, handle partial matches for monetary values (only for non-explicit searches)
+      // This handles cases like searching for "127" and highlighting "$1,275"
+      const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+      highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+        // Only process if not already highlighted
+        if (match.includes('<mark')) {
+          return match;
         }
-      }
-      
-      return match;
-    });
+        
+        // Extract the numeric value from the match
+        const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+        
+        // Check if any query amount is a partial match of this value
+        for (const queryAmount of amounts) {
+          if (isPartialMonetaryMatch(queryAmount, numericValue)) {
+            return `<mark class="monetary-highlight">${match}</mark>`;
+          }
+        }
+        
+        return match;
+      });
+    }
   }
   
   // Highlight range values if it's a range query

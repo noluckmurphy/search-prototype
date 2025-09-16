@@ -4,7 +4,9 @@ export type SearchEntityType =
   | 'PurchaseOrder'
   | 'Bill'
   | 'Receipt'
-  | 'Payment';
+  | 'Payment'
+  | 'Person'
+  | 'Organization';
 
 export type LineItemType = 'Labor' | 'Material' | 'Subcontractor' | 'Other';
 
@@ -39,14 +41,62 @@ export interface DocumentRecord extends SearchRecordBase {
 }
 
 export interface FinancialRecord extends SearchRecordBase {
-  entityType: Exclude<SearchEntityType, 'Document'>;
+  entityType: 'ClientInvoice' | 'PurchaseOrder' | 'Bill' | 'Receipt' | 'Payment';
   totalValue: number;
   issuedDate: string;
   dueDate?: string;
   lineItems: LineItem[];
 }
 
-export type SearchRecord = DocumentRecord | FinancialRecord;
+export type PersonType = 'Client' | 'Contact';
+
+export interface PersonRecord extends SearchRecordBase {
+  entityType: 'Person';
+  personType: PersonType;
+  jobTitle: string;
+  associatedOrganization?: string;
+  email: string;
+  phone: string;
+  location: string;
+  tradeFocus?: string;
+}
+
+export type OrganizationType = 'Subcontractor' | 'Vendor';
+
+export interface OrganizationRecord extends SearchRecordBase {
+  entityType: 'Organization';
+  organizationType: OrganizationType;
+  tradeFocus: string;
+  serviceArea: string;
+  primaryContact: string;
+  phone: string;
+  email: string;
+  website?: string;
+}
+
+export type SearchRecord =
+  | DocumentRecord
+  | FinancialRecord
+  | PersonRecord
+  | OrganizationRecord;
+
+export function isFinancialRecord(record: SearchRecord): record is FinancialRecord {
+  return (
+    record.entityType === 'ClientInvoice' ||
+    record.entityType === 'PurchaseOrder' ||
+    record.entityType === 'Bill' ||
+    record.entityType === 'Receipt' ||
+    record.entityType === 'Payment'
+  );
+}
+
+export function isPersonRecord(record: SearchRecord): record is PersonRecord {
+  return record.entityType === 'Person';
+}
+
+export function isOrganizationRecord(record: SearchRecord): record is OrganizationRecord {
+  return record.entityType === 'Organization';
+}
 
 export interface SearchGroup {
   entityType: SearchEntityType;
@@ -62,7 +112,11 @@ export type FacetKey =
   | 'client'
   | 'issuedDate'
   | 'totalValue'
-  | 'groupBy';
+  | 'groupBy'
+  | 'personType'
+  | 'contactOrganization'
+  | 'organizationType'
+  | 'tradeFocus';
 
 export interface FacetValue {
   key: FacetKey;

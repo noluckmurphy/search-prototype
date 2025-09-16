@@ -6,6 +6,8 @@ export interface SettingsState {
   groupLimits: Record<string, number>;
   lineItemsContextCount: number;
   showLineItemsByDefault: boolean;
+  collapseIrrelevantLineItems: boolean;
+  lineItemsCollapseThreshold: number;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -17,6 +19,8 @@ function normalize(state: SettingsState): SettingsState {
     groupLimits: { ...state.groupLimits },
     lineItemsContextCount: state.lineItemsContextCount ?? 3,
     showLineItemsByDefault: state.showLineItemsByDefault ?? true,
+    collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
+    lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
   };
 }
 

@@ -91,6 +91,17 @@ function createHeader(options) {
   };
 }
 
+// src/types.ts
+function isFinancialRecord(record) {
+  return record.entityType === "ClientInvoice" || record.entityType === "PurchaseOrder" || record.entityType === "Bill" || record.entityType === "Receipt" || record.entityType === "Payment";
+}
+function isPersonRecord(record) {
+  return record.entityType === "Person";
+}
+function isOrganizationRecord(record) {
+  return record.entityType === "Organization";
+}
+
 // src/utils/format.ts
 var ENTITY_LABELS = {
   Document: { singular: "Document", plural: "Documents" },
@@ -98,7 +109,9 @@ var ENTITY_LABELS = {
   PurchaseOrder: { singular: "Purchase Order", plural: "Purchase Orders" },
   Bill: { singular: "Bill", plural: "Bills" },
   Receipt: { singular: "Receipt", plural: "Receipts" },
-  Payment: { singular: "Payment", plural: "Payments" }
+  Payment: { singular: "Payment", plural: "Payments" },
+  Person: { singular: "Person", plural: "People" },
+  Organization: { singular: "Organization", plural: "Organizations" }
 };
 function formatEntityType(type, options) {
   const label = ENTITY_LABELS[type];
@@ -172,10 +185,29 @@ function findBestMatch(record, query) {
       searchableFields.push({ field: "author", content: docRecord.author });
     }
   }
-  if (record.entityType !== "Document") {
-    const financialRecord = record;
-    if (financialRecord.lineItems) {
-      financialRecord.lineItems.forEach((item, index) => {
+  if (isPersonRecord(record)) {
+    searchableFields.push(
+      { field: "personType", content: record.personType },
+      { field: "jobTitle", content: record.jobTitle },
+      { field: "organization", content: record.associatedOrganization ?? "" },
+      { field: "email", content: record.email },
+      { field: "phone", content: record.phone },
+      { field: "location", content: record.location },
+      { field: "tradeFocus", content: record.tradeFocus ?? "" }
+    );
+  } else if (isOrganizationRecord(record)) {
+    searchableFields.push(
+      { field: "organizationType", content: record.organizationType },
+      { field: "tradeFocus", content: record.tradeFocus },
+      { field: "serviceArea", content: record.serviceArea },
+      { field: "primaryContact", content: record.primaryContact },
+      { field: "phone", content: record.phone },
+      { field: "email", content: record.email },
+      { field: "website", content: record.website ?? "" }
+    );
+  } else if (isFinancialRecord(record)) {
+    if (record.lineItems) {
+      record.lineItems.forEach((item, index) => {
         searchableFields.push(
           { field: `lineItem${index}_title`, content: item.lineItemTitle },
           { field: `lineItem${index}_description`, content: item.lineItemDescription },
@@ -254,14 +286,23 @@ function highlightHybrid(text, query) {
   const { amounts, textTokens, range } = extractMonetaryTokens(query);
   if (amounts.length > 0 || textTokens.length > 0 || range) {
     if (amounts.length > 0) {
+      const isExplicitMonetary = query.trim().startsWith("$");
       for (const amount of amounts) {
         const amountStr = amount.toString();
         const amountWithCommas = amount.toLocaleString();
-        const pattern = new RegExp(
-          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
-          "g"
-        );
-        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+        if (isExplicitMonetary) {
+          const monetaryPattern = new RegExp(
+            `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+            "g"
+          );
+          highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight">$1</mark>');
+        } else {
+          const pattern = new RegExp(
+            `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+            "g"
+          );
+          highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+        }
       }
     }
     if (range) {
@@ -293,29 +334,40 @@ function highlightMonetaryValues(text, query) {
     return escapeHtml(text);
   }
   let highlightedText = escapeHtml(text);
+  const isExplicitMonetary = query.trim().startsWith("$");
   if (amounts.length > 0) {
     for (const amount of amounts) {
       const amountStr = amount.toString();
       const amountWithCommas = amount.toLocaleString();
-      const pattern = new RegExp(
-        `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
-        "g"
-      );
-      highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+      if (isExplicitMonetary) {
+        const monetaryPattern = new RegExp(
+          `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+          "g"
+        );
+        highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight">$1</mark>');
+      } else {
+        const pattern = new RegExp(
+          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+          "g"
+        );
+        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+      }
     }
-    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
-    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
-      if (match.includes("<mark")) {
-        return match;
-      }
-      const numericValue = parseFloat(match.replace(/[$,\s]/g, ""));
-      for (const queryAmount of amounts) {
-        if (isPartialMonetaryMatch(queryAmount, numericValue)) {
-          return `<mark class="monetary-highlight">${match}</mark>`;
+    if (!isExplicitMonetary) {
+      const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+      highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+        if (match.includes("<mark")) {
+          return match;
         }
-      }
-      return match;
-    });
+        const numericValue = parseFloat(match.replace(/[$,\s]/g, ""));
+        for (const queryAmount of amounts) {
+          if (isPartialMonetaryMatch(queryAmount, numericValue)) {
+            return `<mark class="monetary-highlight">${match}</mark>`;
+          }
+        }
+        return match;
+      });
+    }
   }
   if (range) {
     const rangePatterns = [
@@ -450,16 +502,29 @@ function createSearchDialog(host, options) {
   dialog.setAttribute("aria-modal", "false");
   dialog.hidden = true;
   host.append(dialog);
+  let previousState2 = null;
   const setState = (state) => {
-    dialog.hidden = !state.visible;
-    dialog.classList.toggle("monetary-search", state.isMonetarySearch || false);
-    if (dialog.hidden) {
-      dialog.innerHTML = "";
-      dialog.style.display = "none";
-      return;
+    const visibilityChanged = !previousState2 || previousState2.visible !== state.visible;
+    if (visibilityChanged) {
+      dialog.hidden = !state.visible;
+      if (dialog.hidden) {
+        dialog.innerHTML = "";
+        dialog.style.display = "none";
+        previousState2 = state;
+        return;
+      }
+      dialog.style.display = "flex";
     }
-    dialog.style.display = "flex";
-    renderDialogContents(dialog, state, options);
+    if (!previousState2 || previousState2.isMonetarySearch !== state.isMonetarySearch) {
+      dialog.classList.toggle("monetary-search", state.isMonetarySearch || false);
+    }
+    const contentChanged = visibilityChanged || !previousState2 || previousState2.status !== state.status || previousState2.query !== state.query || previousState2.response !== state.response;
+    if (contentChanged) {
+      requestAnimationFrame(() => {
+        renderDialogContents(dialog, state, options);
+      });
+    }
+    previousState2 = state;
   };
   return {
     element: dialog,
@@ -477,7 +542,7 @@ function renderDialogContents(container, state, options) {
     return;
   }
   const effectiveLength = getEffectiveQueryLength(state.query);
-  if (effectiveLength === 0 && state.status === "idle") {
+  if (effectiveLength === 0) {
     container.append(renderEmptyState());
     return;
   }
@@ -585,7 +650,7 @@ function renderGroupItem(item, query, isMonetarySearch) {
   } else {
     li.append(title, meta);
   }
-  if (item.entityType !== "Document" && query) {
+  if (query && isFinancialRecord(item)) {
     const lineItemsMatch = renderMiniLineItems(item, query, isMonetarySearch);
     if (lineItemsMatch) {
       li.append(lineItemsMatch);
@@ -599,20 +664,37 @@ function buildItemMeta(item, query, isMonetarySearch) {
   if (item.entityType === "Document") {
     parts.push(item.documentType);
     parts.push(`Updated ${formatDate(item.updatedAt)}`);
-  } else {
-    const financialItem = item;
-    if (typeof financialItem.totalValue === "number") {
-      parts.push(formatCurrency(financialItem.totalValue));
+    return parts.filter(Boolean).join(" \u2022 ");
+  }
+  if (isFinancialRecord(item)) {
+    parts.push(formatCurrency(item.totalValue));
+    if (item.status) {
+      parts.push(item.status);
     }
-    if (financialItem.status) {
-      parts.push(financialItem.status);
+    return parts.filter(Boolean).join(" \u2022 ");
+  }
+  if (isPersonRecord(item)) {
+    parts.push(item.personType);
+    parts.push(item.jobTitle);
+    if (item.associatedOrganization) {
+      parts.push(item.associatedOrganization);
     }
+    parts.push(item.location);
+    return parts.filter(Boolean).join(" \u2022 ");
+  }
+  if (isOrganizationRecord(item)) {
+    parts.push(item.organizationType);
+    parts.push(item.tradeFocus);
+    parts.push(item.serviceArea);
+    return parts.filter(Boolean).join(" \u2022 ");
   }
   return parts.filter(Boolean).join(" \u2022 ");
 }
 function renderMiniLineItems(item, query, isMonetarySearch) {
-  const financial = item;
-  const items = financial.lineItems ?? [];
+  if (!isFinancialRecord(item)) {
+    return null;
+  }
+  const items = item.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }
@@ -682,10 +764,14 @@ var defaults_default = {
     PurchaseOrder: 4,
     Bill: 4,
     Receipt: 4,
-    Payment: 4
+    Payment: 4,
+    Person: 4,
+    Organization: 4
   },
   lineItemsContextCount: 3,
-  showLineItemsByDefault: true
+  showLineItemsByDefault: true,
+  collapseIrrelevantLineItems: true,
+  lineItemsCollapseThreshold: 5
 };
 
 // src/state/store.ts
@@ -716,7 +802,9 @@ function normalize(state) {
     ...state,
     groupLimits: { ...state.groupLimits },
     lineItemsContextCount: state.lineItemsContextCount ?? 3,
-    showLineItemsByDefault: state.showLineItemsByDefault ?? true
+    showLineItemsByDefault: state.showLineItemsByDefault ?? true,
+    collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
+    lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5
   };
 }
 function mergeSettings(base, overrides) {
@@ -809,7 +897,11 @@ var FACET_LABELS = {
   client: "Client",
   issuedDate: "Issued",
   totalValue: "Total",
-  groupBy: "Group by"
+  groupBy: "Group by",
+  personType: "Person Type",
+  contactOrganization: "Contact Organization",
+  organizationType: "Organization Type",
+  tradeFocus: "Trade Focus"
 };
 function createResultsView(options) {
   const container = document.createElement("section");
@@ -838,13 +930,29 @@ function createResultsView(options) {
   clearButton.addEventListener("click", () => {
     options.onClearFacets?.();
   });
+  let previousContext = null;
   const render = (context) => {
     const { response, selections, status, query, errorMessage, isMonetarySearch } = context;
-    renderSummary(summaryEl, status, response, query, errorMessage);
-    renderFacets(facetsContainer, status, response, selections, options);
-    renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
-    const hasSelections = selections && Object.keys(selections).length > 0;
-    clearButton.hidden = !hasSelections;
+    const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage;
+    if (summaryChanged) {
+      renderSummary(summaryEl, status, response, query, errorMessage);
+    }
+    const facetsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.selections !== selections;
+    if (facetsChanged) {
+      renderFacets(facetsContainer, status, response, selections, options);
+    }
+    const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch;
+    if (resultsChanged) {
+      requestAnimationFrame(() => {
+        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
+      });
+    }
+    const selectionsChanged = !previousContext || previousContext.selections !== selections;
+    if (selectionsChanged) {
+      const hasSelections = selections && Object.keys(selections).length > 0;
+      clearButton.hidden = !hasSelections;
+    }
+    previousContext = context;
   };
   return {
     element: container,
@@ -1022,7 +1130,7 @@ function renderResultCard(item, query, isMonetarySearch) {
       card.append(context);
     }
   }
-  if (item.entityType !== "Document") {
+  if (isFinancialRecord(item)) {
     const lineItemsBlock = renderLineItems(item, query, isMonetarySearch);
     if (lineItemsBlock) {
       card.append(lineItemsBlock);
@@ -1032,41 +1140,57 @@ function renderResultCard(item, query, isMonetarySearch) {
 }
 function buildMetaItems(item, query, isMonetarySearch) {
   const metas = [];
-  const project = document.createElement("li");
-  project.innerHTML = `<span>Project</span><strong>${query ? isMonetarySearch ? highlightMonetaryValues(item.project, query) : highlightText(item.project, query) : item.project}</strong>`;
-  metas.push(project);
-  const status = document.createElement("li");
-  status.innerHTML = `<span>Status</span><strong>${query ? isMonetarySearch ? highlightMonetaryValues(item.status, query) : highlightText(item.status, query) : item.status}</strong>`;
-  metas.push(status);
+  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+  const highlightValue = (value) => highlightFn ? highlightFn(value, query) : value;
+  const pushMeta = (label, value) => {
+    if (!value) {
+      return;
+    }
+    const entry = document.createElement("li");
+    entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
+    metas.push(entry);
+  };
+  pushMeta("Project", item.project);
+  pushMeta("Status", item.status);
   if (item.entityType === "Document") {
     const doc = item;
-    const docType = document.createElement("li");
-    docType.innerHTML = `<span>Type</span><strong>${query ? isMonetarySearch ? highlightMonetaryValues(doc.documentType, query) : highlightText(doc.documentType, query) : doc.documentType}</strong>`;
-    metas.push(docType);
-    const updated = document.createElement("li");
-    updated.innerHTML = `<span>Updated</span><strong>${formatDate(item.updatedAt)}</strong>`;
-    metas.push(updated);
-  } else {
-    const financial = item;
-    const issued = document.createElement("li");
-    issued.innerHTML = `<span>Issued</span><strong>${formatDate(financial.issuedDate)}</strong>`;
-    metas.push(issued);
-    if (financial.dueDate) {
-      const due = document.createElement("li");
-      due.innerHTML = `<span>Due</span><strong>${formatDate(financial.dueDate)}</strong>`;
-      metas.push(due);
+    pushMeta("Type", doc.documentType);
+    pushMeta("Updated", formatDate(item.updatedAt));
+    return metas;
+  }
+  if (isFinancialRecord(item)) {
+    pushMeta("Issued", formatDate(item.issuedDate));
+    if (item.dueDate) {
+      pushMeta("Due", formatDate(item.dueDate));
     }
-    const total = document.createElement("li");
-    const totalValue = formatCurrency(financial.totalValue);
-    total.innerHTML = `<span>Total</span><strong>${query ? isMonetarySearch ? highlightMonetaryValues(totalValue, query) : highlightText(totalValue, query) : totalValue}</strong>`;
-    metas.push(total);
+    pushMeta("Total", formatCurrency(item.totalValue));
+    return metas;
+  }
+  if (isPersonRecord(item)) {
+    pushMeta("Person Type", item.personType);
+    pushMeta("Role", item.jobTitle);
+    pushMeta("Organization", item.associatedOrganization);
+    pushMeta("Location", item.location);
+    pushMeta("Email", item.email);
+    pushMeta("Phone", item.phone);
+    pushMeta("Trade Focus", item.tradeFocus ?? void 0);
+    return metas;
+  }
+  if (isOrganizationRecord(item)) {
+    pushMeta("Business Type", item.organizationType);
+    pushMeta("Trade", item.tradeFocus);
+    pushMeta("Service Area", item.serviceArea);
+    pushMeta("Primary Contact", item.primaryContact);
+    pushMeta("Phone", item.phone);
+    pushMeta("Email", item.email);
+    pushMeta("Website", item.website ?? void 0);
+    return metas;
   }
   return metas;
 }
 function hasLineItemMatches(item, query, isMonetarySearch) {
-  if (!query) return false;
-  const financial = item;
-  const items = financial.lineItems ?? [];
+  if (!query || !isFinancialRecord(item)) return false;
+  const items = item.lineItems ?? [];
   if (items.length === 0) return false;
   const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
   return items.some((lineItem) => {
@@ -1087,9 +1211,8 @@ function hasLineItemMatches(item, query, isMonetarySearch) {
   });
 }
 function getMatchingLineItemIndices(item, query, isMonetarySearch) {
-  if (!query) return [];
-  const financial = item;
-  const items = financial.lineItems ?? [];
+  if (!query || !isFinancialRecord(item)) return [];
+  const items = item.lineItems ?? [];
   if (items.length === 0) return [];
   const matchingIndices = [];
   const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
@@ -1114,9 +1237,56 @@ function getMatchingLineItemIndices(item, query, isMonetarySearch) {
   });
   return matchingIndices;
 }
+function groupMatchingLineItems(matchingIndices, collapseThreshold) {
+  if (matchingIndices.length === 0) return [];
+  const groups = [];
+  let currentGroup = {
+    startIndex: matchingIndices[0],
+    endIndex: matchingIndices[0],
+    indices: [matchingIndices[0]]
+  };
+  for (let i = 1; i < matchingIndices.length; i++) {
+    const currentIndex = matchingIndices[i];
+    const lastIndex = matchingIndices[i - 1];
+    if (currentIndex - lastIndex <= collapseThreshold) {
+      currentGroup.endIndex = currentIndex;
+      currentGroup.indices.push(currentIndex);
+    } else {
+      groups.push(currentGroup);
+      currentGroup = {
+        startIndex: currentIndex,
+        endIndex: currentIndex,
+        indices: [currentIndex]
+      };
+    }
+  }
+  groups.push(currentGroup);
+  return groups;
+}
+function calculateDisplayRanges(groups, contextCount, totalItems) {
+  if (groups.length === 0) return [];
+  const ranges = [];
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    const start = Math.max(0, group.startIndex - contextCount);
+    const end = Math.min(totalItems - 1, group.endIndex + contextCount);
+    ranges.push({ start, end });
+    if (i < groups.length - 1) {
+      const nextGroup = groups[i + 1];
+      const gapStart = end + 1;
+      const gapEnd = Math.max(0, nextGroup.startIndex - contextCount) - 1;
+      if (gapStart <= gapEnd) {
+        ranges.push({ start: gapStart, end: gapEnd, isCollapsed: true });
+      }
+    }
+  }
+  return ranges;
+}
 function renderLineItems(item, query, isMonetarySearch) {
-  const financial = item;
-  const items = financial.lineItems ?? [];
+  if (!isFinancialRecord(item)) {
+    return null;
+  }
+  const items = item.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }
@@ -1128,6 +1298,21 @@ function renderLineItems(item, query, isMonetarySearch) {
   const heading = document.createElement("h4");
   heading.textContent = "Line items";
   wrapper.append(heading);
+  const renderLineItemRow = (line, index) => {
+    const row = document.createElement("tr");
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    const highlightFn2 = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+    row.innerHTML = `
+      <td class="line-item__description">${query && highlightFn2 ? highlightFn2(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn2 ? highlightFn2(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn2 ? highlightFn2(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn2 ? highlightFn2(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn2 ? highlightFn2(total, query) : total}</td>
+    `;
+    return row;
+  };
   if (!shouldShowLineItems) {
     const toggleLink = document.createElement("button");
     toggleLink.className = "line-items-toggle";
@@ -1192,79 +1377,115 @@ function renderLineItems(item, query, isMonetarySearch) {
   const tbody = document.createElement("tbody");
   const contextCount = settings.lineItemsContextCount;
   const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-  let displayItems;
-  let remainingItems = [];
+  let displayRanges = [];
+  let hiddenItems = [];
   if (hasMatches && contextCount > 0) {
     const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
     if (matchingIndices.length > 0) {
-      const minIndex = Math.min(...matchingIndices);
-      const maxIndex = Math.max(...matchingIndices);
-      const startIndex = Math.max(0, minIndex - contextCount);
-      const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-      displayItems = items.slice(startIndex, endIndex);
-      remainingItems = [
-        ...items.slice(0, startIndex),
-        ...items.slice(endIndex)
-      ];
+      if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+        const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+        displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+        hiddenItems = [];
+        displayRanges.forEach((range) => {
+          if (range.isCollapsed) {
+            for (let i = range.start; i <= range.end; i++) {
+              hiddenItems.push(items[i]);
+            }
+          }
+        });
+      } else {
+        const minIndex = Math.min(...matchingIndices);
+        const maxIndex = Math.max(...matchingIndices);
+        const startIndex = Math.max(0, minIndex - contextCount);
+        const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+        displayRanges = [{ start: startIndex, end: endIndex - 1 }];
+        hiddenItems = [
+          ...items.slice(0, startIndex),
+          ...items.slice(endIndex)
+        ];
+      }
     } else {
-      displayItems = items.slice(0, contextCount);
-      remainingItems = items.slice(contextCount);
+      displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
+      hiddenItems = items.slice(contextCount);
     }
   } else {
-    displayItems = items;
-    remainingItems = [];
+    displayRanges = [{ start: 0, end: items.length - 1 }];
+    hiddenItems = [];
   }
-  displayItems.forEach((line) => {
-    const row = document.createElement("tr");
-    const unitPrice = formatCurrency(line.lineItemUnitPrice);
-    const total = formatCurrency(line.lineItemTotal);
-    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
-    `;
-    tbody.append(row);
+  const collapsedRows = [];
+  const collapsedContent = [];
+  displayRanges.forEach((range) => {
+    if (range.isCollapsed) {
+      const collapsedRow = document.createElement("tr");
+      collapsedRow.className = "line-item__collapsed";
+      const itemCount = range.end - range.start + 1;
+      collapsedRow.innerHTML = `
+        <td colspan="5" class="line-item__collapsed-content">
+          <span class="line-item__collapsed-text">...</span>
+          <span class="line-item__collapsed-count">${itemCount} items</span>
+        </td>
+      `;
+      tbody.append(collapsedRow);
+      collapsedRows.push(collapsedRow);
+      const contentRows = [];
+      for (let i = range.start; i <= range.end; i++) {
+        const lineItemRow = renderLineItemRow(items[i], i);
+        lineItemRow.style.display = "none";
+        tbody.append(lineItemRow);
+        contentRows.push(lineItemRow);
+      }
+      collapsedContent.push(contentRows);
+    } else {
+      for (let i = range.start; i <= range.end; i++) {
+        const lineItemRow = renderLineItemRow(items[i], i);
+        tbody.append(lineItemRow);
+      }
+    }
   });
   const hiddenRows = [];
-  remainingItems.forEach((line) => {
-    const row = document.createElement("tr");
-    row.style.display = "none";
-    const unitPrice = formatCurrency(line.lineItemUnitPrice);
-    const total = formatCurrency(line.lineItemTotal);
-    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
-    `;
-    tbody.append(row);
-    hiddenRows.push(row);
+  hiddenItems.forEach((line) => {
+    const lineItemRow = renderLineItemRow(line, 0);
+    lineItemRow.style.display = "none";
+    tbody.append(lineItemRow);
+    hiddenRows.push(lineItemRow);
   });
   table.append(tbody);
   wrapper.append(table);
-  if (remainingItems.length > 0) {
+  const totalCollapsedCount = collapsedContent.reduce((sum, rows) => sum + rows.length, 0);
+  const totalHiddenCount = totalCollapsedCount + hiddenItems.length;
+  if (totalHiddenCount > 0) {
     const toggleButton = document.createElement("button");
     toggleButton.className = "line-items-toggle";
     toggleButton.type = "button";
-    const remainingCount = remainingItems.length;
-    toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? "" : "s"}`;
+    toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? "" : "s"}`;
     toggleButton.addEventListener("click", () => {
       const isHidden = hiddenRows[0]?.style.display === "none";
       if (isHidden) {
+        collapsedRows.forEach((row) => {
+          row.style.display = "none";
+        });
+        collapsedContent.forEach((contentRows) => {
+          contentRows.forEach((row) => {
+            row.style.display = "";
+          });
+        });
         hiddenRows.forEach((row) => {
           row.style.display = "";
         });
-        toggleButton.textContent = `Hide ${remainingCount} line item${remainingCount === 1 ? "" : "s"}`;
+        toggleButton.textContent = `Hide ${totalHiddenCount} line item${totalHiddenCount === 1 ? "" : "s"}`;
       } else {
+        collapsedRows.forEach((row) => {
+          row.style.display = "";
+        });
+        collapsedContent.forEach((contentRows) => {
+          contentRows.forEach((row) => {
+            row.style.display = "none";
+          });
+        });
         hiddenRows.forEach((row) => {
           row.style.display = "none";
         });
-        toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? "" : "s"}`;
+        toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? "" : "s"}`;
       }
     });
     wrapper.append(toggleButton);
@@ -1346,10 +1567,7 @@ function createSettingsView() {
   lineItemsContextField.append(lineItemsContextSelect);
   resultsSection.append(lineItemsContextField);
   const showLineItemsField = document.createElement("div");
-  showLineItemsField.className = "settings-field";
-  showLineItemsField.innerHTML = `
-    <label for="show-line-items-default">Show line items by default</label>
-  `;
+  showLineItemsField.className = "settings-field settings-field--checkbox";
   const showLineItemsCheckbox = document.createElement("input");
   showLineItemsCheckbox.id = "show-line-items-default";
   showLineItemsCheckbox.type = "checkbox";
@@ -1358,6 +1576,31 @@ function createSettingsView() {
   showLineItemsLabel.textContent = 'Show line items by default (uncheck to collapse behind "Show line items" link)';
   showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
   resultsSection.append(showLineItemsField);
+  const collapseLineItemsField = document.createElement("div");
+  collapseLineItemsField.className = "settings-field settings-field--checkbox";
+  const collapseLineItemsCheckbox = document.createElement("input");
+  collapseLineItemsCheckbox.id = "collapse-irrelevant-line-items";
+  collapseLineItemsCheckbox.type = "checkbox";
+  const collapseLineItemsLabel = document.createElement("label");
+  collapseLineItemsLabel.htmlFor = "collapse-irrelevant-line-items";
+  collapseLineItemsLabel.textContent = 'Collapse irrelevant line items between results (shows "..." for large gaps between matches)';
+  collapseLineItemsField.append(collapseLineItemsCheckbox, collapseLineItemsLabel);
+  resultsSection.append(collapseLineItemsField);
+  const collapseThresholdField = document.createElement("div");
+  collapseThresholdField.className = "settings-field";
+  collapseThresholdField.innerHTML = `
+    <label for="line-items-collapse-threshold">Collapse threshold</label>
+  `;
+  const collapseThresholdSelect = document.createElement("select");
+  collapseThresholdSelect.id = "line-items-collapse-threshold";
+  collapseThresholdSelect.innerHTML = `
+    <option value="3">3 items</option>
+    <option value="5">5 items</option>
+    <option value="7">7 items</option>
+    <option value="10">10 items</option>
+  `;
+  collapseThresholdField.append(collapseThresholdSelect);
+  resultsSection.append(collapseThresholdField);
   const groupSection = document.createElement("fieldset");
   groupSection.className = "settings-group";
   groupSection.innerHTML = `
@@ -1405,6 +1648,8 @@ function createSettingsView() {
     delayInput.value = String(state.searchDelayMs);
     lineItemsContextSelect.value = String(state.lineItemsContextCount);
     showLineItemsCheckbox.checked = state.showLineItemsByDefault;
+    collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
+    collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
     renderGroupInputs(state.groupLimits);
   };
   form.addEventListener("submit", (event) => {
@@ -1413,6 +1658,8 @@ function createSettingsView() {
     const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
     const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
     const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
+    const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
+    const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
     const groupLimits = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -1422,6 +1669,8 @@ function createSettingsView() {
       searchDelayMs: resolvedDelay,
       lineItemsContextCount: resolvedLineItemsContext,
       showLineItemsByDefault: showLineItemsCheckbox.checked,
+      collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
+      lineItemsCollapseThreshold: resolvedCollapseThreshold,
       groupLimits
     });
     window.location.reload();
@@ -1522,6 +1771,16 @@ var appState = {
 };
 
 // src/data/searchService.ts
+var GROUP_ORDER = [
+  "Document",
+  "Person",
+  "Organization",
+  "ClientInvoice",
+  "PurchaseOrder",
+  "Bill",
+  "Receipt",
+  "Payment"
+];
 var FACET_KEYS = [
   "entityType",
   "project",
@@ -1530,6 +1789,10 @@ var FACET_KEYS = [
   "client",
   "issuedDate",
   "totalValue",
+  "personType",
+  "contactOrganization",
+  "organizationType",
+  "tradeFocus",
   "groupBy"
 ];
 var CORPUS = [];
@@ -1568,22 +1831,47 @@ function normalizeRecord(record) {
     tags: record.tags ?? [],
     metadata: cleanMetadata
   };
-  if (record.entityType === "Document") {
-    return {
-      ...baseRecord,
-      entityType: "Document",
-      documentType: record.documentType,
-      author: record.author
-    };
-  } else {
-    return {
-      ...baseRecord,
-      entityType: record.entityType,
-      totalValue: record.totalValue,
-      issuedDate: record.issuedDate,
-      dueDate: record.dueDate,
-      lineItems: record.lineItems ?? []
-    };
+  switch (record.entityType) {
+    case "Document":
+      return {
+        ...baseRecord,
+        entityType: "Document",
+        documentType: record.documentType,
+        author: record.author
+      };
+    case "Person":
+      return {
+        ...baseRecord,
+        entityType: "Person",
+        personType: record.personType,
+        jobTitle: record.jobTitle,
+        associatedOrganization: record.associatedOrganization,
+        email: record.email,
+        phone: record.phone,
+        location: record.location,
+        tradeFocus: record.tradeFocus
+      };
+    case "Organization":
+      return {
+        ...baseRecord,
+        entityType: "Organization",
+        organizationType: record.organizationType,
+        tradeFocus: record.tradeFocus,
+        serviceArea: record.serviceArea,
+        primaryContact: record.primaryContact,
+        phone: record.phone,
+        email: record.email,
+        website: record.website
+      };
+    default:
+      return {
+        ...baseRecord,
+        entityType: record.entityType,
+        totalValue: record.totalValue,
+        issuedDate: record.issuedDate,
+        dueDate: record.dueDate,
+        lineItems: record.lineItems ?? []
+      };
   }
 }
 function buildHaystack(record) {
@@ -1596,11 +1884,30 @@ function buildHaystack(record) {
     record.tags.join(" "),
     ...Object.values(record.metadata ?? {}).map((value) => value == null ? "" : String(value))
   ];
-  if (record.entityType !== "Document") {
-    const financialRecord = record;
-    financialRecord.lineItems.forEach((item) => {
+  if (isFinancialRecord(record)) {
+    record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
     });
+  } else if (isPersonRecord(record)) {
+    base.push(
+      record.personType,
+      record.jobTitle,
+      record.associatedOrganization ?? "",
+      record.email,
+      record.phone,
+      record.location,
+      record.tradeFocus ?? ""
+    );
+  } else if (isOrganizationRecord(record)) {
+    base.push(
+      record.organizationType,
+      record.tradeFocus,
+      record.serviceArea,
+      record.primaryContact,
+      record.phone,
+      record.email,
+      record.website ?? ""
+    );
   }
   return base.filter((chunk) => Boolean(chunk)).join(" ").toLowerCase();
 }
@@ -1753,7 +2060,7 @@ function matchesMonetaryQuery(record, query) {
   if (amounts.length === 0 && textTokens.length === 0 && !range) {
     return true;
   }
-  if (record.entityType === "Document") {
+  if (!isFinancialRecord(record)) {
     return false;
   }
   const financialRecord = record;
@@ -1792,11 +2099,14 @@ function matchesMonetaryQuery(record, query) {
       }
     }
   }
+  const isExplicitMonetary = query.trim().startsWith("$");
+  if (isExplicitMonetary) {
+    return false;
+  }
   if (textTokens.length > 0) {
     for (const lineItem of financialRecord.lineItems) {
       const lineItemText = [
         lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
         lineItem.lineItemType
       ].join(" ").toLowerCase();
       if (textTokens.every((token) => lineItemText.includes(token))) {
@@ -1841,6 +2151,28 @@ function getFacetValue(record, key) {
         return void 0;
       }
       return bucketTotal(record.totalValue);
+    case "personType":
+      return isPersonRecord(record) ? record.personType : void 0;
+    case "contactOrganization":
+      if (isPersonRecord(record)) {
+        return record.associatedOrganization ?? void 0;
+      }
+      if (isOrganizationRecord(record)) {
+        return record.title;
+      }
+      return void 0;
+    case "organizationType":
+      return isOrganizationRecord(record) ? record.organizationType : void 0;
+    case "tradeFocus": {
+      if (isPersonRecord(record) && record.tradeFocus) {
+        return record.tradeFocus;
+      }
+      if (isOrganizationRecord(record)) {
+        return record.tradeFocus;
+      }
+      const metadataTrade = record.metadata?.tradeFocus;
+      return typeof metadataTrade === "string" ? metadataTrade : void 0;
+    }
     case "groupBy":
       return void 0;
     default:
@@ -1950,7 +2282,7 @@ function calculateMonetaryRelevanceScore(record, query) {
   if (amounts.length === 0 && textTokens.length === 0 && !range) {
     return 0;
   }
-  if (record.entityType === "Document") {
+  if (!isFinancialRecord(record)) {
     return 0;
   }
   const financialRecord = record;
@@ -2024,11 +2356,11 @@ function calculateMonetaryRelevanceScore(record, query) {
       }
     }
   }
-  if (textTokens.length > 0) {
+  const isExplicitMonetary = query.trim().startsWith("$");
+  if (!isExplicitMonetary && textTokens.length > 0) {
     for (const lineItem of financialRecord.lineItems) {
       const lineItemText = [
         lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
         lineItem.lineItemType
       ].join(" ").toLowerCase();
       const lineItemMatches = textTokens.filter((token) => lineItemText.includes(token)).length;
@@ -2115,7 +2447,18 @@ function buildGroups(records, groupBy) {
       }
       typeGroups.get(record.entityType).push(record);
     });
-    return Array.from(typeGroups.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([entityType, items]) => ({
+    return Array.from(typeGroups.entries()).sort((a, b) => {
+      const orderA = GROUP_ORDER.indexOf(a[0]);
+      const orderB = GROUP_ORDER.indexOf(b[0]);
+      if (orderA !== -1 || orderB !== -1) {
+        const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+        const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+        if (safeOrderA !== safeOrderB) {
+          return safeOrderA - safeOrderB;
+        }
+      }
+      return a[0].localeCompare(b[0]);
+    }).map(([entityType, items]) => ({
       entityType,
       items,
       groupTitle: entityType
@@ -2145,7 +2488,20 @@ function buildGroups(records, groupBy) {
     }
     map.get(groupKey).push(record);
   });
-  const sortedEntries = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  const sortedEntries = Array.from(map.entries()).sort((a, b) => {
+    if (groupBy === "Type") {
+      const orderA = GROUP_ORDER.indexOf(a[0]);
+      const orderB = GROUP_ORDER.indexOf(b[0]);
+      if (orderA !== -1 || orderB !== -1) {
+        const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+        const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+        if (safeOrderA !== safeOrderB) {
+          return safeOrderA - safeOrderB;
+        }
+      }
+    }
+    return a[0].localeCompare(b[0]);
+  });
   return sortedEntries.map(([groupKey, items]) => ({
     entityType: groupBy === "Type" ? groupKey : determineGroupEntityType(items),
     items,
@@ -2182,7 +2538,8 @@ async function runSearch(options, overrides) {
   const isGrouped = groupBy && groupBy !== "None";
   const fullGroups = buildGroups(records, groupBy);
   const limitedGroups = applyGroupLimits(fullGroups, groupLimits);
-  await wait(delay);
+  const effectiveDelay = options.query.trim().length < 3 ? Math.min(delay, 50) : delay;
+  await wait(effectiveDelay);
   return {
     query: options.query,
     totalResults: records.length,
@@ -2205,6 +2562,18 @@ if (!root) {
 var main = document.createElement("main");
 main.className = "app-main";
 var activeSearchToken = 0;
+var searchDebounceTimer = null;
+function debouncedSearch(value, options) {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+  const effectiveLength = getEffectiveQueryLength(value.trim());
+  const delay = effectiveLength < 2 ? 0 : 150;
+  searchDebounceTimer = window.setTimeout(() => {
+    void performSearch(value, options);
+    searchDebounceTimer = null;
+  }, delay);
+}
 var header = createHeader({
   onNavigate: (route) => navigate(route),
   onHome: () => {
@@ -2225,7 +2594,7 @@ var header = createHeader({
     appState.setSearchQuery(value);
     header.setMonetarySearchMode(isMonetaryQuery(value));
     const isHome = appState.getState().route === "home";
-    void performSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
+    debouncedSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
   },
   onSearchSubmit: () => {
     navigate("results");
@@ -2235,11 +2604,13 @@ var header = createHeader({
     if (appState.getState().route !== "home") {
       return;
     }
-    appState.setDialogOpen(true);
-    const query = appState.getState().searchQuery;
-    if (query.trim()) {
-      void performSearch(query, { openDialog: true, updateSubmitted: false });
-    }
+    requestAnimationFrame(() => {
+      appState.setDialogOpen(true);
+      const query = appState.getState().searchQuery;
+      if (query.trim()) {
+        debouncedSearch(query, { openDialog: true, updateSubmitted: false });
+      }
+    });
   },
   onSearchBlur: () => {
   },
@@ -2412,27 +2783,41 @@ function handleDocumentClick(event) {
   }
   appState.setDialogOpen(false);
 }
+var previousState = null;
 appState.subscribe((state) => {
-  Object.entries(screens).forEach(([route, element]) => {
-    element.hidden = route !== state.route;
-  });
-  header.searchInput.value = state.searchQuery;
-  header.setActiveRoute(state.route);
-  searchDialog.setState({
-    visible: state.dialogOpen && state.route === "home",
-    status: state.searchStatus,
-    query: state.searchQuery,
-    response: state.recentResponse,
-    isMonetarySearch: isMonetaryQuery(state.searchQuery)
-  });
-  resultsView.render({
-    response: state.recentResponse,
-    selections: state.facetSelections,
-    status: state.searchStatus,
-    query: state.lastSubmittedQuery || state.searchQuery,
-    errorMessage: state.errorMessage,
-    isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery)
-  });
+  if (!previousState || previousState.route !== state.route) {
+    Object.entries(screens).forEach(([route, element]) => {
+      element.hidden = route !== state.route;
+    });
+  }
+  if (!previousState || previousState.searchQuery !== state.searchQuery) {
+    header.searchInput.value = state.searchQuery;
+  }
+  if (!previousState || previousState.route !== state.route) {
+    header.setActiveRoute(state.route);
+  }
+  const dialogStateChanged = !previousState || previousState.dialogOpen !== state.dialogOpen || previousState.route !== state.route || previousState.searchStatus !== state.searchStatus || previousState.searchQuery !== state.searchQuery || previousState.recentResponse !== state.recentResponse;
+  if (dialogStateChanged) {
+    searchDialog.setState({
+      visible: state.dialogOpen && state.route === "home",
+      status: state.searchStatus,
+      query: state.searchQuery,
+      response: state.recentResponse,
+      isMonetarySearch: isMonetaryQuery(state.searchQuery)
+    });
+  }
+  const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.errorMessage !== state.errorMessage;
+  if (resultsStateChanged) {
+    resultsView.render({
+      response: state.recentResponse,
+      selections: state.facetSelections,
+      status: state.searchStatus,
+      query: state.lastSubmittedQuery || state.searchQuery,
+      errorMessage: state.errorMessage,
+      isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery)
+    });
+  }
+  previousState = state;
 });
 document.addEventListener("keydown", handleGlobalKeydown);
 document.addEventListener("mousedown", handleDocumentClick);

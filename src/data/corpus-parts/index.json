@@ -1,6 +1,6 @@
 {
-  "totalDocuments": 150,
-  "totalFiles": 5,
+  "totalDocuments": 170,
+  "totalFiles": 6,
   "documentsPerFile": 30,
   "files": [
     {
@@ -181,6 +181,32 @@
         "document-068",
         "document-069",
         "document-070"
+      ]
+    },
+    {
+      "filename": "corpus-part-06.json",
+      "documentCount": 20,
+      "documentIds": [
+        "organization-001",
+        "organization-002",
+        "organization-003",
+        "organization-004",
+        "organization-005",
+        "organization-006",
+        "organization-007",
+        "organization-008",
+        "person-001",
+        "person-002",
+        "person-003",
+        "person-004",
+        "person-005",
+        "person-006",
+        "person-007",
+        "person-008",
+        "person-009",
+        "person-010",
+        "person-011",
+        "person-012"
       ]
     }
   ]

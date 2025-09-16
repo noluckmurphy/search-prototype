@@ -4,7 +4,7 @@ import { createHeader } from './components/header';
 import { createSearchDialog } from './components/searchDialog';
 import { createResultsView } from './components/resultsView';
 import { createSettingsView } from './components/settingsView';
-import { appState } from './state/appState';
+import { appState, AppState } from './state/appState';
 import { runSearch } from './data/searchService';
 import { ScreenRoute } from './types';
 import { getEffectiveQueryLength, MIN_EFFECTIVE_QUERY_LENGTH } from './utils/query';
@@ -22,6 +22,23 @@ const main = document.createElement('main');
 main.className = 'app-main';
 
 let activeSearchToken = 0;
+let searchDebounceTimer: number | null = null;
+
+// Debounce search operations to reduce UI blocking
+function debouncedSearch(value: string, options: { openDialog?: boolean; updateSubmitted?: boolean }) {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+  
+  // For very short queries, search immediately to provide instant feedback
+  const effectiveLength = getEffectiveQueryLength(value.trim());
+  const delay = effectiveLength < 2 ? 0 : 150; // 150ms debounce for longer queries
+  
+  searchDebounceTimer = window.setTimeout(() => {
+    void performSearch(value, options);
+    searchDebounceTimer = null;
+  }, delay);
+}
 
 const header = createHeader({
   onNavigate: (route) => navigate(route),
@@ -44,13 +61,14 @@ const header = createHeader({
       appState.clearFacets();
     }
     
+    // Update search query immediately for responsive UI
     appState.setSearchQuery(value);
     
     // Set monetary search mode based on query
     header.setMonetarySearchMode(isMonetaryQuery(value));
     
     const isHome = appState.getState().route === 'home';
-    void performSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
+    debouncedSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
   },
   onSearchSubmit: () => {
     navigate('results');
@@ -60,11 +78,15 @@ const header = createHeader({
     if (appState.getState().route !== 'home') {
       return;
     }
-    appState.setDialogOpen(true);
-    const query = appState.getState().searchQuery;
-    if (query.trim()) {
-      void performSearch(query, { openDialog: true, updateSubmitted: false });
-    }
+    // Use requestAnimationFrame to defer heavy operations and keep UI responsive
+    requestAnimationFrame(() => {
+      appState.setDialogOpen(true);
+      const query = appState.getState().searchQuery;
+      if (query.trim()) {
+        // Use debounced search for focus events too
+        debouncedSearch(query, { openDialog: true, updateSubmitted: false });
+      }
+    });
   },
   onSearchBlur: () => {
     // Defer closing to outside-click + escape handlers.
@@ -278,30 +300,66 @@ function handleDocumentClick(event: MouseEvent) {
   appState.setDialogOpen(false);
 }
 
+// Track previous state to avoid unnecessary re-renders
+let previousState: AppState | null = null;
+
 appState.subscribe((state) => {
-  Object.entries(screens).forEach(([route, element]) => {
-    element.hidden = route !== state.route;
-  });
+  // Only update route visibility if route changed
+  if (!previousState || previousState.route !== state.route) {
+    Object.entries(screens).forEach(([route, element]) => {
+      element.hidden = route !== state.route;
+    });
+  }
 
-  header.searchInput.value = state.searchQuery;
-  header.setActiveRoute(state.route);
+  // Only update search input if query changed
+  if (!previousState || previousState.searchQuery !== state.searchQuery) {
+    header.searchInput.value = state.searchQuery;
+  }
 
-  searchDialog.setState({
-    visible: state.dialogOpen && state.route === 'home',
-    status: state.searchStatus,
-    query: state.searchQuery,
-    response: state.recentResponse,
-    isMonetarySearch: isMonetaryQuery(state.searchQuery),
-  });
+  // Only update active route if route changed
+  if (!previousState || previousState.route !== state.route) {
+    header.setActiveRoute(state.route);
+  }
 
-  resultsView.render({
-    response: state.recentResponse,
-    selections: state.facetSelections,
-    status: state.searchStatus,
-    query: state.lastSubmittedQuery || state.searchQuery,
-    errorMessage: state.errorMessage,
-    isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
-  });
+  // Only update search dialog if relevant state changed
+  const dialogStateChanged = !previousState || 
+    previousState.dialogOpen !== state.dialogOpen ||
+    previousState.route !== state.route ||
+    previousState.searchStatus !== state.searchStatus ||
+    previousState.searchQuery !== state.searchQuery ||
+    previousState.recentResponse !== state.recentResponse;
+
+  if (dialogStateChanged) {
+    searchDialog.setState({
+      visible: state.dialogOpen && state.route === 'home',
+      status: state.searchStatus,
+      query: state.searchQuery,
+      response: state.recentResponse,
+      isMonetarySearch: isMonetaryQuery(state.searchQuery),
+    });
+  }
+
+  // Only update results view if relevant state changed
+  const resultsStateChanged = !previousState ||
+    previousState.recentResponse !== state.recentResponse ||
+    previousState.facetSelections !== state.facetSelections ||
+    previousState.searchStatus !== state.searchStatus ||
+    previousState.lastSubmittedQuery !== state.lastSubmittedQuery ||
+    previousState.searchQuery !== state.searchQuery ||
+    previousState.errorMessage !== state.errorMessage;
+
+  if (resultsStateChanged) {
+    resultsView.render({
+      response: state.recentResponse,
+      selections: state.facetSelections,
+      status: state.searchStatus,
+      query: state.lastSubmittedQuery || state.searchQuery,
+      errorMessage: state.errorMessage,
+      isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
+    });
+  }
+
+  previousState = state;
 });
 
 document.addEventListener('keydown', handleGlobalKeydown);

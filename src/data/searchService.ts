@@ -4,16 +4,23 @@ import {
   FacetSelectionState,
   FacetValue,
   FinancialRecord,
+  OrganizationRecord,
+  PersonRecord,
   SearchEntityType,
   SearchGroup,
   SearchOptions,
   SearchRecord,
   SearchResponse,
+  isFinancialRecord,
+  isOrganizationRecord,
+  isPersonRecord,
 } from '../types';
 import { settingsStore } from '../state/settingsStore';
 
 const GROUP_ORDER: SearchEntityType[] = [
   'Document',
+  'Person',
+  'Organization',
   'ClientInvoice',
   'PurchaseOrder',
   'Bill',
@@ -29,6 +36,10 @@ const FACET_KEYS: FacetKey[] = [
   'client',
   'issuedDate',
   'totalValue',
+  'personType',
+  'contactOrganization',
+  'organizationType',
+  'tradeFocus',
   'groupBy',
 ];
 
@@ -81,22 +92,47 @@ function normalizeRecord(record: any): SearchRecord {
     metadata: cleanMetadata,
   };
 
-  if (record.entityType === 'Document') {
-    return {
-      ...baseRecord,
-      entityType: 'Document' as const,
-      documentType: record.documentType,
-      author: record.author,
-    } as DocumentRecord;
-  } else {
-    return {
-      ...baseRecord,
-      entityType: record.entityType as Exclude<SearchEntityType, 'Document'>,
-      totalValue: record.totalValue,
-      issuedDate: record.issuedDate,
-      dueDate: record.dueDate,
-      lineItems: record.lineItems ?? [],
-    } as FinancialRecord;
+  switch (record.entityType as SearchEntityType) {
+    case 'Document':
+      return {
+        ...baseRecord,
+        entityType: 'Document',
+        documentType: record.documentType,
+        author: record.author,
+      } as DocumentRecord;
+    case 'Person':
+      return {
+        ...baseRecord,
+        entityType: 'Person',
+        personType: record.personType,
+        jobTitle: record.jobTitle,
+        associatedOrganization: record.associatedOrganization,
+        email: record.email,
+        phone: record.phone,
+        location: record.location,
+        tradeFocus: record.tradeFocus,
+      } as PersonRecord;
+    case 'Organization':
+      return {
+        ...baseRecord,
+        entityType: 'Organization',
+        organizationType: record.organizationType,
+        tradeFocus: record.tradeFocus,
+        serviceArea: record.serviceArea,
+        primaryContact: record.primaryContact,
+        phone: record.phone,
+        email: record.email,
+        website: record.website,
+      } as OrganizationRecord;
+    default:
+      return {
+        ...baseRecord,
+        entityType: record.entityType,
+        totalValue: record.totalValue,
+        issuedDate: record.issuedDate,
+        dueDate: record.dueDate,
+        lineItems: record.lineItems ?? [],
+      } as FinancialRecord;
   }
 }
 
@@ -111,11 +147,30 @@ function buildHaystack(record: SearchRecord): string {
     ...Object.values(record.metadata ?? {}).map((value) => (value == null ? '' : String(value))),
   ];
 
-  if (record.entityType !== 'Document') {
-    const financialRecord = record as Extract<SearchRecord, { entityType: Exclude<SearchEntityType, 'Document'> }>;
-    financialRecord.lineItems.forEach((item) => {
+  if (isFinancialRecord(record)) {
+    record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
     });
+  } else if (isPersonRecord(record)) {
+    base.push(
+      record.personType,
+      record.jobTitle,
+      record.associatedOrganization ?? '',
+      record.email,
+      record.phone,
+      record.location,
+      record.tradeFocus ?? '',
+    );
+  } else if (isOrganizationRecord(record)) {
+    base.push(
+      record.organizationType,
+      record.tradeFocus,
+      record.serviceArea,
+      record.primaryContact,
+      record.phone,
+      record.email,
+      record.website ?? '',
+    );
   }
 
   return base
@@ -368,11 +423,11 @@ function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
   }
 
   // For monetary searches, focus on financial records and their line items
-  if (record.entityType === 'Document') {
-    return false; // Skip documents for monetary searches
+  if (!isFinancialRecord(record)) {
+    return false; // Skip non-financial records for monetary searches
   }
 
-  const financialRecord = record as FinancialRecord;
+  const financialRecord = record;
   
   // Handle range queries
   if (range) {
@@ -427,12 +482,23 @@ function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
     }
   }
 
-  // Check text tokens against line item descriptions
+  // For explicit monetary searches (queries starting with $), be more restrictive
+  // Only match against monetary values, not descriptions or quantities
+  const isExplicitMonetary = query.trim().startsWith('$');
+  
+  if (isExplicitMonetary) {
+    // For explicit monetary searches, don't match against descriptions or quantities
+    // Only match against actual monetary values (totals, unit prices)
+    return false; // We've already checked all monetary values above
+  }
+
+  // For non-explicit monetary searches (like "123"), allow text token matching
+  // but still be more restrictive about what we match against
   if (textTokens.length > 0) {
     for (const lineItem of financialRecord.lineItems) {
+      // Only match against line item titles and types, not descriptions or quantities
       const lineItemText = [
         lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
         lineItem.lineItemType
       ].join(' ').toLowerCase();
 
@@ -484,6 +550,28 @@ function getFacetValue(record: SearchRecord, key: FacetKey): string | undefined 
         return undefined;
       }
       return bucketTotal((record as any).totalValue);
+    case 'personType':
+      return isPersonRecord(record) ? record.personType : undefined;
+    case 'contactOrganization':
+      if (isPersonRecord(record)) {
+        return record.associatedOrganization ?? undefined;
+      }
+      if (isOrganizationRecord(record)) {
+        return record.title;
+      }
+      return undefined;
+    case 'organizationType':
+      return isOrganizationRecord(record) ? record.organizationType : undefined;
+    case 'tradeFocus': {
+      if (isPersonRecord(record) && record.tradeFocus) {
+        return record.tradeFocus;
+      }
+      if (isOrganizationRecord(record)) {
+        return record.tradeFocus;
+      }
+      const metadataTrade = record.metadata?.tradeFocus;
+      return typeof metadataTrade === 'string' ? metadataTrade : undefined;
+    }
     case 'groupBy':
       // This facet is handled specially - it's not a property of individual records
       return undefined;
@@ -638,11 +726,11 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
     return 0;
   }
 
-  if (record.entityType === 'Document') {
-    return 0; // Skip documents for monetary searches
+  if (!isFinancialRecord(record)) {
+    return 0; // Skip non-financial records for monetary searches
   }
 
-  const financialRecord = record as FinancialRecord;
+  const financialRecord = record;
   let score = 0;
   
   // Handle range queries
@@ -736,12 +824,17 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
     }
   }
 
-  // Check text tokens against line item descriptions
-  if (textTokens.length > 0) {
+  // For explicit monetary searches (queries starting with $), be more restrictive
+  // Only score against monetary values, not descriptions or quantities
+  const isExplicitMonetary = query.trim().startsWith('$');
+  
+  if (!isExplicitMonetary && textTokens.length > 0) {
+    // For non-explicit monetary searches (like "123"), allow text token matching
+    // but still be more restrictive about what we match against
     for (const lineItem of financialRecord.lineItems) {
+      // Only match against line item titles and types, not descriptions or quantities
       const lineItemText = [
         lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
         lineItem.lineItemType
       ].join(' ').toLowerCase();
       
@@ -868,7 +961,18 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
     
     // Convert to SearchGroup array, sorted by entity type
     return Array.from(typeGroups.entries())
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => {
+        const orderA = GROUP_ORDER.indexOf(a[0]);
+        const orderB = GROUP_ORDER.indexOf(b[0]);
+        if (orderA !== -1 || orderB !== -1) {
+          const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+          const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+          if (safeOrderA !== safeOrderB) {
+            return safeOrderA - safeOrderB;
+          }
+        }
+        return a[0].localeCompare(b[0]);
+      })
       .map(([entityType, items]) => ({
         entityType,
         items,
@@ -905,7 +1009,20 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
   });
 
   // Sort groups by key name for consistent ordering
-  const sortedEntries = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  const sortedEntries = Array.from(map.entries()).sort((a, b) => {
+    if (groupBy === 'Type') {
+      const orderA = GROUP_ORDER.indexOf(a[0] as SearchEntityType);
+      const orderB = GROUP_ORDER.indexOf(b[0] as SearchEntityType);
+      if (orderA !== -1 || orderB !== -1) {
+        const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+        const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+        if (safeOrderA !== safeOrderB) {
+          return safeOrderA - safeOrderB;
+        }
+      }
+    }
+    return a[0].localeCompare(b[0]);
+  });
 
   return sortedEntries.map(([groupKey, items]) => ({
     entityType: groupBy === 'Type' ? groupKey as SearchEntityType : determineGroupEntityType(items),
@@ -960,7 +1077,9 @@ export async function runSearch(
   const fullGroups = buildGroups(records, groupBy);
   const limitedGroups = applyGroupLimits(fullGroups, groupLimits);
 
-  await wait(delay);
+  // Reduce delay for better responsiveness, especially for short queries
+  const effectiveDelay = options.query.trim().length < 3 ? Math.min(delay, 50) : delay;
+  await wait(effectiveDelay);
 
   return {
     query: options.query,

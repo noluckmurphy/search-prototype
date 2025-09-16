@@ -8,6 +8,7 @@
 import { TestFramework } from './test-framework.js';
 import { searchServiceTests } from './unit/search-service.test.js';
 import { monetaryTests } from './unit/monetary.test.js';
+import { monetarySearchTests } from './unit/monetary-search.test.js';
 import { SearchIntegrationTests } from './integration/search-integration.test.js';
 import { MonetaryIntegrationTests } from './integration/monetary-integration.test.js';
 
@@ -39,7 +40,8 @@ class TestRunner {
     
     const unitTestSuites = [
       { name: 'Search Service Unit Tests', suite: searchServiceTests },
-      { name: 'Monetary Search Unit Tests', suite: monetaryTests }
+      { name: 'Monetary Search Unit Tests', suite: monetaryTests },
+      { name: 'Monetary Search Behavior Tests', suite: monetarySearchTests }
     ];
 
     for (const { name, suite } of unitTestSuites) {

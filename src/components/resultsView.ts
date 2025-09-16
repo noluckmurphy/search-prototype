@@ -5,6 +5,9 @@ import {
   SearchGroup,
   SearchRecord,
   SearchResponse,
+  isFinancialRecord,
+  isOrganizationRecord,
+  isPersonRecord,
 } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
@@ -43,6 +46,10 @@ const FACET_LABELS: Record<FacetKey, string> = {
   issuedDate: 'Issued',
   totalValue: 'Total',
   groupBy: 'Group by',
+  personType: 'Person Type',
+  contactOrganization: 'Contact Organization',
+  organizationType: 'Organization Type',
+  tradeFocus: 'Trade Focus',
 };
 
 export interface ResultsViewOptions {
@@ -99,15 +106,56 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
     options.onClearFacets?.();
   });
 
+  // Track previous context to avoid unnecessary re-renders
+  let previousContext: ResultsRenderContext | null = null;
+
   const render = (context: ResultsRenderContext) => {
     const { response, selections, status, query, errorMessage, isMonetarySearch } = context;
 
-    renderSummary(summaryEl, status, response, query, errorMessage);
-    renderFacets(facetsContainer, status, response, selections, options);
-    renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
+    // Only update summary if relevant state changed
+    const summaryChanged = !previousContext ||
+      previousContext.status !== status ||
+      previousContext.response !== response ||
+      previousContext.query !== query ||
+      previousContext.errorMessage !== errorMessage;
 
-    const hasSelections = selections && Object.keys(selections).length > 0;
-    clearButton.hidden = !hasSelections;
+    if (summaryChanged) {
+      renderSummary(summaryEl, status, response, query, errorMessage);
+    }
+
+    // Only update facets if relevant state changed
+    const facetsChanged = !previousContext ||
+      previousContext.status !== status ||
+      previousContext.response !== response ||
+      previousContext.selections !== selections;
+
+    if (facetsChanged) {
+      renderFacets(facetsContainer, status, response, selections, options);
+    }
+
+    // Only update results if relevant state changed
+    const resultsChanged = !previousContext ||
+      previousContext.status !== status ||
+      previousContext.response !== response ||
+      previousContext.query !== query ||
+      previousContext.errorMessage !== errorMessage ||
+      previousContext.isMonetarySearch !== isMonetarySearch;
+
+    if (resultsChanged) {
+      // Use requestAnimationFrame to defer heavy DOM operations
+      requestAnimationFrame(() => {
+        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
+      });
+    }
+
+    // Only update clear button if selections changed
+    const selectionsChanged = !previousContext || previousContext.selections !== selections;
+    if (selectionsChanged) {
+      const hasSelections = selections && Object.keys(selections).length > 0;
+      clearButton.hidden = !hasSelections;
+    }
+
+    previousContext = context;
   };
 
   return {
@@ -359,7 +407,7 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
     }
   }
 
-  if (item.entityType !== 'Document') {
+  if (isFinancialRecord(item)) {
     const lineItemsBlock = renderLineItems(item, query, isMonetarySearch);
     if (lineItemsBlock) {
       card.append(lineItemsBlock);
@@ -372,57 +420,72 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
 function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLLIElement[] {
   const metas: HTMLLIElement[] = [];
 
-  const project = document.createElement('li');
-  project.innerHTML = `<span>Project</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(item.project, query) : highlightText(item.project, query)) : item.project}</strong>`;
-  metas.push(project);
+  const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+  const highlightValue = (value: string) => (highlightFn ? highlightFn(value, query!) : value);
 
-  const status = document.createElement('li');
-  status.innerHTML = `<span>Status</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(item.status, query) : highlightText(item.status, query)) : item.status}</strong>`;
-  metas.push(status);
+  const pushMeta = (label: string, value?: string) => {
+    if (!value) {
+      return;
+    }
+    const entry = document.createElement('li');
+    entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
+    metas.push(entry);
+  };
+
+  pushMeta('Project', item.project);
+  pushMeta('Status', item.status);
 
   if (item.entityType === 'Document') {
     const doc = item as any;
+    pushMeta('Type', doc.documentType);
+    pushMeta('Updated', formatDate(item.updatedAt));
+    return metas;
+  }
 
-    const docType = document.createElement('li');
-    docType.innerHTML = `<span>Type</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(doc.documentType, query) : highlightText(doc.documentType, query)) : doc.documentType}</strong>`;
-    metas.push(docType);
-
-    const updated = document.createElement('li');
-    updated.innerHTML = `<span>Updated</span><strong>${formatDate(item.updatedAt)}</strong>`;
-    metas.push(updated);
-  } else {
-    const financial = item as any;
-
-    const issued = document.createElement('li');
-    issued.innerHTML = `<span>Issued</span><strong>${formatDate(financial.issuedDate)}</strong>`;
-    metas.push(issued);
-
-    if (financial.dueDate) {
-      const due = document.createElement('li');
-      due.innerHTML = `<span>Due</span><strong>${formatDate(financial.dueDate)}</strong>`;
-      metas.push(due);
+  if (isFinancialRecord(item)) {
+    pushMeta('Issued', formatDate(item.issuedDate));
+    if (item.dueDate) {
+      pushMeta('Due', formatDate(item.dueDate));
     }
+    pushMeta('Total', formatCurrency(item.totalValue));
+    return metas;
+  }
 
-    const total = document.createElement('li');
-    const totalValue = formatCurrency(financial.totalValue);
-    total.innerHTML = `<span>Total</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(totalValue, query) : highlightText(totalValue, query)) : totalValue}</strong>`;
-    metas.push(total);
+  if (isPersonRecord(item)) {
+    pushMeta('Person Type', item.personType);
+    pushMeta('Role', item.jobTitle);
+    pushMeta('Organization', item.associatedOrganization);
+    pushMeta('Location', item.location);
+    pushMeta('Email', item.email);
+    pushMeta('Phone', item.phone);
+    pushMeta('Trade Focus', item.tradeFocus ?? undefined);
+    return metas;
+  }
+
+  if (isOrganizationRecord(item)) {
+    pushMeta('Business Type', item.organizationType);
+    pushMeta('Trade', item.tradeFocus);
+    pushMeta('Service Area', item.serviceArea);
+    pushMeta('Primary Contact', item.primaryContact);
+    pushMeta('Phone', item.phone);
+    pushMeta('Email', item.email);
+    pushMeta('Website', item.website ?? undefined);
+    return metas;
   }
 
   return metas;
 }
 
 function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch?: boolean): boolean {
-  if (!query) return false;
+  if (!query || !isFinancialRecord(item)) return false;
   
-  const financial = item as any;
-  const items = financial.lineItems ?? [];
+  const items = item.lineItems ?? [];
   if (items.length === 0) return false;
 
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
 
   // Check if any line item has actual highlighting matches
-  return items.some((lineItem: any) => {
+  return items.some((lineItem) => {
     const searchableFields = [
       lineItem.lineItemTitle,
       lineItem.lineItemDescription,
@@ -443,10 +506,9 @@ function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch
 }
 
 function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMonetarySearch?: boolean): number[] {
-  if (!query) return [];
+  if (!query || !isFinancialRecord(item)) return [];
   
-  const financial = item as any;
-  const items = financial.lineItems ?? [];
+  const items = item.lineItems ?? [];
   if (items.length === 0) return [];
 
   const matchingIndices: number[] = [];
@@ -478,9 +540,86 @@ function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMoneta
   return matchingIndices;
 }
 
+interface MatchGroup {
+  startIndex: number;
+  endIndex: number;
+  indices: number[];
+}
+
+function groupMatchingLineItems(matchingIndices: number[], collapseThreshold: number): MatchGroup[] {
+  if (matchingIndices.length === 0) return [];
+  
+  const groups: MatchGroup[] = [];
+  let currentGroup: MatchGroup = {
+    startIndex: matchingIndices[0],
+    endIndex: matchingIndices[0],
+    indices: [matchingIndices[0]]
+  };
+  
+  for (let i = 1; i < matchingIndices.length; i++) {
+    const currentIndex = matchingIndices[i];
+    const lastIndex = matchingIndices[i - 1];
+    
+    // If the gap is within the threshold, add to current group
+    if (currentIndex - lastIndex <= collapseThreshold) {
+      currentGroup.endIndex = currentIndex;
+      currentGroup.indices.push(currentIndex);
+    } else {
+      // Gap is too large, start a new group
+      groups.push(currentGroup);
+      currentGroup = {
+        startIndex: currentIndex,
+        endIndex: currentIndex,
+        indices: [currentIndex]
+      };
+    }
+  }
+  
+  // Add the last group
+  groups.push(currentGroup);
+  
+  return groups;
+}
+
+function calculateDisplayRanges(
+  groups: MatchGroup[], 
+  contextCount: number, 
+  totalItems: number
+): Array<{ start: number; end: number; isCollapsed?: boolean }> {
+  if (groups.length === 0) return [];
+  
+  const ranges: Array<{ start: number; end: number; isCollapsed?: boolean }> = [];
+  
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    
+    // Calculate the range for this group with context
+    const start = Math.max(0, group.startIndex - contextCount);
+    const end = Math.min(totalItems - 1, group.endIndex + contextCount);
+    
+    ranges.push({ start, end });
+    
+    // Add collapsed range between groups (except after the last group)
+    if (i < groups.length - 1) {
+      const nextGroup = groups[i + 1];
+      const gapStart = end + 1;
+      const gapEnd = Math.max(0, nextGroup.startIndex - contextCount) - 1;
+      
+      if (gapStart <= gapEnd) {
+        ranges.push({ start: gapStart, end: gapEnd, isCollapsed: true });
+      }
+    }
+  }
+  
+  return ranges;
+}
+
 function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement | null {
-  const financial = item as any;
-  const items = financial.lineItems ?? [];
+  if (!isFinancialRecord(item)) {
+    return null;
+  }
+
+  const items = item.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }
@@ -498,6 +637,24 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   const heading = document.createElement('h4');
   heading.textContent = 'Line items';
   wrapper.append(heading);
+
+  // Helper function to render a line item row
+  const renderLineItemRow = (line: any, index: number): HTMLTableRowElement => {
+    const row = document.createElement('tr');
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+    
+    row.innerHTML = `
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
+    `;
+    return row;
+  };
 
   // If we shouldn't show line items by default and there are no matches, show a toggle link
   if (!shouldShowLineItems) {
@@ -581,102 +738,151 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   const contextCount = settings.lineItemsContextCount;
   const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
   
-  // Determine which items to show
-  let displayItems: any[];
-  let remainingItems: any[] = [];
+  // Determine which items to show initially
+  let displayRanges: Array<{ start: number; end: number; isCollapsed?: boolean }> = [];
+  let hiddenItems: any[] = [];
   
   if (hasMatches && contextCount > 0) {
-    // When there are matches, always include matched items and show context around them
     const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
     
     if (matchingIndices.length > 0) {
-      // Find the range of items to show around matches
-      const minIndex = Math.min(...matchingIndices);
-      const maxIndex = Math.max(...matchingIndices);
-      
-      // Calculate start and end indices with context
-      const startIndex = Math.max(0, minIndex - contextCount);
-      const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-      
-      displayItems = items.slice(startIndex, endIndex);
-      remainingItems = [
-        ...items.slice(0, startIndex),
-        ...items.slice(endIndex)
-      ];
+      if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+        // Use smart grouping logic
+        const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+        displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+        
+        // Calculate hidden items (items in collapsed ranges)
+        hiddenItems = [];
+        displayRanges.forEach(range => {
+          if (range.isCollapsed) {
+            for (let i = range.start; i <= range.end; i++) {
+              hiddenItems.push(items[i]);
+            }
+          }
+        });
+      } else {
+        // Original logic: show all items between first and last match
+        const minIndex = Math.min(...matchingIndices);
+        const maxIndex = Math.max(...matchingIndices);
+        
+        const startIndex = Math.max(0, minIndex - contextCount);
+        const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+        
+        displayRanges = [{ start: startIndex, end: endIndex - 1 }];
+        hiddenItems = [
+          ...items.slice(0, startIndex),
+          ...items.slice(endIndex)
+        ];
+      }
     } else {
       // Fallback: show first contextCount items
-      displayItems = items.slice(0, contextCount);
-      remainingItems = items.slice(contextCount);
+      displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
+      hiddenItems = items.slice(contextCount);
     }
   } else {
     // No matches or contextCount is 0: show all items
-    displayItems = items;
-    remainingItems = [];
+    displayRanges = [{ start: 0, end: items.length - 1 }];
+    hiddenItems = [];
   }
   
-  // Render visible items
-  displayItems.forEach((line: any) => {
-    const row = document.createElement('tr');
-    const unitPrice = formatCurrency(line.lineItemUnitPrice);
-    const total = formatCurrency(line.lineItemTotal);
-    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    
-    row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
-    `;
-    tbody.append(row);
+  // Track collapsed rows and their replacement content
+  const collapsedRows: HTMLTableRowElement[] = [];
+  const collapsedContent: HTMLTableRowElement[][] = [];
+
+  // Render items according to display ranges
+  displayRanges.forEach((range) => {
+    if (range.isCollapsed) {
+      // Add collapsed placeholder row
+      const collapsedRow = document.createElement('tr');
+      collapsedRow.className = 'line-item__collapsed';
+      const itemCount = range.end - range.start + 1;
+      collapsedRow.innerHTML = `
+        <td colspan="5" class="line-item__collapsed-content">
+          <span class="line-item__collapsed-text">...</span>
+          <span class="line-item__collapsed-count">${itemCount} items</span>
+        </td>
+      `;
+      tbody.append(collapsedRow);
+      collapsedRows.push(collapsedRow);
+      
+      // Create the actual content rows for this collapsed range
+      const contentRows: HTMLTableRowElement[] = [];
+      for (let i = range.start; i <= range.end; i++) {
+        const lineItemRow = renderLineItemRow(items[i], i);
+        lineItemRow.style.display = 'none'; // Initially hidden
+        tbody.append(lineItemRow);
+        contentRows.push(lineItemRow);
+      }
+      collapsedContent.push(contentRows);
+    } else {
+      // Add regular line item rows for this range
+      for (let i = range.start; i <= range.end; i++) {
+        const lineItemRow = renderLineItemRow(items[i], i);
+        tbody.append(lineItemRow);
+      }
+    }
   });
 
-  // Add remaining items (initially hidden) if there are any
+  // Add hidden items (initially hidden) if there are any
   const hiddenRows: HTMLTableRowElement[] = [];
-  remainingItems.forEach((line: any) => {
-    const row = document.createElement('tr');
-    row.style.display = 'none';
-    const unitPrice = formatCurrency(line.lineItemUnitPrice);
-    const total = formatCurrency(line.lineItemTotal);
-    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    
-    row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
-    `;
-    tbody.append(row);
-    hiddenRows.push(row);
+  hiddenItems.forEach((line: any) => {
+    const lineItemRow = renderLineItemRow(line, 0); // index doesn't matter for hidden items
+    lineItemRow.style.display = 'none';
+    tbody.append(lineItemRow);
+    hiddenRows.push(lineItemRow);
   });
 
   table.append(tbody);
   wrapper.append(table);
 
-  // Add toggle button for remaining items if there are any
-  if (remainingItems.length > 0) {
+  // Calculate total hidden count (collapsed content + hidden items)
+  const totalCollapsedCount = collapsedContent.reduce((sum, rows) => sum + rows.length, 0);
+  const totalHiddenCount = totalCollapsedCount + hiddenItems.length;
+
+  // Add single toggle button for all hidden content if there are any
+  if (totalHiddenCount > 0) {
     const toggleButton = document.createElement('button');
     toggleButton.className = 'line-items-toggle';
     toggleButton.type = 'button';
-    const remainingCount = remainingItems.length;
-    toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? '' : 's'}`;
+    toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? '' : 's'}`;
     
     toggleButton.addEventListener('click', () => {
       const isHidden = hiddenRows[0]?.style.display === 'none';
       
       if (isHidden) {
-        // Show remaining items
+        // Show all hidden content
+        // Hide collapsed placeholder rows
+        collapsedRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        // Show collapsed content
+        collapsedContent.forEach(contentRows => {
+          contentRows.forEach(row => {
+            row.style.display = '';
+          });
+        });
+        // Show hidden items
         hiddenRows.forEach(row => {
           row.style.display = '';
         });
-        toggleButton.textContent = `Hide ${remainingCount} line item${remainingCount === 1 ? '' : 's'}`;
+        toggleButton.textContent = `Hide ${totalHiddenCount} line item${totalHiddenCount === 1 ? '' : 's'}`;
       } else {
-        // Hide remaining items
+        // Hide all hidden content
+        // Show collapsed placeholder rows
+        collapsedRows.forEach(row => {
+          row.style.display = '';
+        });
+        // Hide collapsed content
+        collapsedContent.forEach(contentRows => {
+          contentRows.forEach(row => {
+            row.style.display = 'none';
+          });
+        });
+        // Hide hidden items
         hiddenRows.forEach(row => {
           row.style.display = 'none';
         });
-        toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? '' : 's'}`;
+        toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? '' : 's'}`;
       }
     });
     
