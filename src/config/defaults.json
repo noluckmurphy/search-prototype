@@ -1,0 +1,11 @@
+{
+  "searchDelayMs": 100,
+  "groupLimits": {
+    "Document": 5,
+    "ClientInvoice": 4,
+    "PurchaseOrder": 4,
+    "Bill": 4,
+    "Receipt": 4,
+    "Payment": 4
+  }
+}

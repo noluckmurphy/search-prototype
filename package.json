@@ -1,0 +1,13 @@
+{
+  "name": "search-prototype",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --outdir=public/assets --format=esm --sourcemap --loader:.css=css",
+    "dev": "npm run build -- --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.9",
+    "typescript": "^5.4.2"
+  }
+}
