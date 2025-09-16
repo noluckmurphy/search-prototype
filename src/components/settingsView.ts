@@ -20,6 +20,13 @@ export function createSettingsView(): SettingsViewHandles {
   const form = document.createElement('form');
   form.className = 'settings-form';
 
+  // Overall Settings Section
+  const overallSection = document.createElement('fieldset');
+  overallSection.className = 'settings-group';
+  overallSection.innerHTML = `
+    <legend>Overall</legend>
+  `;
+
   const delayField = document.createElement('div');
   delayField.className = 'settings-field';
   delayField.innerHTML = `
@@ -33,6 +40,32 @@ export function createSettingsView(): SettingsViewHandles {
   delayInput.step = '10';
 
   delayField.append(delayInput);
+  overallSection.append(delayField);
+
+  // Full Results Page Settings Section
+  const resultsSection = document.createElement('fieldset');
+  resultsSection.className = 'settings-group';
+  resultsSection.innerHTML = `
+    <legend>Full Results Page</legend>
+  `;
+
+  const lineItemsContextField = document.createElement('div');
+  lineItemsContextField.className = 'settings-field';
+  lineItemsContextField.innerHTML = `
+    <label for="line-items-context">Line items context around matches</label>
+  `;
+
+  const lineItemsContextSelect = document.createElement('select');
+  lineItemsContextSelect.id = 'line-items-context';
+  lineItemsContextSelect.innerHTML = `
+    <option value="1">1 before/after</option>
+    <option value="2">2 before/after</option>
+    <option value="3">3 before/after</option>
+    <option value="0">All line items</option>
+  `;
+
+  lineItemsContextField.append(lineItemsContextSelect);
+  resultsSection.append(lineItemsContextField);
 
   const groupSection = document.createElement('fieldset');
   groupSection.className = 'settings-group';
@@ -59,7 +92,7 @@ export function createSettingsView(): SettingsViewHandles {
 
   actions.append(saveButton, resetButton);
 
-  form.append(delayField, groupSection, actions);
+  form.append(overallSection, resultsSection, groupSection, actions);
   container.append(heading, form);
 
   const groupInputs = new Map<string, HTMLInputElement>();
@@ -92,6 +125,7 @@ export function createSettingsView(): SettingsViewHandles {
   const render = () => {
     const state = settingsStore.getState();
     delayInput.value = String(state.searchDelayMs);
+    lineItemsContextSelect.value = String(state.lineItemsContextCount);
     renderGroupInputs(state.groupLimits);
   };
 
@@ -101,6 +135,9 @@ export function createSettingsView(): SettingsViewHandles {
     const nextDelay = Number.parseInt(delayInput.value, 10);
     const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
 
+    const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
+    const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
+
     const groupLimits: Record<string, number> = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -109,6 +146,7 @@ export function createSettingsView(): SettingsViewHandles {
 
     settingsStore.update({
       searchDelayMs: resolvedDelay,
+      lineItemsContextCount: resolvedLineItemsContext,
       groupLimits,
     });
 

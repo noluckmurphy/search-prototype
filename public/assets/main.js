@@ -472,6 +472,116 @@ function escapeHtml2(value) {
   return div.innerHTML;
 }
 
+// src/config/defaults.json
+var defaults_default = {
+  searchDelayMs: 100,
+  groupLimits: {
+    Document: 5,
+    ClientInvoice: 4,
+    PurchaseOrder: 4,
+    Bill: 4,
+    Receipt: 4,
+    Payment: 4
+  },
+  lineItemsContextCount: 3
+};
+
+// src/state/store.ts
+function createStore(initialState3) {
+  let state = initialState3;
+  const listeners = /* @__PURE__ */ new Set();
+  const getState = () => state;
+  const setState = (updater) => {
+    const nextState = typeof updater === "function" ? updater(state) : { ...state, ...updater };
+    if (Object.is(nextState, state)) {
+      return;
+    }
+    state = nextState;
+    listeners.forEach((listener) => listener(state));
+  };
+  const subscribe = (listener) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+  return { getState, setState, subscribe };
+}
+
+// src/state/settingsStore.ts
+var STORAGE_KEY = "search-prototype.settings";
+var DEFAULTS = normalize(defaults_default);
+function normalize(state) {
+  return {
+    ...state,
+    groupLimits: { ...state.groupLimits },
+    lineItemsContextCount: state.lineItemsContextCount ?? 3
+  };
+}
+function mergeSettings(base, overrides) {
+  if (!overrides) {
+    return normalize(base);
+  }
+  return {
+    ...base,
+    ...overrides,
+    groupLimits: {
+      ...base.groupLimits,
+      ...overrides.groupLimits ?? {}
+    }
+  };
+}
+function readPersisted() {
+  if (typeof window === "undefined") {
+    return void 0;
+  }
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return void 0;
+    }
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn("Failed to parse persisted settings; falling back to defaults.", error);
+    return void 0;
+  }
+}
+function persist(state) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+var initialState = mergeSettings(DEFAULTS, readPersisted());
+var store = createStore(initialState);
+store.subscribe((state) => {
+  persist(state);
+});
+var settingsStore = {
+  getState: store.getState,
+  subscribe: store.subscribe,
+  update(partial) {
+    store.setState((prev) => mergeSettings(prev, partial));
+  },
+  setGroupLimit(section, limit) {
+    store.setState(
+      (prev) => mergeSettings(prev, {
+        groupLimits: {
+          ...prev.groupLimits,
+          [section]: limit
+        }
+      })
+    );
+  },
+  reset() {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+    store.setState(() => normalize(DEFAULTS));
+  },
+  get defaults() {
+    return normalize(DEFAULTS);
+  }
+};
+
 // src/components/resultsView.ts
 var FACET_LABELS = {
   entityType: "Type",
@@ -754,7 +864,9 @@ function renderLineItems(item, query, isMonetarySearch) {
   thead.append(headerRow);
   table.append(thead);
   const tbody = document.createElement("tbody");
-  const displayItems = items.slice(0, 3);
+  const settings = settingsStore.getState();
+  const contextCount = settings.lineItemsContextCount;
+  const displayItems = contextCount === 0 ? items : items.slice(0, contextCount);
   displayItems.forEach((line) => {
     const row = document.createElement("tr");
     const unitPrice = formatCurrency(line.lineItemUnitPrice);
@@ -769,10 +881,10 @@ function renderLineItems(item, query, isMonetarySearch) {
     `;
     tbody.append(row);
   });
-  if (items.length > 3) {
+  if (contextCount > 0 && items.length > contextCount) {
     const moreRow = document.createElement("tr");
     moreRow.className = "line-item__more-row";
-    const remaining = items.length - 3;
+    const remaining = items.length - contextCount;
     moreRow.innerHTML = `
       <td colspan="5" class="line-item__more">${remaining} more line item${remaining === 1 ? "" : "s"}\u2026</td>
     `;
@@ -808,114 +920,6 @@ function getFieldLabel(field) {
   return labels[field] || field;
 }
 
-// src/config/defaults.json
-var defaults_default = {
-  searchDelayMs: 100,
-  groupLimits: {
-    Document: 5,
-    ClientInvoice: 4,
-    PurchaseOrder: 4,
-    Bill: 4,
-    Receipt: 4,
-    Payment: 4
-  }
-};
-
-// src/state/store.ts
-function createStore(initialState3) {
-  let state = initialState3;
-  const listeners = /* @__PURE__ */ new Set();
-  const getState = () => state;
-  const setState = (updater) => {
-    const nextState = typeof updater === "function" ? updater(state) : { ...state, ...updater };
-    if (Object.is(nextState, state)) {
-      return;
-    }
-    state = nextState;
-    listeners.forEach((listener) => listener(state));
-  };
-  const subscribe = (listener) => {
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  };
-  return { getState, setState, subscribe };
-}
-
-// src/state/settingsStore.ts
-var STORAGE_KEY = "search-prototype.settings";
-var DEFAULTS = normalize(defaults_default);
-function normalize(state) {
-  return {
-    ...state,
-    groupLimits: { ...state.groupLimits }
-  };
-}
-function mergeSettings(base, overrides) {
-  if (!overrides) {
-    return normalize(base);
-  }
-  return {
-    ...base,
-    ...overrides,
-    groupLimits: {
-      ...base.groupLimits,
-      ...overrides.groupLimits ?? {}
-    }
-  };
-}
-function readPersisted() {
-  if (typeof window === "undefined") {
-    return void 0;
-  }
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return void 0;
-    }
-    return JSON.parse(raw);
-  } catch (error) {
-    console.warn("Failed to parse persisted settings; falling back to defaults.", error);
-    return void 0;
-  }
-}
-function persist(state) {
-  if (typeof window === "undefined") {
-    return;
-  }
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-var initialState = mergeSettings(DEFAULTS, readPersisted());
-var store = createStore(initialState);
-store.subscribe((state) => {
-  persist(state);
-});
-var settingsStore = {
-  getState: store.getState,
-  subscribe: store.subscribe,
-  update(partial) {
-    store.setState((prev) => mergeSettings(prev, partial));
-  },
-  setGroupLimit(section, limit) {
-    store.setState(
-      (prev) => mergeSettings(prev, {
-        groupLimits: {
-          ...prev.groupLimits,
-          [section]: limit
-        }
-      })
-    );
-  },
-  reset() {
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-    store.setState(() => normalize(DEFAULTS));
-  },
-  get defaults() {
-    return normalize(DEFAULTS);
-  }
-};
-
 // src/components/settingsView.ts
 function createSettingsView() {
   const container = document.createElement("section");
@@ -927,6 +931,11 @@ function createSettingsView() {
   `;
   const form = document.createElement("form");
   form.className = "settings-form";
+  const overallSection = document.createElement("fieldset");
+  overallSection.className = "settings-group";
+  overallSection.innerHTML = `
+    <legend>Overall</legend>
+  `;
   const delayField = document.createElement("div");
   delayField.className = "settings-field";
   delayField.innerHTML = `
@@ -938,6 +947,27 @@ function createSettingsView() {
   delayInput.min = "0";
   delayInput.step = "10";
   delayField.append(delayInput);
+  overallSection.append(delayField);
+  const resultsSection = document.createElement("fieldset");
+  resultsSection.className = "settings-group";
+  resultsSection.innerHTML = `
+    <legend>Full Results Page</legend>
+  `;
+  const lineItemsContextField = document.createElement("div");
+  lineItemsContextField.className = "settings-field";
+  lineItemsContextField.innerHTML = `
+    <label for="line-items-context">Line items context around matches</label>
+  `;
+  const lineItemsContextSelect = document.createElement("select");
+  lineItemsContextSelect.id = "line-items-context";
+  lineItemsContextSelect.innerHTML = `
+    <option value="1">1 before/after</option>
+    <option value="2">2 before/after</option>
+    <option value="3">3 before/after</option>
+    <option value="0">All line items</option>
+  `;
+  lineItemsContextField.append(lineItemsContextSelect);
+  resultsSection.append(lineItemsContextField);
   const groupSection = document.createElement("fieldset");
   groupSection.className = "settings-group";
   groupSection.innerHTML = `
@@ -957,7 +987,7 @@ function createSettingsView() {
   resetButton.className = "secondary";
   resetButton.textContent = "Restore defaults";
   actions.append(saveButton, resetButton);
-  form.append(delayField, groupSection, actions);
+  form.append(overallSection, resultsSection, groupSection, actions);
   container.append(heading, form);
   const groupInputs = /* @__PURE__ */ new Map();
   const renderGroupInputs = (groupLimits) => {
@@ -983,12 +1013,15 @@ function createSettingsView() {
   const render = () => {
     const state = settingsStore.getState();
     delayInput.value = String(state.searchDelayMs);
+    lineItemsContextSelect.value = String(state.lineItemsContextCount);
     renderGroupInputs(state.groupLimits);
   };
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const nextDelay = Number.parseInt(delayInput.value, 10);
     const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
+    const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
+    const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
     const groupLimits = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -996,6 +1029,7 @@ function createSettingsView() {
     });
     settingsStore.update({
       searchDelayMs: resolvedDelay,
+      lineItemsContextCount: resolvedLineItemsContext,
       groupLimits
     });
     window.location.reload();

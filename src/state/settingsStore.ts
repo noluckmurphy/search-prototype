@@ -4,6 +4,7 @@ import { createStore } from './store';
 export interface SettingsState {
   searchDelayMs: number;
   groupLimits: Record<string, number>;
+  lineItemsContextCount: number;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -13,6 +14,7 @@ function normalize(state: SettingsState): SettingsState {
   return {
     ...state,
     groupLimits: { ...state.groupLimits },
+    lineItemsContextCount: state.lineItemsContextCount ?? 3,
   };
 }
 

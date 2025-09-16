@@ -7,5 +7,6 @@
     "Bill": 4,
     "Receipt": 4,
     "Payment": 4
-  }
+  },
+  "lineItemsContextCount": 3
 }

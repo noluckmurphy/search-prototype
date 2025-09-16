@@ -9,6 +9,7 @@ import {
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues } from '../utils/highlight';
+import { settingsStore } from '../state/settingsStore';
 
 const FACET_LABELS: Record<FacetKey, string> = {
   entityType: 'Type',
@@ -412,7 +413,9 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   // Create table body
   const tbody = document.createElement('tbody');
   
-  const displayItems = items.slice(0, 3);
+  const settings = settingsStore.getState();
+  const contextCount = settings.lineItemsContextCount;
+  const displayItems = contextCount === 0 ? items : items.slice(0, contextCount);
   displayItems.forEach((line: any) => {
     const row = document.createElement('tr');
     const unitPrice = formatCurrency(line.lineItemUnitPrice);
@@ -429,11 +432,11 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     tbody.append(row);
   });
 
-  // Add "more items" row if there are additional items
-  if (items.length > 3) {
+  // Add "more items" row if there are additional items and we're not showing all
+  if (contextCount > 0 && items.length > contextCount) {
     const moreRow = document.createElement('tr');
     moreRow.className = 'line-item__more-row';
-    const remaining = items.length - 3;
+    const remaining = items.length - contextCount;
     moreRow.innerHTML = `
       <td colspan="5" class="line-item__more">${remaining} more line item${remaining === 1 ? '' : 's'}…</td>
     `;
