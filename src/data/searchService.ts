@@ -250,11 +250,13 @@ function matchesMonetaryString(queryStr: string, dataValue: number): boolean {
   // For queries without decimals, apply progressive restriction based on specificity
   if (querySignificantDigits >= 4) {
     // 4+ digits (like "8000") - very restrictive, must start with exact digits
-    // Allow if data starts with query (for cases like "1500" matching "150")
+    // For very long queries, be extremely restrictive - only allow exact matches or longer values that start with the query
     if (normalizedData.length >= querySignificantDigits) {
       return normalizedData.startsWith(normalizedQuery);
     } else {
-      return normalizedQuery.startsWith(normalizedData);
+      // Don't allow shorter values to match longer queries for 4+ digits
+      // This prevents "6" from matching "696013456"
+      return false;
     }
   } else if (querySignificantDigits >= 3) {
     // 3 digits (like "800") - restrictive, must start with same 3 digits

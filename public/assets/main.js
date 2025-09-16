@@ -1633,7 +1633,7 @@ function matchesMonetaryString(queryStr, dataValue) {
     if (normalizedData.length >= querySignificantDigits) {
       return normalizedData.startsWith(normalizedQuery);
     } else {
-      return normalizedQuery.startsWith(normalizedData);
+      return false;
     }
   } else if (querySignificantDigits >= 3) {
     if (normalizedData.length >= 3) {
