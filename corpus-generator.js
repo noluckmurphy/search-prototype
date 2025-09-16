@@ -272,26 +272,26 @@ function randomBetween(min, max) {
 }
 
 // Generate random price based on quantity and type
-function generatePrice(quantity, unitType, lineItemType) {
+function generatePrice(quantity, unitType, lineItemType, entityType = null) {
   let basePrice = 1;
   
-  // Base price by unit type
+  // Base price by unit type - reduced for more realistic totals
   switch (unitType) {
-    case 'sq ft': basePrice = randomBetween(2, 25); break;
-    case 'linear feet': basePrice = randomBetween(5, 50); break;
-    case 'cubic yards': basePrice = randomBetween(100, 500); break;
-    case 'units': basePrice = randomBetween(50, 2000); break;
-    case 'hours': basePrice = randomBetween(75, 200); break;
-    case 'pieces': basePrice = randomBetween(10, 500); break;
-    case 'loads': basePrice = randomBetween(200, 800); break;
-    case 'fixtures': basePrice = randomBetween(100, 1500); break;
-    case 'bathrooms': basePrice = randomBetween(2000, 15000); break;
-    case 'closets': basePrice = randomBetween(500, 3000); break;
-    case 'permits': basePrice = randomBetween(100, 1000); break;
-    case 'inspections': basePrice = randomBetween(150, 500); break;
+    case 'sq ft': basePrice = randomBetween(1, 8); break;
+    case 'linear feet': basePrice = randomBetween(2, 15); break;
+    case 'cubic yards': basePrice = randomBetween(25, 120); break;
+    case 'units': basePrice = randomBetween(15, 400); break;
+    case 'hours': basePrice = randomBetween(25, 85); break;
+    case 'pieces': basePrice = randomBetween(3, 150); break;
+    case 'loads': basePrice = randomBetween(50, 200); break;
+    case 'fixtures': basePrice = randomBetween(30, 400); break;
+    case 'bathrooms': basePrice = randomBetween(500, 3000); break;
+    case 'closets': basePrice = randomBetween(150, 800); break;
+    case 'permits': basePrice = randomBetween(25, 250); break;
+    case 'inspections': basePrice = randomBetween(40, 150); break;
     case 'dollars': basePrice = 1; break;
-    case 'ls': basePrice = randomBetween(500, 5000); break;
-    default: basePrice = randomBetween(10, 100); break;
+    case 'ls': basePrice = randomBetween(150, 1200); break;
+    default: basePrice = randomBetween(5, 50); break;
   }
   
   // Adjust by line item type
@@ -303,11 +303,16 @@ function generatePrice(quantity, unitType, lineItemType) {
     case 'Other': basePrice *= randomBetween(0.7, 1.4); break;
   }
   
+  // Special adjustment for Client Invoices to allow higher figures
+  if (entityType === 'ClientInvoice') {
+    basePrice *= randomBetween(2, 5); // 2-5x multiplier for client invoices
+  }
+  
   return Math.round(basePrice);
 }
 
 // Generate a single line item
-function generateLineItem(lineItemId, term) {
+function generateLineItem(lineItemId, term, entityType = null) {
   const termVariations = TERM_VARIATIONS[term] || [term];
   const selectedTerm = termVariations[randomBetween(0, termVariations.length - 1)];
   
@@ -320,14 +325,14 @@ function generateLineItem(lineItemId, term) {
   
   if (templateGroup) {
     const template = templateGroup.templates[randomBetween(0, templateGroup.templates.length - 1)];
-    const quantity = randomBetween(1, 50);
+    const quantity = randomBetween(1, 25);
     const unitType = UNIT_TYPES[randomBetween(0, UNIT_TYPES.length - 1)];
     const lineItemType = LINE_ITEM_TYPES[randomBetween(0, LINE_ITEM_TYPES.length - 1)];
     
     title = template.replace('{quantity}', quantity);
     description = `${lineItemType} for ${title.toLowerCase()} on Building core areas`;
     
-    const unitPrice = generatePrice(quantity, unitType, lineItemType);
+    const unitPrice = generatePrice(quantity, unitType, lineItemType, entityType);
     const total = quantity * unitPrice;
     
     return {
@@ -342,10 +347,10 @@ function generateLineItem(lineItemId, term) {
     };
   } else {
     // Fallback for terms without specific templates
-    const quantity = randomBetween(1, 20);
+    const quantity = randomBetween(1, 15);
     const unitType = UNIT_TYPES[randomBetween(0, UNIT_TYPES.length - 1)];
     const lineItemType = LINE_ITEM_TYPES[randomBetween(0, LINE_ITEM_TYPES.length - 1)];
-    const unitPrice = generatePrice(quantity, unitType, lineItemType);
+    const unitPrice = generatePrice(quantity, unitType, lineItemType, entityType);
     const total = quantity * unitPrice;
     
     return {
@@ -373,7 +378,7 @@ function generateLineItems(documentId, entityType, lineItemCount) {
   for (let i = 0; i < lineItemCount; i++) {
     const term = termsToUse[randomBetween(0, termsToUse.length - 1)];
     const lineItemId = `${documentId}-item-${i + 1}`;
-    lineItems.push(generateLineItem(lineItemId, term));
+    lineItems.push(generateLineItem(lineItemId, term, entityType));
   }
   
   return lineItems;
