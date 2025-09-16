@@ -414,6 +414,19 @@ function isPartialMonetaryMatch(queryAmount, dataValue) {
   return false;
 }
 
+// src/utils/query.ts
+var MIN_EFFECTIVE_QUERY_LENGTH = 2;
+function getEffectiveQueryLength(query) {
+  if (!query) {
+    return 0;
+  }
+  return query.replace(/\$/g, "").replace(/\s+/g, "").length;
+}
+function isQueryTooShort(query) {
+  const effectiveLength = getEffectiveQueryLength(query);
+  return effectiveLength > 0 && effectiveLength < MIN_EFFECTIVE_QUERY_LENGTH;
+}
+
 // src/components/searchDialog.ts
 function hasMonetaryPotential(query) {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -463,8 +476,13 @@ function renderDialogContents(container, state, options) {
     container.append(renderErrorState());
     return;
   }
-  if (!state.query.trim() && state.status === "idle") {
+  const effectiveLength = getEffectiveQueryLength(state.query);
+  if (effectiveLength === 0 && state.status === "idle") {
     container.append(renderEmptyState());
+    return;
+  }
+  if (isQueryTooShort(state.query)) {
+    container.append(renderShortQueryState());
     return;
   }
   const response = state.response;
@@ -491,6 +509,15 @@ function renderEmptyState() {
   wrapper.innerHTML = `
     <h3>Quick search</h3>
     <p>Start typing or press <kbd>/</kbd> to jump into the search bar.</p>
+  `;
+  return wrapper;
+}
+function renderShortQueryState() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "search-dialog__empty";
+  wrapper.innerHTML = `
+    <h3>Keep typing</h3>
+    <p>Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.</p>
   `;
   return wrapper;
 }
@@ -827,7 +854,11 @@ function createResultsView(options) {
 function renderSummary(target, status, response, query, errorMessage) {
   switch (status) {
     case "idle":
-      target.textContent = "Type a query to explore results and filters.";
+      if (isQueryTooShort(query)) {
+        target.textContent = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.`;
+      } else {
+        target.textContent = "Type a query to explore results and filters.";
+      }
       return;
     case "loading":
       target.textContent = query ? `Searching for \u201C${query}\u201D\u2026` : "Searching\u2026";
@@ -915,7 +946,8 @@ function renderFacets(container, status, response, selections, options) {
 function renderGroups(container, status, response, query, errorMessage, isMonetarySearch) {
   container.innerHTML = "";
   if (status === "idle") {
-    container.innerHTML = '<p class="results-view__empty">Run a search to populate full results.</p>';
+    const message = isQueryTooShort(query) ? `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.` : "Run a search to populate full results.";
+    container.innerHTML = `<p class="results-view__empty">${message}</p>`;
     return;
   }
   if (status === "loading") {
@@ -2290,10 +2322,20 @@ function navigate(route) {
 async function performSearch(query, options = {}) {
   const { openDialog = false, updateSubmitted = true } = options;
   const trimmed = query.trim();
+  const effectiveLength = getEffectiveQueryLength(trimmed);
   if (openDialog && appState.getState().route === "home") {
     appState.setDialogOpen(true);
   }
-  if (!trimmed) {
+  if (effectiveLength === 0) {
+    activeSearchToken += 1;
+    if (updateSubmitted) {
+      appState.setLastSubmittedQuery("");
+    }
+    appState.setStatus("idle");
+    appState.setResponse(null);
+    return;
+  }
+  if (effectiveLength < MIN_EFFECTIVE_QUERY_LENGTH) {
     activeSearchToken += 1;
     if (updateSubmitted) {
       appState.setLastSubmittedQuery("");

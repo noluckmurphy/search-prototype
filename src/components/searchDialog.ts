@@ -2,6 +2,7 @@ import { SearchGroup, SearchRecord, SearchResponse } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
+import { getEffectiveQueryLength, isQueryTooShort, MIN_EFFECTIVE_QUERY_LENGTH } from '../utils/query';
 
 // Helper function to detect if a query has monetary potential (for hybrid highlighting)
 function hasMonetaryPotential(query: string): boolean {
@@ -91,8 +92,15 @@ function renderDialogContents(
     return;
   }
 
-  if (!state.query.trim() && state.status === 'idle') {
+  const effectiveLength = getEffectiveQueryLength(state.query);
+
+  if (effectiveLength === 0 && state.status === 'idle') {
     container.append(renderEmptyState());
+    return;
+  }
+
+  if (isQueryTooShort(state.query)) {
+    container.append(renderShortQueryState());
     return;
   }
 
@@ -125,6 +133,16 @@ function renderEmptyState(): HTMLElement {
   wrapper.innerHTML = `
     <h3>Quick search</h3>
     <p>Start typing or press <kbd>/</kbd> to jump into the search bar.</p>
+  `;
+  return wrapper;
+}
+
+function renderShortQueryState(): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'search-dialog__empty';
+  wrapper.innerHTML = `
+    <h3>Keep typing</h3>
+    <p>Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.</p>
   `;
   return wrapper;
 }

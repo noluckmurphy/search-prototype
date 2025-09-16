@@ -10,6 +10,7 @@ import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
 import { settingsStore } from '../state/settingsStore';
+import { MIN_EFFECTIVE_QUERY_LENGTH, isQueryTooShort } from '../utils/query';
 
 // Helper function to detect if a query has monetary potential (for hybrid highlighting)
 function hasMonetaryPotential(query: string): boolean {
@@ -124,7 +125,11 @@ function renderSummary(
 ) {
   switch (status) {
     case 'idle':
-      target.textContent = 'Type a query to explore results and filters.';
+      if (isQueryTooShort(query)) {
+        target.textContent = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.`;
+      } else {
+        target.textContent = 'Type a query to explore results and filters.';
+      }
       return;
     case 'loading':
       target.textContent = query ? `Searching for “${query}”…` : 'Searching…';
@@ -248,7 +253,10 @@ function renderGroups(
   container.innerHTML = '';
 
   if (status === 'idle') {
-    container.innerHTML = '<p class="results-view__empty">Run a search to populate full results.</p>';
+    const message = isQueryTooShort(query)
+      ? `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`
+      : 'Run a search to populate full results.';
+    container.innerHTML = `<p class="results-view__empty">${message}</p>`;
     return;
   }
 

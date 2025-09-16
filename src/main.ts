@@ -7,6 +7,7 @@ import { createSettingsView } from './components/settingsView';
 import { appState } from './state/appState';
 import { runSearch } from './data/searchService';
 import { ScreenRoute } from './types';
+import { getEffectiveQueryLength, MIN_EFFECTIVE_QUERY_LENGTH } from './utils/query';
 
 function isMonetaryQuery(query: string): boolean {
   return query.trim().startsWith('$');
@@ -164,12 +165,23 @@ async function performSearch(
 ): Promise<void> {
   const { openDialog = false, updateSubmitted = true } = options;
   const trimmed = query.trim();
+  const effectiveLength = getEffectiveQueryLength(trimmed);
 
   if (openDialog && appState.getState().route === 'home') {
     appState.setDialogOpen(true);
   }
 
-  if (!trimmed) {
+  if (effectiveLength === 0) {
+    activeSearchToken += 1;
+    if (updateSubmitted) {
+      appState.setLastSubmittedQuery('');
+    }
+    appState.setStatus('idle');
+    appState.setResponse(null);
+    return;
+  }
+
+  if (effectiveLength < MIN_EFFECTIVE_QUERY_LENGTH) {
     activeSearchToken += 1;
     if (updateSubmitted) {
       appState.setLastSubmittedQuery('');
