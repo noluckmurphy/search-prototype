@@ -23,6 +23,10 @@ function createHeader(options) {
   searchArea.append(searchForm, dialogHost);
   const navActions = document.createElement("div");
   navActions.className = "nav-actions";
+  const homeButton = document.createElement("button");
+  homeButton.type = "button";
+  homeButton.className = "home-button";
+  homeButton.textContent = "Home";
   const resultsButton = document.createElement("button");
   resultsButton.type = "button";
   resultsButton.dataset.route = "results";
@@ -31,7 +35,7 @@ function createHeader(options) {
   settingsButton.type = "button";
   settingsButton.dataset.route = "settings";
   settingsButton.textContent = "Settings";
-  navActions.append(resultsButton, settingsButton);
+  navActions.append(homeButton, resultsButton, settingsButton);
   nav.append(brand, searchArea, navActions);
   header2.append(nav);
   searchInput.addEventListener("input", () => {
@@ -50,6 +54,9 @@ function createHeader(options) {
     event.preventDefault();
     options.onSearchSubmit();
   });
+  homeButton.addEventListener("click", () => {
+    options.onHome();
+  });
   navActions.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLButtonElement)) {
@@ -62,6 +69,9 @@ function createHeader(options) {
     options.onNavigate(route);
   });
   const setActiveRoute = (route) => {
+    const isHomeActive = route === "home";
+    homeButton.classList.toggle("is-active", isHomeActive);
+    homeButton.setAttribute("aria-pressed", String(isHomeActive));
     for (const button of navActions.querySelectorAll("button[data-route]")) {
       const isActive = button.dataset.route === route;
       button.classList.toggle("is-active", isActive);
@@ -257,6 +267,16 @@ function highlightMonetaryValues(text, query) {
     for (const pattern of rangePatterns) {
       highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$&</mark>');
     }
+    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+      const numericValue = parseFloat(match.replace(/[$,\s]/g, ""));
+      if (!isNaN(numericValue) && numericValue >= range.min && numericValue <= range.max) {
+        if (!match.includes("<mark")) {
+          return `<mark class="monetary-highlight">${match}</mark>`;
+        }
+      }
+      return match;
+    });
   }
   if (textTokens.length > 0) {
     for (const token of textTokens) {
@@ -447,6 +467,12 @@ function renderGroupItem(item, query, isMonetarySearch) {
   } else {
     li.append(title, meta);
   }
+  if (item.entityType !== "Document" && query) {
+    const lineItemsMatch = renderMiniLineItems(item, query, isMonetarySearch);
+    if (lineItemsMatch) {
+      li.append(lineItemsMatch);
+    }
+  }
   return li;
 }
 function buildItemMeta(item, query, isMonetarySearch) {
@@ -465,6 +491,62 @@ function buildItemMeta(item, query, isMonetarySearch) {
     }
   }
   return parts.filter(Boolean).join(" \u2022 ");
+}
+function renderMiniLineItems(item, query, isMonetarySearch) {
+  const financial = item;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) {
+    return null;
+  }
+  const matchingItems = items.filter((lineItem) => {
+    const searchableFields = [
+      { value: lineItem.lineItemTitle, field: "title" },
+      { value: lineItem.lineItemDescription, field: "description" },
+      { value: lineItem.lineItemType, field: "type" },
+      { value: lineItem.lineItemQuantity?.toString(), field: "quantity" },
+      { value: lineItem.lineItemQuantityUnitOfMeasure, field: "unit" },
+      { value: formatCurrency(lineItem.lineItemUnitPrice), field: "unitPrice" },
+      { value: formatCurrency(lineItem.lineItemTotal), field: "total" }
+    ];
+    return searchableFields.some(({ value }) => {
+      if (!value) return false;
+      const highlighted = isMonetarySearch ? highlightMonetaryValues(value, query) : highlightText(value, query);
+      return highlighted.includes("<mark");
+    });
+  });
+  if (matchingItems.length === 0) {
+    return null;
+  }
+  const wrapper = document.createElement("small");
+  wrapper.className = "mini-line-items";
+  const table = document.createElement("table");
+  table.className = "mini-line-items__table";
+  const displayItems = matchingItems.slice(0, 3);
+  displayItems.forEach((line) => {
+    const row = document.createElement("tr");
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    row.innerHTML = `
+      <td class="mini-line-items__description">${isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)}</td>
+      <td class="mini-line-items__type">${isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)}</td>
+      <td class="mini-line-items__quantity">${isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity}</td>
+      <td class="mini-line-items__unit-price">${isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice}</td>
+      <td class="mini-line-items__total">${isMonetarySearch ? highlightMonetaryValues(total, query) : total}</td>
+    `;
+    table.append(row);
+  });
+  if (matchingItems.length > 3) {
+    const moreRow = document.createElement("tr");
+    moreRow.className = "mini-line-items__more-row";
+    const remaining = matchingItems.length - 3;
+    moreRow.innerHTML = `
+      <td colspan="5" class="mini-line-items__more">+${remaining} more matching line item${remaining === 1 ? "" : "s"}\u2026</td>
+    `;
+    table.append(moreRow);
+  }
+  wrapper.append(table);
+  return wrapper;
 }
 function escapeHtml2(value) {
   const div = document.createElement("div");
@@ -1739,6 +1821,15 @@ main.className = "app-main";
 var activeSearchToken = 0;
 var header = createHeader({
   onNavigate: (route) => navigate(route),
+  onHome: () => {
+    appState.setSearchQuery("");
+    appState.setLastSubmittedQuery("");
+    appState.setResponse(null);
+    appState.setStatus("idle");
+    appState.setDialogOpen(false);
+    appState.clearFacets();
+    navigate("home");
+  },
   onSearchChange: (value) => {
     const currentState = appState.getState();
     const previousQuery = currentState.lastSubmittedQuery || currentState.searchQuery;

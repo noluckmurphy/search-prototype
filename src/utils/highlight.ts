@@ -196,6 +196,7 @@ export function highlightMonetaryValues(text: string, query: string): string {
   
   // Highlight range values if it's a range query
   if (range) {
+    // First, highlight the range pattern itself in the text
     const rangePatterns = [
       // Range format: min-max
       new RegExp(`\\b${escapeRegex(range.min.toString())}\\s*-\\s*${escapeRegex(range.max.toString())}\\b`, 'g'),
@@ -209,6 +210,24 @@ export function highlightMonetaryValues(text: string, query: string): string {
     for (const pattern of rangePatterns) {
       highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$&</mark>');
     }
+    
+    // Additionally, highlight any monetary values in the text that fall within the range
+    // This handles cases where the displayed value (like $31,344) falls within the range ($30000-40000)
+    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+      // Extract the numeric value from the match
+      const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+      
+      // Check if this value falls within the range
+      if (!isNaN(numericValue) && numericValue >= range.min && numericValue <= range.max) {
+        // Only highlight if it's not already highlighted
+        if (!match.includes('<mark')) {
+          return `<mark class="monetary-highlight">${match}</mark>`;
+        }
+      }
+      
+      return match;
+    });
   }
   
   // Also highlight any text tokens that match

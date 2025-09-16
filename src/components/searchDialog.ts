@@ -184,6 +184,14 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
     li.append(title, meta);
   }
 
+  // Add line item matches for non-Document entities
+  if (item.entityType !== 'Document' && query) {
+    const lineItemsMatch = renderMiniLineItems(item, query, isMonetarySearch);
+    if (lineItemsMatch) {
+      li.append(lineItemsMatch);
+    }
+  }
+
   return li;
 }
 
@@ -205,6 +213,78 @@ function buildItemMeta(item: SearchRecord, query?: string, isMonetarySearch?: bo
   }
 
   return parts.filter(Boolean).join(' • ');
+}
+
+function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch?: boolean): HTMLElement | null {
+  const financial = item as any;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) {
+    return null;
+  }
+
+  // Find line items that have actual highlighting matches (not just text matches)
+  const matchingItems = items.filter((lineItem: any) => {
+    const searchableFields = [
+      { value: lineItem.lineItemTitle, field: 'title' },
+      { value: lineItem.lineItemDescription, field: 'description' },
+      { value: lineItem.lineItemType, field: 'type' },
+      { value: lineItem.lineItemQuantity?.toString(), field: 'quantity' },
+      { value: lineItem.lineItemQuantityUnitOfMeasure, field: 'unit' },
+      { value: formatCurrency(lineItem.lineItemUnitPrice), field: 'unitPrice' },
+      { value: formatCurrency(lineItem.lineItemTotal), field: 'total' }
+    ];
+    
+    // Check if any field has actual highlighting (contains <mark> tags)
+    return searchableFields.some(({ value }) => {
+      if (!value) return false;
+      
+      const highlighted = isMonetarySearch ? highlightMonetaryValues(value, query) : highlightText(value, query);
+      return highlighted.includes('<mark');
+    });
+  });
+
+  if (matchingItems.length === 0) {
+    return null;
+  }
+
+  const wrapper = document.createElement('small');
+  wrapper.className = 'mini-line-items';
+
+  const table = document.createElement('table');
+  table.className = 'mini-line-items__table';
+
+  // Show up to 3 matching line items
+  const displayItems = matchingItems.slice(0, 3);
+  
+  displayItems.forEach((line: any) => {
+    const row = document.createElement('tr');
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    
+    row.innerHTML = `
+      <td class="mini-line-items__description">${isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)}</td>
+      <td class="mini-line-items__type">${isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)}</td>
+      <td class="mini-line-items__quantity">${isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity}</td>
+      <td class="mini-line-items__unit-price">${isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice}</td>
+      <td class="mini-line-items__total">${isMonetarySearch ? highlightMonetaryValues(total, query) : total}</td>
+    `;
+    table.append(row);
+  });
+
+  // Add "more items" row if there are additional matching items
+  if (matchingItems.length > 3) {
+    const moreRow = document.createElement('tr');
+    moreRow.className = 'mini-line-items__more-row';
+    const remaining = matchingItems.length - 3;
+    moreRow.innerHTML = `
+      <td colspan="5" class="mini-line-items__more">+${remaining} more matching line item${remaining === 1 ? '' : 's'}…</td>
+    `;
+    table.append(moreRow);
+  }
+
+  wrapper.append(table);
+  return wrapper;
 }
 
 function escapeHtml(value: string): string {

@@ -24,6 +24,16 @@ let activeSearchToken = 0;
 
 const header = createHeader({
   onNavigate: (route) => navigate(route),
+  onHome: () => {
+    // Reset search state but keep settings
+    appState.setSearchQuery('');
+    appState.setLastSubmittedQuery('');
+    appState.setResponse(null);
+    appState.setStatus('idle');
+    appState.setDialogOpen(false);
+    appState.clearFacets();
+    navigate('home');
+  },
   onSearchChange: (value) => {
     const currentState = appState.getState();
     const previousQuery = currentState.lastSubmittedQuery || currentState.searchQuery;

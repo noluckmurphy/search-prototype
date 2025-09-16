@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mini Line Items</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div class="search-dialog">
+        <section class="search-dialog__group">
+            <h4>Invoices - With Line Item Matches</h4>
+            <ul class="search-dialog__list">
+                <li class="search-dialog__item">
+                    <div class="search-dialog__item-title">Test Invoice with Matching Line Items</div>
+                    <div class="search-dialog__item-meta">Project Alpha • $1,250.00 • Approved</div>
+                    <div class="search-context">Matched in Line Item: <mark class="search-highlight">consulting</mark> services</div>
+                    <small class="mini-line-items">
+                        <table class="mini-line-items__table">
+                            <tr>
+                                <td class="mini-line-items__description"><mark class="search-highlight">Consulting</mark> Services</td>
+                                <td class="mini-line-items__type">Service</td>
+                                <td class="mini-line-items__quantity">40 hrs</td>
+                                <td class="mini-line-items__unit-price">$75.00</td>
+                                <td class="mini-line-items__total">$3,000.00</td>
+                            </tr>
+                            <tr>
+                                <td class="mini-line-items__description">Project Management</td>
+                                <td class="mini-line-items__type">Service</td>
+                                <td class="mini-line-items__quantity">20 hrs</td>
+                                <td class="mini-line-items__unit-price">$50.00</td>
+                                <td class="mini-line-items__total">$1,000.00</td>
+                            </tr>
+                            <tr>
+                                <td class="mini-line-items__description">Software Development</td>
+                                <td class="mini-line-items__type">Service</td>
+                                <td class="mini-line-items__quantity">10 hrs</td>
+                                <td class="mini-line-items__unit-price">$100.00</td>
+                                <td class="mini-line-items__total">$1,000.00</td>
+                            </tr>
+                            <tr class="mini-line-items__more-row">
+                                <td colspan="5" class="mini-line-items__more">+2 more matching line items…</td>
+                            </tr>
+                        </table>
+                    </small>
+                </li>
+                <li class="search-dialog__item">
+                    <div class="search-dialog__item-title">Another Invoice with <mark class="search-highlight">consulting</mark> in title</div>
+                    <div class="search-dialog__item-meta">Project Beta • $800.00 • Pending</div>
+                    <div class="search-context">Matched in title</div>
+                    <!-- No line items shown here because the match is in title, not in line items -->
+                </li>
+            </ul>
+        </section>
+        
+        <section class="search-dialog__group">
+            <h4>Monetary Search - With Line Item Matches</h4>
+            <ul class="search-dialog__list">
+                <li class="search-dialog__item">
+                    <div class="search-dialog__item-title">Invoice with <mark class="monetary-highlight">$1000</mark> Match</div>
+                    <div class="search-dialog__item-meta">Project Gamma • <mark class="monetary-highlight">$1,000.00</mark> • Paid</div>
+                    <small class="mini-line-items">
+                        <table class="mini-line-items__table">
+                            <tr>
+                                <td class="mini-line-items__description">Development Work</td>
+                                <td class="mini-line-items__type">Service</td>
+                                <td class="mini-line-items__quantity">10 hrs</td>
+                                <td class="mini-line-items__unit-price"><mark class="monetary-highlight">$100.00</mark></td>
+                                <td class="mini-line-items__total"><mark class="monetary-highlight">$1,000.00</mark></td>
+                            </tr>
+                        </table>
+                    </small>
+                </li>
+            </ul>
+        </section>
+        
+        <section class="search-dialog__group">
+            <h4>Examples WITHOUT Line Items (no highlighting in line items)</h4>
+            <ul class="search-dialog__list">
+                <li class="search-dialog__item">
+                    <div class="search-dialog__item-title">Invoice with <mark class="search-highlight">Project</mark> in title only</div>
+                    <div class="search-dialog__item-meta">Project Delta • $500.00 • Draft</div>
+                    <div class="search-context">Matched in title</div>
+                    <!-- No line items shown because match is only in title, not in line items -->
+                </li>
+                <li class="search-dialog__item">
+                    <div class="search-dialog__item-title">Invoice with <mark class="monetary-highlight">$500</mark> in total only</div>
+                    <div class="search-dialog__item-meta">Project Echo • <mark class="monetary-highlight">$500.00</mark> • Draft</div>
+                    <!-- No line items shown because the $500 match is only in the total, not in individual line items -->
+                </li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
