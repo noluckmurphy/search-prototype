@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
+import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues } from '../utils/highlight';
 
 const FACET_LABELS: Record<FacetKey, string> = {
   entityType: 'Type',
@@ -17,6 +18,7 @@ const FACET_LABELS: Record<FacetKey, string> = {
   client: 'Client',
   issuedDate: 'Issued',
   totalValue: 'Total',
+  groupBy: 'Group by',
 };
 
 export interface ResultsViewOptions {
@@ -30,6 +32,7 @@ export interface ResultsRenderContext {
   status: SearchStatus;
   query: string;
   errorMessage?: string;
+  isMonetarySearch?: boolean;
 }
 
 export interface ResultsViewHandles {
@@ -45,7 +48,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
   header.className = 'results-view__header';
   header.innerHTML = `
     <div>
-      <h1>Search results</h1>
+      <h1>Search Results</h1>
       <p class="results-view__summary" id="results-summary"></p>
     </div>
     <div class="results-view__actions">
@@ -53,13 +56,17 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
     </div>
   `;
 
-  const facetsContainer = document.createElement('div');
+  const mainContent = document.createElement('div');
+  mainContent.className = 'results-view__main';
+
+  const facetsContainer = document.createElement('aside');
   facetsContainer.className = 'results-view__facets';
 
   const resultsContainer = document.createElement('div');
   resultsContainer.className = 'results-view__groups';
 
-  container.append(header, facetsContainer, resultsContainer);
+  mainContent.append(facetsContainer, resultsContainer);
+  container.append(header, mainContent);
 
   const summaryEl = header.querySelector<HTMLParagraphElement>('#results-summary')!;
   const clearButton = header.querySelector<HTMLButtonElement>('.clear-facets')!;
@@ -69,11 +76,11 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
   });
 
   const render = (context: ResultsRenderContext) => {
-    const { response, selections, status, query, errorMessage } = context;
+    const { response, selections, status, query, errorMessage, isMonetarySearch } = context;
 
     renderSummary(summaryEl, status, response, query, errorMessage);
     renderFacets(facetsContainer, status, response, selections, options);
-    renderGroups(resultsContainer, status, response?.fullGroups ?? [], query, errorMessage);
+    renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
 
     const hasSelections = selections && Object.keys(selections).length > 0;
     clearButton.hidden = !hasSelections;
@@ -162,34 +169,44 @@ function renderFacets(
     const block = document.createElement('section');
     block.className = 'results-view__facet-block';
 
-    const heading = document.createElement('h2');
+    const heading = document.createElement('h3');
     heading.textContent = FACET_LABELS[key] ?? key;
     block.append(heading);
 
-    const list = document.createElement('div');
+    const list = document.createElement('ul');
     list.className = 'results-view__facet-list';
 
     values.forEach((facet) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'facet-chip';
-      button.dataset.key = key;
-      button.dataset.value = facet.value;
-      button.textContent = facet.value;
+      const listItem = document.createElement('li');
+      listItem.className = 'results-view__facet-item';
 
-      const badge = document.createElement('span');
-      badge.className = 'facet-chip__badge';
-      badge.textContent = String(facet.count);
-      button.append(badge);
+      const label = document.createElement('label');
+      label.className = 'facet-checkbox';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'facet-checkbox__input';
+      checkbox.dataset.key = key;
+      checkbox.dataset.value = facet.value;
 
       const isSelected = selections[key]?.has(facet.value) ?? false;
-      button.classList.toggle('is-selected', isSelected);
+      checkbox.checked = isSelected;
 
-      button.addEventListener('click', () => {
+      const text = document.createElement('span');
+      text.className = 'facet-checkbox__text';
+      text.textContent = facet.value;
+
+      const count = document.createElement('span');
+      count.className = 'facet-checkbox__count';
+      count.textContent = String(facet.count);
+
+      label.append(checkbox, text, count);
+      listItem.append(label);
+      list.append(listItem);
+
+      checkbox.addEventListener('change', () => {
         options.onFacetToggle(key, facet.value);
       });
-
-      list.append(button);
     });
 
     block.append(list);
@@ -200,9 +217,10 @@ function renderFacets(
 function renderGroups(
   container: HTMLElement,
   status: SearchStatus,
-  groups: SearchGroup[],
+  response: SearchResponse | null,
   query: string,
   errorMessage?: string,
+  isMonetarySearch?: boolean,
 ) {
   container.innerHTML = '';
 
@@ -223,24 +241,39 @@ function renderGroups(
     return;
   }
 
-  if (!groups.length) {
-    container.innerHTML = `<p class="results-view__empty">No results for “${query}”. Adjust search terms or facets.</p>`;
+  if (!response || !response.fullGroups.length) {
+    container.innerHTML = `<p class="results-view__empty">No results for "${query}". Adjust search terms or facets.</p>`;
     return;
   }
 
-  groups.forEach((group) => {
-    container.append(renderGroup(group));
-  });
+  // If results are grouped, render groups; otherwise render as flat list
+  if (response.isGrouped) {
+    response.fullGroups.forEach((group) => {
+      container.append(renderGroup(group, group.groupTitle, query, isMonetarySearch));
+    });
+  } else {
+    // Render as flat list without group headers
+    const flatList = document.createElement('div');
+    flatList.className = 'results-list';
+    
+    response.records.forEach((record) => {
+      flatList.append(renderResultCard(record, query, isMonetarySearch));
+    });
+    
+    container.append(flatList);
+  }
 }
 
-function renderGroup(group: SearchGroup): HTMLElement {
+function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, isMonetarySearch?: boolean): HTMLElement {
   const section = document.createElement('section');
   section.className = 'results-group';
 
   const heading = document.createElement('header');
   heading.className = 'results-group__header';
+  
+  const title = groupTitle || formatEntityType(group.entityType, { plural: true });
   heading.innerHTML = `
-    <h2>${formatEntityType(group.entityType, { plural: true })}</h2>
+    <h2>${title}</h2>
     <span class="results-group__count">${group.items.length}</span>
   `;
 
@@ -248,14 +281,14 @@ function renderGroup(group: SearchGroup): HTMLElement {
   list.className = 'results-group__list';
 
   group.items.forEach((item) => {
-    list.append(renderResultCard(item));
+    list.append(renderResultCard(item, query, isMonetarySearch));
   });
 
   section.append(heading, list);
   return section;
 }
 
-function renderResultCard(item: SearchRecord): HTMLElement {
+function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement {
   const card = document.createElement('article');
   card.className = 'result-card';
 
@@ -263,7 +296,7 @@ function renderResultCard(item: SearchRecord): HTMLElement {
   header.className = 'result-card__header';
 
   const title = document.createElement('h3');
-  title.textContent = item.title;
+  title.innerHTML = query ? (isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query)) : item.title;
 
   const badge = document.createElement('span');
   badge.className = 'result-card__badge';
@@ -273,16 +306,28 @@ function renderResultCard(item: SearchRecord): HTMLElement {
 
   const summary = document.createElement('p');
   summary.className = 'result-card__summary';
-  summary.textContent = item.summary;
+  summary.innerHTML = query ? (isMonetarySearch ? highlightMonetaryValues(item.summary, query) : highlightText(item.summary, query)) : item.summary;
 
   const metaList = document.createElement('ul');
   metaList.className = 'result-card__meta';
-  metaList.append(...buildMetaItems(item));
+  metaList.append(...buildMetaItems(item, query, isMonetarySearch));
 
   card.append(header, summary, metaList);
 
+  // Add context line if the match is not in title or summary
+  if (query) {
+    const match = findBestMatch(item, query);
+    if (match && match.field !== 'title' && match.field !== 'summary') {
+      const context = document.createElement('div');
+      context.className = 'search-context';
+      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 120, query);
+      context.innerHTML = `<strong>Matched in ${getFieldLabel(match.field)}:</strong> ${highlightedSnippet}`;
+      card.append(context);
+    }
+  }
+
   if (item.entityType !== 'Document') {
-    const lineItemsBlock = renderLineItems(item);
+    const lineItemsBlock = renderLineItems(item, query, isMonetarySearch);
     if (lineItemsBlock) {
       card.append(lineItemsBlock);
     }
@@ -291,22 +336,22 @@ function renderResultCard(item: SearchRecord): HTMLElement {
   return card;
 }
 
-function buildMetaItems(item: SearchRecord): HTMLLIElement[] {
+function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLLIElement[] {
   const metas: HTMLLIElement[] = [];
 
   const project = document.createElement('li');
-  project.innerHTML = `<span>Project</span><strong>${item.project}</strong>`;
+  project.innerHTML = `<span>Project</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(item.project, query) : highlightText(item.project, query)) : item.project}</strong>`;
   metas.push(project);
 
   const status = document.createElement('li');
-  status.innerHTML = `<span>Status</span><strong>${item.status}</strong>`;
+  status.innerHTML = `<span>Status</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(item.status, query) : highlightText(item.status, query)) : item.status}</strong>`;
   metas.push(status);
 
   if (item.entityType === 'Document') {
     const doc = item as any;
 
     const docType = document.createElement('li');
-    docType.innerHTML = `<span>Type</span><strong>${doc.documentType}</strong>`;
+    docType.innerHTML = `<span>Type</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(doc.documentType, query) : highlightText(doc.documentType, query)) : doc.documentType}</strong>`;
     metas.push(docType);
 
     const updated = document.createElement('li');
@@ -326,14 +371,15 @@ function buildMetaItems(item: SearchRecord): HTMLLIElement[] {
     }
 
     const total = document.createElement('li');
-    total.innerHTML = `<span>Total</span><strong>${formatCurrency(financial.totalValue)}</strong>`;
+    const totalValue = formatCurrency(financial.totalValue);
+    total.innerHTML = `<span>Total</span><strong>${query ? (isMonetarySearch ? highlightMonetaryValues(totalValue, query) : highlightText(totalValue, query)) : totalValue}</strong>`;
     metas.push(total);
   }
 
   return metas;
 }
 
-function renderLineItems(item: SearchRecord): HTMLElement | null {
+function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement | null {
   const financial = item as any;
   const items = financial.lineItems ?? [];
   if (items.length === 0) {
@@ -347,31 +393,83 @@ function renderLineItems(item: SearchRecord): HTMLElement | null {
   heading.textContent = 'Line items';
   wrapper.append(heading);
 
-  const list = document.createElement('ul');
+  const table = document.createElement('table');
+  table.className = 'line-items-table';
 
-  items.slice(0, 3).forEach((line: any) => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <div class="line-item__title">${line.lineItemTitle}</div>
-      <div class="line-item__details">
-        <span>${line.lineItemType}</span>
-        <span>${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure} @ ${formatCurrency(
-          line.lineItemUnitPrice,
-        )}</span>
-        <span class="line-item__total">${formatCurrency(line.lineItemTotal)}</span>
-      </div>
+  // Create table header
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  headerRow.innerHTML = `
+    <th>Description</th>
+    <th>Type</th>
+    <th>Quantity</th>
+    <th>Unit Price</th>
+    <th>Total</th>
+  `;
+  thead.append(headerRow);
+  table.append(thead);
+
+  // Create table body
+  const tbody = document.createElement('tbody');
+  
+  const displayItems = items.slice(0, 3);
+  displayItems.forEach((line: any) => {
+    const row = document.createElement('tr');
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    
+    row.innerHTML = `
+      <td class="line-item__description">${query ? (isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query ? (isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query ? (isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity) : quantity}</td>
+      <td class="line-item__unit-price">${query ? (isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice) : unitPrice}</td>
+      <td class="line-item__total">${query ? (isMonetarySearch ? highlightMonetaryValues(total, query) : total) : total}</td>
     `;
-    list.append(li);
+    tbody.append(row);
   });
 
+  // Add "more items" row if there are additional items
   if (items.length > 3) {
-    const remainder = document.createElement('li');
-    remainder.className = 'line-item__more';
+    const moreRow = document.createElement('tr');
+    moreRow.className = 'line-item__more-row';
     const remaining = items.length - 3;
-    remainder.textContent = `${remaining} more line item${remaining === 1 ? '' : 's'}…`;
-    list.append(remainder);
+    moreRow.innerHTML = `
+      <td colspan="5" class="line-item__more">${remaining} more line item${remaining === 1 ? '' : 's'}…</td>
+    `;
+    tbody.append(moreRow);
   }
 
-  wrapper.append(list);
+  table.append(tbody);
+  wrapper.append(table);
   return wrapper;
+}
+
+function getFieldLabel(field: string): string {
+  const labels: Record<string, string> = {
+    title: 'Title',
+    summary: 'Summary',
+    project: 'Project',
+    client: 'Client',
+    status: 'Status',
+    documentType: 'Document Type',
+    author: 'Author',
+    tags: 'Tags',
+  };
+
+  if (field.startsWith('lineItem') && field.includes('_')) {
+    const [, index, type] = field.split('_');
+    const typeLabels: Record<string, string> = {
+      title: 'Line Item Title',
+      description: 'Line Item Description',
+      type: 'Line Item Type',
+    };
+    return typeLabels[type] || 'Line Item';
+  }
+
+  if (field.startsWith('metadata_')) {
+    return 'Metadata';
+  }
+
+  return labels[field] || field;
 }

@@ -51,6 +51,7 @@ export type SearchRecord = DocumentRecord | FinancialRecord;
 export interface SearchGroup {
   entityType: SearchEntityType;
   items: SearchRecord[];
+  groupTitle?: string;
 }
 
 export type FacetKey =
@@ -60,7 +61,8 @@ export type FacetKey =
   | 'documentType'
   | 'client'
   | 'issuedDate'
-  | 'totalValue';
+  | 'totalValue'
+  | 'groupBy';
 
 export interface FacetValue {
   key: FacetKey;
@@ -80,6 +82,7 @@ export interface SearchResponse {
   fullGroups: SearchGroup[];
   facets: Partial<Record<FacetKey, FacetValue[]>>;
   records: SearchRecord[];
+  isGrouped: boolean;
 }
 
 export type ScreenRoute = 'home' | 'results' | 'settings';
@@ -89,4 +92,5 @@ export type FacetSelectionState = Partial<Record<FacetKey, Set<string>>>;
 export interface SearchOptions {
   query: string;
   selections?: FacetSelectionState;
+  isMonetarySearch?: boolean;
 }

@@ -8,6 +8,10 @@ import { appState } from './state/appState';
 import { runSearch } from './data/searchService';
 import { ScreenRoute } from './types';
 
+function isMonetaryQuery(query: string): boolean {
+  return query.trim().startsWith('$');
+}
+
 const root = document.querySelector<HTMLDivElement>('#app');
 if (!root) {
   throw new Error('Root container #app not found');
@@ -21,14 +25,30 @@ let activeSearchToken = 0;
 const header = createHeader({
   onNavigate: (route) => navigate(route),
   onSearchChange: (value) => {
+    const currentState = appState.getState();
+    const previousQuery = currentState.lastSubmittedQuery || currentState.searchQuery;
+    
+    // Clear filters if the search query has changed from the last submitted query
+    if (value.trim() !== previousQuery.trim()) {
+      appState.clearFacets();
+    }
+    
     appState.setSearchQuery(value);
-    void performSearch(value, { openDialog: true, updateSubmitted: false });
+    
+    // Set monetary search mode based on query
+    header.setMonetarySearchMode(isMonetaryQuery(value));
+    
+    const isHome = appState.getState().route === 'home';
+    void performSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
   },
   onSearchSubmit: () => {
     navigate('results');
     void performSearch(appState.getState().searchQuery, { openDialog: false });
   },
   onSearchFocus: () => {
+    if (appState.getState().route !== 'home') {
+      return;
+    }
     appState.setDialogOpen(true);
     const query = appState.getState().searchQuery;
     if (query.trim()) {
@@ -51,6 +71,14 @@ const searchDialog = createSearchDialog(header.dialogHost, {
     navigate('results');
     void performSearch(appState.getState().searchQuery, { openDialog: false });
   },
+});
+
+// Initialize dialog as hidden
+searchDialog.setState({
+  visible: false,
+  status: appState.getState().searchStatus,
+  query: appState.getState().searchQuery,
+  response: appState.getState().recentResponse,
 });
 
 const resultsView = createResultsView({
@@ -127,13 +155,15 @@ async function performSearch(
   const { openDialog = false, updateSubmitted = true } = options;
   const trimmed = query.trim();
 
-  if (openDialog) {
+  if (openDialog && appState.getState().route === 'home') {
     appState.setDialogOpen(true);
   }
 
   if (!trimmed) {
     activeSearchToken += 1;
-    appState.setLastSubmittedQuery('');
+    if (updateSubmitted) {
+      appState.setLastSubmittedQuery('');
+    }
     appState.setStatus('idle');
     appState.setResponse(null);
     return;
@@ -159,7 +189,7 @@ async function performSearch(
       appState.setLastSubmittedQuery(trimmed);
     }
 
-    if (openDialog) {
+    if (openDialog && appState.getState().route === 'home') {
       appState.setDialogOpen(true);
     }
   } catch (error) {
@@ -175,10 +205,15 @@ async function performSearch(
 function focusSearchBar() {
   header.searchInput.focus();
   header.searchInput.select();
-  appState.setDialogOpen(true);
-  const query = appState.getState().searchQuery;
-  if (query.trim()) {
-    void performSearch(query, { openDialog: true, updateSubmitted: false });
+  const isHome = appState.getState().route === 'home';
+  if (isHome) {
+    appState.setDialogOpen(true);
+    const query = appState.getState().searchQuery;
+    if (query.trim()) {
+      void performSearch(query, { openDialog: true, updateSubmitted: false });
+    }
+  } else {
+    appState.setDialogOpen(false);
   }
 }
 
@@ -230,10 +265,11 @@ appState.subscribe((state) => {
   header.setActiveRoute(state.route);
 
   searchDialog.setState({
-    visible: state.dialogOpen,
+    visible: state.dialogOpen && state.route === 'home',
     status: state.searchStatus,
     query: state.searchQuery,
     response: state.recentResponse,
+    isMonetarySearch: isMonetaryQuery(state.searchQuery),
   });
 
   resultsView.render({
@@ -242,6 +278,7 @@ appState.subscribe((state) => {
     status: state.searchStatus,
     query: state.lastSubmittedQuery || state.searchQuery,
     errorMessage: state.errorMessage,
+    isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
   });
 });
 

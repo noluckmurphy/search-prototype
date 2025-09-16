@@ -65,18 +65,31 @@ export const appState = {
   toggleFacet(key: FacetKey, value: string) {
     store.setState((prev) => {
       const selections = cloneSelections(prev.facetSelections);
-      const current = selections[key] ?? new Set<string>();
-
-      if (current.has(value)) {
-        current.delete(value);
+      
+      // Special handling for groupBy facet - only one option can be selected at a time
+      if (key === 'groupBy') {
+        if (selections[key]?.has(value)) {
+          // If the same value is selected, deselect it
+          delete selections[key];
+        } else {
+          // Select the new value and clear any other groupBy selections
+          selections[key] = new Set([value]);
+        }
       } else {
-        current.add(value);
-      }
+        // Normal facet behavior - multiple selections allowed
+        const current = selections[key] ?? new Set<string>();
 
-      if (current.size === 0) {
-        delete selections[key];
-      } else {
-        selections[key] = current;
+        if (current.has(value)) {
+          current.delete(value);
+        } else {
+          current.add(value);
+        }
+
+        if (current.size === 0) {
+          delete selections[key];
+        } else {
+          selections[key] = current;
+        }
       }
 
       return {

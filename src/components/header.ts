@@ -14,6 +14,7 @@ export interface HeaderHandles {
   searchInput: HTMLInputElement;
   dialogHost: HTMLDivElement;
   setActiveRoute(route: ScreenRoute): void;
+  setMonetarySearchMode(isMonetary: boolean): void;
 }
 
 export function createHeader(options: HeaderOptions): HeaderHandles {
@@ -25,7 +26,6 @@ export function createHeader(options: HeaderOptions): HeaderHandles {
 
   const brand = document.createElement('div');
   brand.className = 'brand';
-  brand.textContent = 'Search Prototype';
 
   const searchArea = document.createElement('div');
   searchArea.className = 'search-area';
@@ -107,10 +107,16 @@ export function createHeader(options: HeaderOptions): HeaderHandles {
     }
   };
 
+  const setMonetarySearchMode = (isMonetary: boolean) => {
+    searchForm.classList.toggle('monetary-search', isMonetary);
+    searchInput.classList.toggle('monetary-search', isMonetary);
+  };
+
   return {
     element: header,
     searchInput,
     dialogHost,
     setActiveRoute,
+    setMonetarySearchMode,
   };
 }

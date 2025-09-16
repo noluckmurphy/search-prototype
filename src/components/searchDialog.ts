@@ -1,12 +1,14 @@
 import { SearchGroup, SearchRecord, SearchResponse } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
+import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues } from '../utils/highlight';
 
 export interface SearchDialogState {
   visible: boolean;
   status: SearchStatus;
   query: string;
   response: SearchResponse | null;
+  isMonetarySearch?: boolean;
 }
 
 export interface SearchDialogOptions {
@@ -32,12 +34,15 @@ export function createSearchDialog(
 
   const setState = (state: SearchDialogState) => {
     dialog.hidden = !state.visible;
+    dialog.classList.toggle('monetary-search', state.isMonetarySearch || false);
 
     if (dialog.hidden) {
       dialog.innerHTML = '';
+      dialog.style.display = 'none';
       return;
     }
 
+    dialog.style.display = 'flex';
     renderDialogContents(dialog, state, options);
   };
 
@@ -75,10 +80,8 @@ function renderDialogContents(
     return;
   }
 
-  container.append(renderResultsSummary(response));
-
   response.limitedGroups.forEach((group) => {
-    container.append(renderGroup(group));
+    container.append(renderGroup(group, state.query, state.isMonetarySearch));
   });
 
   const footer = document.createElement('div');
@@ -87,7 +90,7 @@ function renderDialogContents(
   const seeAllButton = document.createElement('button');
   seeAllButton.type = 'button';
   seeAllButton.className = 'see-all-button';
-  seeAllButton.textContent = 'See all results';
+  seeAllButton.textContent = `See ${response.totalResults} results →`;
   seeAllButton.addEventListener('click', () => options.onSeeAllResults());
 
   footer.append(seeAllButton);
@@ -136,16 +139,8 @@ function renderNoResults(query: string): HTMLElement {
   return wrapper;
 }
 
-function renderResultsSummary(response: SearchResponse): HTMLElement {
-  const summary = document.createElement('div');
-  summary.className = 'search-dialog__summary';
-  summary.textContent = `${response.totalResults} result${
-    response.totalResults === 1 ? '' : 's'
-  } for “${response.query}”`;
-  return summary;
-}
 
-function renderGroup(group: SearchGroup): HTMLElement {
+function renderGroup(group: SearchGroup, query: string, isMonetarySearch?: boolean): HTMLElement {
   const section = document.createElement('section');
   section.className = 'search-dialog__group';
 
@@ -157,30 +152,42 @@ function renderGroup(group: SearchGroup): HTMLElement {
   list.className = 'search-dialog__list';
 
   group.items.forEach((item) => {
-    list.append(renderGroupItem(item));
+    list.append(renderGroupItem(item, query, isMonetarySearch));
   });
 
   section.append(list);
   return section;
 }
 
-function renderGroupItem(item: SearchRecord): HTMLLIElement {
+function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: boolean): HTMLLIElement {
   const li = document.createElement('li');
   li.className = 'search-dialog__item';
 
   const title = document.createElement('div');
   title.className = 'search-dialog__item-title';
-  title.textContent = item.title;
+  title.innerHTML = isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query);
 
   const meta = document.createElement('div');
   meta.className = 'search-dialog__item-meta';
-  meta.textContent = buildItemMeta(item);
+  const metaText = buildItemMeta(item, query, isMonetarySearch);
+  meta.innerHTML = isMonetarySearch ? highlightMonetaryValues(metaText, query) : metaText;
 
-  li.append(title, meta);
+  // Add context line showing what was matched
+  const match = findBestMatch(item, query);
+  if (match && match.field !== 'title') {
+    const context = document.createElement('div');
+    context.className = 'search-context';
+    const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 80, query);
+    context.innerHTML = highlightedSnippet;
+    li.append(title, meta, context);
+  } else {
+    li.append(title, meta);
+  }
+
   return li;
 }
 
-function buildItemMeta(item: SearchRecord): string {
+function buildItemMeta(item: SearchRecord, query?: string, isMonetarySearch?: boolean): string {
   const parts: string[] = [];
   parts.push(item.project);
 

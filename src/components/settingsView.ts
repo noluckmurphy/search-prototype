@@ -13,8 +13,8 @@ export function createSettingsView(): SettingsViewHandles {
 
   const heading = document.createElement('header');
   heading.innerHTML = `
-    <h1>Prototype settings</h1>
-    <p>Adjust prototype behaviors. Changes save to your browser and reload the experience.</p>
+    <h1>Prototype Settings</h1>
+    <p>Adjust prototype behaviors. Changes save to the browser local storage and reload the experience.</p>
   `;
 
   const form = document.createElement('form');
