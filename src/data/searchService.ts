@@ -821,10 +821,57 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   return searchQuery.trim() ? sortByRelevance(filtered, searchQuery, isMonetary) : sortByRecency(filtered);
 }
 
+function determineGroupEntityType(records: SearchRecord[]): SearchEntityType {
+  if (records.length === 0) {
+    return 'Document';
+  }
+  
+  // If all records have the same entity type, use that
+  const firstType = records[0].entityType;
+  if (records.every(record => record.entityType === firstType)) {
+    return firstType;
+  }
+  
+  // If records are mixed types, use the most common type
+  const typeCounts = new Map<SearchEntityType, number>();
+  records.forEach(record => {
+    typeCounts.set(record.entityType, (typeCounts.get(record.entityType) || 0) + 1);
+  });
+  
+  let mostCommonType: SearchEntityType = 'Document';
+  let maxCount = 0;
+  
+  for (const [type, count] of typeCounts.entries()) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostCommonType = type;
+    }
+  }
+  
+  return mostCommonType;
+}
+
 function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
   if (!groupBy || groupBy === 'None') {
-    // Return a single group with all records
-    return records.length > 0 ? [{ entityType: 'Document' as SearchEntityType, items: records }] : [];
+    // When not grouping, create separate groups for each entity type
+    // This allows us to apply individual limits to each type
+    const typeGroups = new Map<SearchEntityType, SearchRecord[]>();
+    
+    records.forEach((record) => {
+      if (!typeGroups.has(record.entityType)) {
+        typeGroups.set(record.entityType, []);
+      }
+      typeGroups.get(record.entityType)!.push(record);
+    });
+    
+    // Convert to SearchGroup array, sorted by entity type
+    return Array.from(typeGroups.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([entityType, items]) => ({
+        entityType,
+        items,
+        groupTitle: entityType,
+      }));
   }
 
   const map = new Map<string, SearchRecord[]>();
@@ -859,7 +906,7 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
   const sortedEntries = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   return sortedEntries.map(([groupKey, items]) => ({
-    entityType: groupBy === 'Type' ? groupKey as SearchEntityType : 'Document' as SearchEntityType,
+    entityType: groupBy === 'Type' ? groupKey as SearchEntityType : determineGroupEntityType(items),
     items,
     groupTitle: groupKey,
   })).filter((group) => group.items.length > 0);

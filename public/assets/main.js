@@ -2052,9 +2052,42 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
   });
   return searchQuery.trim() ? sortByRelevance(filtered, searchQuery, isMonetary) : sortByRecency(filtered);
 }
+function determineGroupEntityType(records) {
+  if (records.length === 0) {
+    return "Document";
+  }
+  const firstType = records[0].entityType;
+  if (records.every((record) => record.entityType === firstType)) {
+    return firstType;
+  }
+  const typeCounts = /* @__PURE__ */ new Map();
+  records.forEach((record) => {
+    typeCounts.set(record.entityType, (typeCounts.get(record.entityType) || 0) + 1);
+  });
+  let mostCommonType = "Document";
+  let maxCount = 0;
+  for (const [type, count] of typeCounts.entries()) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostCommonType = type;
+    }
+  }
+  return mostCommonType;
+}
 function buildGroups(records, groupBy) {
   if (!groupBy || groupBy === "None") {
-    return records.length > 0 ? [{ entityType: "Document", items: records }] : [];
+    const typeGroups = /* @__PURE__ */ new Map();
+    records.forEach((record) => {
+      if (!typeGroups.has(record.entityType)) {
+        typeGroups.set(record.entityType, []);
+      }
+      typeGroups.get(record.entityType).push(record);
+    });
+    return Array.from(typeGroups.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([entityType, items]) => ({
+      entityType,
+      items,
+      groupTitle: entityType
+    }));
   }
   const map = /* @__PURE__ */ new Map();
   records.forEach((record) => {
@@ -2082,7 +2115,7 @@ function buildGroups(records, groupBy) {
   });
   const sortedEntries = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   return sortedEntries.map(([groupKey, items]) => ({
-    entityType: groupBy === "Type" ? groupKey : "Document",
+    entityType: groupBy === "Type" ? groupKey : determineGroupEntityType(items),
     items,
     groupTitle: groupKey
   })).filter((group) => group.items.length > 0);
