@@ -179,20 +179,18 @@ export function highlightMonetaryValues(text: string, query: string): string {
   // Highlight numeric values that match the query amounts
   if (amounts.length > 0) {
     for (const amount of amounts) {
-      // Create patterns to match the amount in various formats
-      const patterns = [
-        // Exact amount with optional commas and decimals
-        new RegExp(`\\b${escapeRegex(amount.toString())}\\b`, 'g'),
-        // Amount with commas (e.g., 1,234.56)
-        new RegExp(`\\b${escapeRegex(amount.toLocaleString())}\\b`, 'g'),
-        // Amount with currency symbol
-        new RegExp(`\\$${escapeRegex(amount.toString())}\\b`, 'g'),
-        new RegExp(`\\$${escapeRegex(amount.toLocaleString())}\\b`, 'g'),
-      ];
+      // Create a single comprehensive pattern that matches the amount in various formats
+      // This avoids double highlighting by using a single replacement
+      const amountStr = amount.toString();
+      const amountWithCommas = amount.toLocaleString();
       
-      for (const pattern of patterns) {
-        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$&</mark>');
-      }
+      // Create a pattern that matches the amount with or without currency symbol and commas
+      const pattern = new RegExp(
+        `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+        'g'
+      );
+      
+      highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
     }
   }
   

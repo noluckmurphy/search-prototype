@@ -1,4 +1,3 @@
-import corpusJson from './search_corpus.json';
 import {
   DocumentRecord,
   FacetKey,
@@ -33,7 +32,37 @@ const FACET_KEYS: FacetKey[] = [
   'groupBy',
 ];
 
-const CORPUS: SearchRecord[] = (corpusJson as any[]).map((record) => normalizeRecord(record));
+// Load corpus from multiple files
+let CORPUS: SearchRecord[] = [];
+
+async function loadCorpus(): Promise<SearchRecord[]> {
+  if (CORPUS.length > 0) {
+    return CORPUS; // Return cached corpus if already loaded
+  }
+
+  try {
+    // Load the index file to get metadata about the split files
+    const indexResponse = await fetch('./corpus-parts/index.json');
+    const indexData = await indexResponse.json();
+    
+    const allRecords: any[] = [];
+    
+    // Load each corpus part file
+    for (const fileInfo of indexData.files) {
+      const response = await fetch(`./corpus-parts/${fileInfo.filename}`);
+      const partData = await response.json();
+      allRecords.push(...partData);
+    }
+    
+    CORPUS = allRecords.map((record) => normalizeRecord(record));
+    return CORPUS;
+  } catch (error) {
+    console.error('Error loading corpus:', error);
+    // Fallback to empty corpus
+    CORPUS = [];
+    return CORPUS;
+  }
+}
 
 function normalizeRecord(record: any): SearchRecord {
   // Clean up metadata to remove undefined values and ensure type safety
@@ -151,9 +180,9 @@ function parseCurrencyString(amountStr: string): number | null {
 }
 
 function normalizeForComparison(value: number | string): string {
-  // Convert to string and remove commas for consistent comparison
+  // Convert to string and remove commas and currency symbols for consistent comparison
   const str = typeof value === 'string' ? value : value.toString();
-  return str.replace(/,/g, '');
+  return str.replace(/[,$]/g, '');
 }
 
 function matchesMonetaryString(queryStr: string, dataValue: number): boolean {
@@ -166,23 +195,68 @@ function matchesMonetaryString(queryStr: string, dataValue: number): boolean {
     return true;
   }
   
-  // Only do partial matching for meaningful substrings
-  // Both query and data must be at least 3 digits to prevent single-digit matches
-  if (normalizedQuery.length >= 3 && normalizedData.length >= 3) {
-    // Check if the query is contained in the data value string
-    // This handles cases like searching "1234" matching "12,345" (partial match)
-    if (normalizedData.includes(normalizedQuery)) {
-      return true;
-    }
+  // UX Principle: The more explicit the user input, the more restrictive we should be
+  // Analyze the specificity of the query to determine matching behavior
+  
+  const queryHasDecimal = queryStr.includes('.');
+  const queryDigitsAfterDecimal = queryHasDecimal ? queryStr.split('.')[1]?.length || 0 : 0;
+  const querySignificantDigits = normalizedQuery.length;
+  
+  // If user provided decimals (like $800.00), be very restrictive
+  if (queryHasDecimal) {
+    // For queries with explicit decimals, only match if:
+    // 1. Exact match (already handled above)
+    // 2. The data value starts with the same significant digits in the same positions
+    //    and the precision doesn't conflict
     
-    // Check if the data value is contained in the query string
-    // This handles cases like searching "12,345" matching "1234" (partial match)
-    if (normalizedQuery.includes(normalizedData)) {
-      return true;
+    // Convert data value to same precision as query for comparison
+    const dataAsDecimal = dataValue.toString();
+    const dataHasDecimal = dataAsDecimal.includes('.');
+    
+      if (queryDigitsAfterDecimal > 0) {
+        // User specified decimal places - be very precise
+        const queryWithoutTrailingZeros = normalizedQuery.replace(/0+$/, '');
+        const dataWithoutTrailingZeros = normalizedData.replace(/0+$/, '');
+        
+        // Only match if the significant digits align exactly
+        // For decimal queries, be very restrictive - only exact matches or where data is a prefix of query
+        return dataWithoutTrailingZeros === queryWithoutTrailingZeros ||
+               (dataWithoutTrailingZeros.length <= queryWithoutTrailingZeros.replace(/\.$/, '').length && 
+                queryWithoutTrailingZeros.replace(/\.$/, '').startsWith(dataWithoutTrailingZeros));
+    } else {
+      // User typed something like "$800." - match whole numbers starting with those digits
+      return normalizedData.startsWith(normalizedQuery);
     }
   }
   
-  return false;
+  // For queries without decimals, apply progressive restriction based on specificity
+  if (querySignificantDigits >= 4) {
+    // 4+ digits (like "8000") - very restrictive, must start with exact digits
+    // Allow if data starts with query (for cases like "1500" matching "150")
+    if (normalizedData.length >= querySignificantDigits) {
+      return normalizedData.startsWith(normalizedQuery);
+    } else {
+      return normalizedQuery.startsWith(normalizedData);
+    }
+  } else if (querySignificantDigits >= 3) {
+    // 3 digits (like "800") - restrictive, must start with same 3 digits
+    if (normalizedData.length >= 3) {
+      return normalizedData.startsWith(normalizedQuery);
+    } else {
+      return normalizedQuery.startsWith(normalizedData);
+    }
+  } else if (querySignificantDigits >= 2) {
+    // 2 digits (like "80") - moderate restriction, must start with same 2 digits
+    if (normalizedData.length >= 2) {
+      return normalizedData.startsWith(normalizedQuery);
+    } else {
+      return normalizedQuery.startsWith(normalizedData);
+    }
+  } else {
+    // 1 digit (like "8") - most restrictive, only exact first digit match
+    // This is the "first digit" rule - only for single digit queries
+    return normalizedData[0] === normalizedQuery[0];
+  }
 }
 
 function isCloseMatch(value1: number, value2: number, tolerance: number = 0.01): boolean {
@@ -292,8 +366,7 @@ function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
     for (const lineItem of financialRecord.lineItems) {
       for (const queryAmount of amounts) {
         if (isCloseMatch(lineItem.lineItemTotal, queryAmount) ||
-            isCloseMatch(lineItem.lineItemUnitPrice, queryAmount) ||
-            isCloseMatch(lineItem.lineItemQuantity, queryAmount)) {
+            isCloseMatch(lineItem.lineItemUnitPrice, queryAmount)) {
           return true;
         }
       }
@@ -311,8 +384,7 @@ function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
     // Check line items for string matches
     for (const lineItem of financialRecord.lineItems) {
       if (matchesMonetaryString(token, lineItem.lineItemTotal) ||
-          matchesMonetaryString(token, lineItem.lineItemUnitPrice) ||
-          matchesMonetaryString(token, lineItem.lineItemQuantity)) {
+          matchesMonetaryString(token, lineItem.lineItemUnitPrice)) {
         return true;
       }
     }
@@ -587,12 +659,6 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
           score += 400; // Close unit price match
         }
         
-        // Quantity matches (lower priority)
-        if (lineItem.lineItemQuantity === queryAmount) {
-          score += 300; // Exact quantity match
-        } else if (isCloseMatch(lineItem.lineItemQuantity, queryAmount, 0.01)) {
-          score += 200; // Close quantity match
-        }
       }
     }
   }
@@ -612,9 +678,6 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
       }
       if (matchesMonetaryString(token, lineItem.lineItemUnitPrice)) {
         score += 550; // Good score for string-based unit price match
-      }
-      if (matchesMonetaryString(token, lineItem.lineItemQuantity)) {
-        score += 250; // Lower score for string-based quantity match
       }
     }
   }
@@ -667,10 +730,11 @@ function sortByRecency(records: SearchRecord[]): SearchRecord[] {
   );
 }
 
-function filterRecords({ query, selections, isMonetarySearch }: SearchOptions): SearchRecord[] {
+async function filterRecords({ query, selections, isMonetarySearch }: SearchOptions): Promise<SearchRecord[]> {
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   
-  const filtered = CORPUS.filter((record) => {
+  const corpus = await loadCorpus();
+  const filtered = corpus.filter((record) => {
     const matchesQueryResult = isMonetary ? matchesMonetaryQuery(record, searchQuery) : matchesQuery(record, searchQuery);
     return matchesQueryResult && matchesSelections(record, selections);
   });
@@ -759,7 +823,7 @@ export async function runSearch(
   const { isMonetary } = parseMonetaryQuery(options.query);
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   
-  const records = filterRecords(searchOptions);
+  const records = await filterRecords(searchOptions);
   const facets = computeFacets(records);
   
   // Determine grouping option from selections
@@ -782,6 +846,7 @@ export async function runSearch(
   };
 }
 
-export function getCorpus(): SearchRecord[] {
-  return [...CORPUS];
+export async function getCorpus(): Promise<SearchRecord[]> {
+  const corpus = await loadCorpus();
+  return [...corpus];
 }

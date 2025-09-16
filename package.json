@@ -4,7 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/main.ts --bundle --outdir=public/assets --format=esm --sourcemap --loader:.css=css",
-    "dev": "npm run build -- --watch"
+    "dev": "npm run build -- --watch",
+    "test": "node tests/nodejs-test-runner.js",
+    "test:unit": "node tests/simple-test-runner.js",
+    "test:integration": "node tests/nodejs-test-runner.js",
+    "test:monetary": "node tests/nodejs-test-runner.js",
+    "test:watch": "node tests/nodejs-test-runner.js",
+    "test:web": "echo 'Open tests/run-tests.html in your browser to run tests with a web interface'"
   },
   "devDependencies": {
     "esbuild": "^0.25.9",

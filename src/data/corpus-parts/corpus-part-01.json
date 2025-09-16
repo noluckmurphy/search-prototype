@@ -1,0 +1,1022 @@
+[
+  {
+    "id": "document-001",
+    "entityType": "Document",
+    "title": "Riverbend Condos – Punch List",
+    "summary": "Punch List prepared for Riverbend Condos covering finish carpentry scope updates.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "In Review",
+    "updatedAt": "2023-05-20T09:02:20.698Z",
+    "tags": [
+      "Interior",
+      "Exterior",
+      "Green Build"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Tanya Singh",
+      "location": "Portland, OR",
+      "revision": "R4",
+      "tradeFocus": "Roofing"
+    },
+    "documentType": "Punch List",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-002",
+    "entityType": "Document",
+    "title": "Sunset Heights – Specification Sheet",
+    "summary": "Specification Sheet prepared for Sunset Heights covering plumbing scope updates.",
+    "project": "Sunset Heights",
+    "client": "Jennifer & Michael Thompson",
+    "status": "Approved",
+    "updatedAt": "2023-07-07T22:28:11.890Z",
+    "tags": [
+      "HVAC",
+      "Exterior",
+      "Procurement"
+    ],
+    "metadata": {
+      "projectPhase": "Foundation",
+      "projectManager": "Caleb Winters",
+      "location": "Sacramento, CA",
+      "revision": "R1",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Rebecca Miles"
+  },
+  {
+    "id": "document-003",
+    "entityType": "Document",
+    "title": "Mesa Verde Townhomes – Inspection Report",
+    "summary": "Inspection Report prepared for Mesa Verde Townhomes covering plumbing scope updates.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "In Review",
+    "updatedAt": "2023-11-01T00:52:19.715Z",
+    "tags": [
+      "Procurement",
+      "Prefabrication",
+      "Exterior"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Leslie Ortega",
+      "location": "Phoenix, AZ",
+      "revision": "R5",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Inspection Report",
+    "author": "Olivia Chen"
+  },
+  {
+    "id": "document-004",
+    "entityType": "Document",
+    "title": "Harbor Point Residences – Specification Sheet",
+    "summary": "Specification Sheet prepared for Harbor Point Residences covering roofing scope updates.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Draft",
+    "updatedAt": "2023-01-19T16:23:47.385Z",
+    "tags": [
+      "Foundations",
+      "Interior",
+      "Schedule"
+    ],
+    "metadata": {
+      "projectPhase": "Mechanical Rough-In",
+      "projectManager": "Noah Kim",
+      "location": "Tacoma, WA",
+      "revision": "R4",
+      "tradeFocus": "Finish Carpentry"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Rebecca Miles"
+  },
+  {
+    "id": "document-005",
+    "entityType": "Document",
+    "title": "Willow Creek Ranch – Change Order",
+    "summary": "Change Order prepared for Willow Creek Ranch covering roofing scope updates.",
+    "project": "Willow Creek Ranch",
+    "client": "Carmen & Roberto Garcia",
+    "status": "Draft",
+    "updatedAt": "2024-03-12T10:15:59.797Z",
+    "tags": [
+      "Procurement",
+      "Interior",
+      "HVAC"
+    ],
+    "metadata": {
+      "projectPhase": "Design Development",
+      "projectManager": "Hannah Cole",
+      "location": "Fort Collins, CO",
+      "revision": "R1",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Change Order",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-006",
+    "entityType": "Document",
+    "title": "Mesa Verde Townhomes – Punch List",
+    "summary": "Punch List prepared for Mesa Verde Townhomes covering sitework scope updates.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "Superseded",
+    "updatedAt": "2023-01-08T04:04:46.586Z",
+    "tags": [
+      "Green Build",
+      "Fire Protection",
+      "Prefabrication"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Leslie Ortega",
+      "location": "Phoenix, AZ",
+      "revision": "R2",
+      "tradeFocus": "Solar"
+    },
+    "documentType": "Punch List",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-007",
+    "entityType": "Document",
+    "title": "Harbor Point Residences – Permit Package",
+    "summary": "Permit Package prepared for Harbor Point Residences covering concrete scope updates.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Draft",
+    "updatedAt": "2023-04-21T06:18:36.685Z",
+    "tags": [
+      "Safety",
+      "Green Build",
+      "HVAC"
+    ],
+    "metadata": {
+      "projectPhase": "Mechanical Rough-In",
+      "projectManager": "Noah Kim",
+      "location": "Tacoma, WA",
+      "revision": "R1",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Permit Package",
+    "author": "Rebecca Miles"
+  },
+  {
+    "id": "document-008",
+    "entityType": "Document",
+    "title": "Riverbend Condos – Permit Package",
+    "summary": "Permit Package prepared for Riverbend Condos covering hvac scope updates.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "Approved",
+    "updatedAt": "2023-01-30T18:52:07.840Z",
+    "tags": [
+      "Interior",
+      "Foundations",
+      "Exterior"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Tanya Singh",
+      "location": "Portland, OR",
+      "revision": "R5",
+      "tradeFocus": "Landscaping"
+    },
+    "documentType": "Permit Package",
+    "author": "Victor Huang"
+  },
+  {
+    "id": "document-009",
+    "entityType": "Document",
+    "title": "Harbor Point Residences – Inspection Report",
+    "summary": "Inspection Report prepared for Harbor Point Residences covering roofing scope updates.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Approved",
+    "updatedAt": "2024-01-07T11:52:22.233Z",
+    "tags": [
+      "Procurement",
+      "HVAC",
+      "Schedule"
+    ],
+    "metadata": {
+      "projectPhase": "Mechanical Rough-In",
+      "projectManager": "Noah Kim",
+      "location": "Tacoma, WA",
+      "revision": "R5",
+      "tradeFocus": "Finish Carpentry"
+    },
+    "documentType": "Inspection Report",
+    "author": "Miguel Alvarez"
+  },
+  {
+    "id": "document-010",
+    "entityType": "Document",
+    "title": "Pinecrest Estate – Permit Package",
+    "summary": "Permit Package prepared for Pinecrest Estate covering hvac scope updates.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Superseded",
+    "updatedAt": "2023-04-13T11:14:52.330Z",
+    "tags": [
+      "Prefabrication",
+      "Procurement",
+      "Fire Protection"
+    ],
+    "metadata": {
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Marcus Hall",
+      "location": "Bend, OR",
+      "revision": "R4",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Permit Package",
+    "author": "Olivia Chen"
+  },
+  {
+    "id": "document-011",
+    "entityType": "Document",
+    "title": "Willow Creek Ranch – Inspection Report",
+    "summary": "Inspection Report prepared for Willow Creek Ranch covering electrical scope updates.",
+    "project": "Willow Creek Ranch",
+    "client": "Carmen & Roberto Garcia",
+    "status": "Approved",
+    "updatedAt": "2023-12-05T23:10:27.741Z",
+    "tags": [
+      "Schedule",
+      "Prefabrication",
+      "HVAC"
+    ],
+    "metadata": {
+      "projectPhase": "Design Development",
+      "projectManager": "Hannah Cole",
+      "location": "Fort Collins, CO",
+      "revision": "R4",
+      "tradeFocus": "Solar"
+    },
+    "documentType": "Inspection Report",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-012",
+    "entityType": "Document",
+    "title": "Pinecrest Estate – Punch List",
+    "summary": "Punch List prepared for Pinecrest Estate covering plumbing scope updates.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Draft",
+    "updatedAt": "2024-05-17T12:08:35.441Z",
+    "tags": [
+      "Green Build",
+      "Procurement",
+      "Fire Protection"
+    ],
+    "metadata": {
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Marcus Hall",
+      "location": "Bend, OR",
+      "revision": "R1",
+      "tradeFocus": "Sitework"
+    },
+    "documentType": "Punch List",
+    "author": "Sofia Brooks"
+  },
+  {
+    "id": "document-013",
+    "entityType": "Document",
+    "title": "Granite Ridge Estates – Inspection Report",
+    "summary": "Inspection Report prepared for Granite Ridge Estates covering structural scope updates.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Draft",
+    "updatedAt": "2023-01-16T15:20:34.463Z",
+    "tags": [
+      "Fire Protection",
+      "Exterior",
+      "Safety"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "Jordan Blake",
+      "location": "Boise, ID",
+      "revision": "R3",
+      "tradeFocus": "HVAC"
+    },
+    "documentType": "Inspection Report",
+    "author": "Victor Huang"
+  },
+  {
+    "id": "document-014",
+    "entityType": "Document",
+    "title": "Granite Ridge Estates – Punch List",
+    "summary": "Punch List prepared for Granite Ridge Estates covering roofing scope updates.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Approved",
+    "updatedAt": "2024-04-17T06:37:55.767Z",
+    "tags": [
+      "Fire Protection",
+      "Safety",
+      "Procurement"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "Jordan Blake",
+      "location": "Boise, ID",
+      "revision": "R5",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Punch List",
+    "author": "Olivia Chen"
+  },
+  {
+    "id": "document-015",
+    "entityType": "Document",
+    "title": "Mesa Verde Townhomes – Inspection Report",
+    "summary": "Inspection Report prepared for Mesa Verde Townhomes covering concrete scope updates.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "Approved",
+    "updatedAt": "2023-06-03T07:33:04.164Z",
+    "tags": [
+      "Safety",
+      "Prefabrication",
+      "Procurement"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Leslie Ortega",
+      "location": "Phoenix, AZ",
+      "revision": "R3",
+      "tradeFocus": "Solar"
+    },
+    "documentType": "Inspection Report",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-016",
+    "entityType": "Document",
+    "title": "Cedar Ridge Homes – Permit Package",
+    "summary": "Permit Package prepared for Cedar Ridge Homes covering hvac scope updates.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Approved",
+    "updatedAt": "2023-05-03T07:03:34.046Z",
+    "tags": [
+      "Exterior",
+      "Safety",
+      "Fire Protection"
+    ],
+    "metadata": {
+      "projectPhase": "Closeout",
+      "projectManager": "Priya Desai",
+      "location": "Spokane, WA",
+      "revision": "R2",
+      "tradeFocus": "Roofing"
+    },
+    "documentType": "Permit Package",
+    "author": "Victor Huang"
+  },
+  {
+    "id": "document-017",
+    "entityType": "Document",
+    "title": "Cedar Ridge Homes – Architectural Drawing",
+    "summary": "Architectural Drawing prepared for Cedar Ridge Homes covering concrete scope updates.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "In Review",
+    "updatedAt": "2024-02-19T15:52:24.692Z",
+    "tags": [
+      "Foundations",
+      "Procurement",
+      "Prefabrication"
+    ],
+    "metadata": {
+      "projectPhase": "Closeout",
+      "projectManager": "Priya Desai",
+      "location": "Spokane, WA",
+      "revision": "R3",
+      "tradeFocus": "Electrical"
+    },
+    "documentType": "Architectural Drawing",
+    "author": "Sofia Brooks"
+  },
+  {
+    "id": "document-018",
+    "entityType": "Document",
+    "title": "Cedar Ridge Homes – Change Order",
+    "summary": "Change Order prepared for Cedar Ridge Homes covering sitework scope updates.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Draft",
+    "updatedAt": "2023-05-12T16:43:54.997Z",
+    "tags": [
+      "HVAC",
+      "Prefabrication",
+      "Foundations"
+    ],
+    "metadata": {
+      "projectPhase": "Closeout",
+      "projectManager": "Priya Desai",
+      "location": "Spokane, WA",
+      "revision": "R5",
+      "tradeFocus": "Structural"
+    },
+    "documentType": "Change Order",
+    "author": "Miguel Alvarez"
+  },
+  {
+    "id": "document-019",
+    "entityType": "Document",
+    "title": "Pinecrest Estate – Specification Sheet",
+    "summary": "Specification Sheet prepared for Pinecrest Estate covering sitework scope updates.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Draft",
+    "updatedAt": "2023-11-28T00:33:17.537Z",
+    "tags": [
+      "Safety",
+      "Schedule",
+      "Interior"
+    ],
+    "metadata": {
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Marcus Hall",
+      "location": "Bend, OR",
+      "revision": "R2",
+      "tradeFocus": "Structural"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Aaron Patel"
+  },
+  {
+    "id": "document-020",
+    "entityType": "Document",
+    "title": "Harbor Point Residences – Permit Package",
+    "summary": "Permit Package prepared for Harbor Point Residences covering landscaping scope updates.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Approved",
+    "updatedAt": "2023-10-20T20:04:16.212Z",
+    "tags": [
+      "Prefabrication",
+      "Exterior",
+      "HVAC"
+    ],
+    "metadata": {
+      "projectPhase": "Mechanical Rough-In",
+      "projectManager": "Noah Kim",
+      "location": "Tacoma, WA",
+      "revision": "R3",
+      "tradeFocus": "Structural"
+    },
+    "documentType": "Permit Package",
+    "author": "Sofia Brooks"
+  },
+  {
+    "id": "clientinvoice-001",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Mesa-2001",
+    "summary": "Client invoice for Mesa Verde Townhomes covering material progress.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "Outstanding",
+    "updatedAt": "2023-02-17T02:17:05.656Z",
+    "tags": [
+      "Interior",
+      "Foundations",
+      "Green Build"
+    ],
+    "metadata": {
+      "vendor": "Granite State Supply",
+      "vendorTrade": "Material",
+      "projectPhase": "Exterior Finishes",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 37800,
+    "issuedDate": "2023-02-06T02:17:05.656Z",
+    "dueDate": "2023-03-19T02:17:05.656Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-001-item-1",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Other for exterior siding on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4602,
+        "lineItemTotal": 18408,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-001-item-2",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Material for rooftop units on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3298,
+        "lineItemTotal": 16490,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-001-item-3",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Labor for main service panel on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 111,
+        "lineItemTotal": 888,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-001-item-4",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Subcontractor for interior paint on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2014,
+        "lineItemTotal": 2014,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-002",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Lakeside-2002",
+    "summary": "Client invoice for Lakeside Villas covering electrical progress.",
+    "project": "Lakeside Villas",
+    "client": "Elena & Miguel Hernandez",
+    "status": "Partial",
+    "updatedAt": "2024-01-30T14:11:31.444Z",
+    "tags": [
+      "Exterior",
+      "Prefabrication",
+      "Foundations"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Framing",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 14330,
+    "issuedDate": "2024-01-01T14:11:31.444Z",
+    "dueDate": "2024-01-31T14:11:31.444Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-002-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Material for landscape irrigation on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 826,
+        "lineItemTotal": 2478,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-2",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Material for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2963,
+        "lineItemTotal": 11852,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-003",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Marina-2003",
+    "summary": "Client invoice for Marina Overlook covering material progress.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Outstanding",
+    "updatedAt": "2023-04-15T00:54:05.038Z",
+    "tags": [
+      "HVAC",
+      "Prefabrication",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Granite State Supply",
+      "vendorTrade": "Material",
+      "projectPhase": "Punch List",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 26008,
+    "issuedDate": "2023-03-19T00:54:05.038Z",
+    "dueDate": "2023-05-08T00:54:05.038Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-003-item-1",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2086,
+        "lineItemTotal": 6258,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-003-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3950,
+        "lineItemTotal": 19750,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-004",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Granite-2004",
+    "summary": "Client invoice for Granite Ridge Estates covering electrical progress.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Sent",
+    "updatedAt": "2023-10-06T11:52:58.884Z",
+    "tags": [
+      "Safety",
+      "Exterior",
+      "Foundations"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Sitework",
+      "costCode": "07-150 Roofing Assembly",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 65315,
+    "issuedDate": "2023-09-19T11:52:58.884Z",
+    "dueDate": "2023-11-17T11:52:58.884Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-004-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4730,
+        "lineItemTotal": 18920,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-004-item-2",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Subcontractor for interior paint on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4909,
+        "lineItemTotal": 29454,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-004-item-3",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3255,
+        "lineItemTotal": 9765,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-004-item-4",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Other for window package on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1196,
+        "lineItemTotal": 7176,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-005",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Riverbend-2005",
+    "summary": "Client invoice for Riverbend Condos covering hvac progress.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "Paid",
+    "updatedAt": "2023-10-04T16:33:19.485Z",
+    "tags": [
+      "Schedule",
+      "Fire Protection",
+      "Prefabrication"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Finishes",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 26136,
+    "issuedDate": "2023-09-01T16:33:19.485Z",
+    "dueDate": "2023-10-27T16:33:19.485Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-005-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2892,
+        "lineItemTotal": 11568,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-2",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Other for main service panel on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4528,
+        "lineItemTotal": 13584,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-3",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Labor for main service panel on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 123,
+        "lineItemTotal": 984,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-006",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Harbor-2006",
+    "summary": "Client invoice for Harbor Point Residences covering other progress.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Draft",
+    "updatedAt": "2023-08-20T22:47:02.831Z",
+    "tags": [
+      "Procurement",
+      "HVAC",
+      "Interior"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Mechanical Rough-In",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 8476,
+    "issuedDate": "2023-08-11T22:47:02.831Z",
+    "dueDate": "2023-09-24T22:47:02.831Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-006-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1301,
+        "lineItemTotal": 5204,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-2",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 818,
+        "lineItemTotal": 3272,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-007",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Marina-2007",
+    "summary": "Client invoice for Marina Overlook covering electrical progress.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Outstanding",
+    "updatedAt": "2024-01-19T04:46:50.075Z",
+    "tags": [
+      "Schedule",
+      "Prefabrication",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Punch List",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 2630,
+    "issuedDate": "2023-12-29T04:46:50.075Z",
+    "dueDate": "2024-02-17T04:46:50.075Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-007-item-1",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Labor for rooftop units on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 121,
+        "lineItemTotal": 2057,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-2",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 573,
+        "lineItemTotal": 573,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-008",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Harbor-2008",
+    "summary": "Client invoice for Harbor Point Residences covering concrete progress.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Sent",
+    "updatedAt": "2023-12-02T18:59:29.884Z",
+    "tags": [
+      "Prefabrication",
+      "Green Build",
+      "Schedule"
+    ],
+    "metadata": {
+      "vendor": "BlueSky Concrete",
+      "vendorTrade": "Concrete",
+      "projectPhase": "Mechanical Rough-In",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 14913,
+    "issuedDate": "2023-11-27T18:59:29.884Z",
+    "dueDate": "2023-12-24T18:59:29.884Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-008-item-1",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Other for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 880,
+        "lineItemTotal": 5280,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 1932,
+        "lineItemTotal": 7728,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-3",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Material for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1905,
+        "lineItemTotal": 1905,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-009",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Marina-2009",
+    "summary": "Client invoice for Marina Overlook covering hvac progress.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Sent",
+    "updatedAt": "2023-08-17T17:18:05.607Z",
+    "tags": [
+      "Exterior",
+      "Green Build",
+      "HVAC"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Punch List",
+      "costCode": "03-310 Concrete Footings",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 35761,
+    "issuedDate": "2023-08-12T17:18:05.607Z",
+    "dueDate": "2023-09-10T17:18:05.607Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-009-item-1",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Material for rooftop units on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4363,
+        "lineItemTotal": 17452,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-009-item-2",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Other for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 889,
+        "lineItemTotal": 5334,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-009-item-3",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Material for interior paint on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4325,
+        "lineItemTotal": 12975,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-010",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Granite-2010",
+    "summary": "Client invoice for Granite Ridge Estates covering finish carpentry progress.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Paid",
+    "updatedAt": "2024-02-25T16:11:20.090Z",
+    "tags": [
+      "Schedule",
+      "Foundations",
+      "Interior"
+    ],
+    "metadata": {
+      "vendor": "Cascade Finishes",
+      "vendorTrade": "Finish Carpentry",
+      "projectPhase": "Sitework",
+      "costCode": "07-150 Roofing Assembly",
+      "paymentTerms": "Net 15"
+    },
+    "totalValue": 24194,
+    "issuedDate": "2024-02-07T16:11:20.090Z",
+    "dueDate": "2024-03-04T16:11:20.090Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-010-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Material for window package on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3724,
+        "lineItemTotal": 7448,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-010-item-2",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5582,
+        "lineItemTotal": 16746,
+        "lineItemType": "Other"
+      }
+    ]
+  }
+]

@@ -1,0 +1,722 @@
+[
+  {
+    "id": "document-041",
+    "entityType": "Document",
+    "title": "Cedar Point – Roofing Installation Specifications",
+    "summary": "Roofing installation specifications covering shingle installation, flashing, and weatherproofing requirements.",
+    "project": "Cedar Point",
+    "client": "Nancy & Robert Davis",
+    "status": "Approved",
+    "updatedAt": "2024-04-25T14:10:00.000Z",
+    "tags": [
+      "Roofing",
+      "Installation",
+      "Weatherproofing"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Amanda Taylor",
+      "location": "Tampa, FL",
+      "revision": "R2",
+      "tradeFocus": "Roofing"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Christopher Wilson"
+  },
+  {
+    "id": "document-042",
+    "entityType": "Document",
+    "title": "Sycamore Springs – Siding Installation Guide",
+    "summary": "Siding installation guide covering vinyl, wood, and fiber cement siding installation procedures and weatherproofing.",
+    "project": "Sycamore Springs",
+    "client": "Carol & Michael Brown",
+    "status": "In Review",
+    "updatedAt": "2024-04-30T12:45:00.000Z",
+    "tags": [
+      "Siding",
+      "Installation",
+      "Exterior"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Jennifer Martinez",
+      "location": "Richmond, VA",
+      "revision": "R1",
+      "tradeFocus": "Siding"
+    },
+    "documentType": "Installation Guide",
+    "author": "David Kim"
+  },
+  {
+    "id": "document-043",
+    "entityType": "Document",
+    "title": "Poplar Ridge – Gutters Installation Schedule",
+    "summary": "Gutters installation schedule covering aluminum and copper gutter installation, downspout placement, and drainage requirements.",
+    "project": "Poplar Ridge",
+    "client": "Sharon & James Wilson",
+    "status": "Draft",
+    "updatedAt": "2024-05-05T09:30:00.000Z",
+    "tags": [
+      "Gutters",
+      "Drainage",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Thomas Anderson",
+      "location": "Louisville, KY",
+      "revision": "R1",
+      "tradeFocus": "Gutters"
+    },
+    "documentType": "Schedule",
+    "author": "Sarah Foster"
+  },
+  {
+    "id": "document-044",
+    "entityType": "Document",
+    "title": "Birchwood Manor – Garage Door Installation",
+    "summary": "Garage door installation specifications covering automatic opener installation, safety features, and weatherproofing requirements.",
+    "project": "Birchwood Manor",
+    "client": "Linda & Richard Garcia",
+    "status": "Approved",
+    "updatedAt": "2024-05-10T16:20:00.000Z",
+    "tags": [
+      "Garage",
+      "Doors",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Rachel Lee",
+      "location": "Memphis, TN",
+      "revision": "R3",
+      "tradeFocus": "Garage"
+    },
+    "documentType": "Installation Guide",
+    "author": "Michael Rodriguez"
+  },
+  {
+    "id": "document-045",
+    "entityType": "Document",
+    "title": "Oakwood Estates – Driveway Installation Plan",
+    "summary": "Driveway installation plan covering concrete, asphalt, and paver installation procedures and drainage considerations.",
+    "project": "Oakwood Estates",
+    "client": "Donna & William Thompson",
+    "status": "In Review",
+    "updatedAt": "2024-05-15T11:15:00.000Z",
+    "tags": [
+      "Driveway",
+      "Concrete",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "Kevin Park",
+      "location": "Birmingham, AL",
+      "revision": "R2",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Installation Plan",
+    "author": "Emily Chen"
+  },
+  {
+    "id": "document-046",
+    "entityType": "Document",
+    "title": "Pine Ridge Homes – Basement Waterproofing",
+    "summary": "Basement waterproofing specifications covering interior and exterior waterproofing systems, drainage, and moisture control.",
+    "project": "Pine Ridge Homes",
+    "client": "Patricia & Robert Johnson",
+    "status": "Approved",
+    "updatedAt": "2024-05-20T13:30:00.000Z",
+    "tags": [
+      "Basement",
+      "Waterproofing",
+      "Drainage"
+    ],
+    "metadata": {
+      "projectPhase": "Foundation",
+      "projectManager": "Lisa Taylor",
+      "location": "Indianapolis, IN",
+      "revision": "R2",
+      "tradeFocus": "Waterproofing"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Christopher Martinez"
+  },
+  {
+    "id": "document-047",
+    "entityType": "Document",
+    "title": "Maple Grove Development – Deck Construction Guide",
+    "summary": "Deck construction guide covering structural requirements, material selection, and safety compliance standards.",
+    "project": "Maple Grove Development",
+    "client": "Deborah & Steven Anderson",
+    "status": "In Review",
+    "updatedAt": "2024-05-25T10:45:00.000Z",
+    "tags": [
+      "Deck",
+      "Construction",
+      "Structural"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "David Wilson",
+      "location": "Columbus, OH",
+      "revision": "R1",
+      "tradeFocus": "Framing"
+    },
+    "documentType": "Construction Guide",
+    "author": "Amanda Kim"
+  },
+  {
+    "id": "document-048",
+    "entityType": "Document",
+    "title": "Cedar Valley Subdivision – Fence Installation Schedule",
+    "summary": "Fence installation schedule covering privacy, decorative, and security fence installation phases and material requirements.",
+    "project": "Cedar Valley Subdivision",
+    "client": "Janet & Michael Davis",
+    "status": "Draft",
+    "updatedAt": "2024-05-30T15:20:00.000Z",
+    "tags": [
+      "Fence",
+      "Installation",
+      "Security"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Rachel Foster",
+      "location": "Detroit, MI",
+      "revision": "R1",
+      "tradeFocus": "Fencing"
+    },
+    "documentType": "Schedule",
+    "author": "Thomas Rodriguez"
+  },
+  {
+    "id": "document-049",
+    "entityType": "Document",
+    "title": "Birchwood Manor – Patio Installation Specifications",
+    "summary": "Patio installation specifications covering concrete, stone, and paver patio construction procedures and drainage requirements.",
+    "project": "Birchwood Manor",
+    "client": "Sandra & James White",
+    "status": "Approved",
+    "updatedAt": "2024-06-05T12:10:00.000Z",
+    "tags": [
+      "Patio",
+      "Concrete",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Jennifer Lee",
+      "location": "Buffalo, NY",
+      "revision": "R3",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Michael Chen"
+  },
+  {
+    "id": "document-050",
+    "entityType": "Document",
+    "title": "Elm Street Residences – Retaining Wall Construction",
+    "summary": "Retaining wall construction specifications covering concrete, stone, and block wall construction procedures and drainage systems.",
+    "project": "Elm Street Residences",
+    "client": "Cynthia & Richard Brown",
+    "status": "In Review",
+    "updatedAt": "2024-06-10T09:35:00.000Z",
+    "tags": [
+      "Retaining Wall",
+      "Construction",
+      "Drainage"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "Kevin Anderson",
+      "location": "Rochester, NY",
+      "revision": "R2",
+      "tradeFocus": "Concrete"
+    },
+    "documentType": "Construction Guide",
+    "author": "Sarah Wilson"
+  },
+  {
+    "id": "document-051",
+    "entityType": "Document",
+    "title": "Willowbrook Commons – Septic System Installation",
+    "summary": "Septic system installation specifications covering tank placement, drain field installation, and permit requirements.",
+    "project": "Willowbrook Commons",
+    "client": "Brenda & Donald Miller",
+    "status": "Approved",
+    "updatedAt": "2024-06-15T14:25:00.000Z",
+    "tags": [
+      "Septic",
+      "Installation",
+      "Permits"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "Lisa Johnson",
+      "location": "Hartford, CT",
+      "revision": "R2",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Installation Guide",
+    "author": "Christopher Taylor"
+  },
+  {
+    "id": "document-052",
+    "entityType": "Document",
+    "title": "Sycamore Heights – Well Installation Specifications",
+    "summary": "Well installation specifications covering drilling requirements, pump installation, and water quality testing procedures.",
+    "project": "Sycamore Heights",
+    "client": "Pamela & Ronald Garcia",
+    "status": "In Review",
+    "updatedAt": "2024-06-20T11:50:00.000Z",
+    "tags": [
+      "Well",
+      "Installation",
+      "Water"
+    ],
+    "metadata": {
+      "projectPhase": "Sitework",
+      "projectManager": "David Martinez",
+      "location": "Providence, RI",
+      "revision": "R1",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Specification Sheet",
+    "author": "Amanda Foster"
+  },
+  {
+    "id": "document-053",
+    "entityType": "Document",
+    "title": "Poplar Grove – Solar Panel Installation Plan",
+    "summary": "Solar panel installation plan covering roof mounting, electrical connections, and grid-tie system requirements.",
+    "project": "Poplar Grove",
+    "client": "Joyce & Gary Thompson",
+    "status": "Draft",
+    "updatedAt": "2024-06-25T16:15:00.000Z",
+    "tags": [
+      "Solar",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Exterior Finishes",
+      "projectManager": "Rachel Kim",
+      "location": "Burlington, VT",
+      "revision": "R1",
+      "tradeFocus": "Solar"
+    },
+    "documentType": "Installation Plan",
+    "author": "Thomas Wilson"
+  },
+  {
+    "id": "document-054",
+    "entityType": "Document",
+    "title": "Ashwood Village – Generator Installation Guide",
+    "summary": "Generator installation guide covering standby generator placement, electrical connections, and fuel system requirements.",
+    "project": "Ashwood Village",
+    "client": "Virginia & Edward White",
+    "status": "Approved",
+    "updatedAt": "2024-06-30T10:40:00.000Z",
+    "tags": [
+      "Generator",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Jennifer Rodriguez",
+      "location": "Montpelier, VT",
+      "revision": "R3",
+      "tradeFocus": "Electrical"
+    },
+    "documentType": "Installation Guide",
+    "author": "Michael Lee"
+  },
+  {
+    "id": "document-055",
+    "entityType": "Document",
+    "title": "Hickory Ridge – Security System Installation",
+    "summary": "Security system installation specifications covering alarm systems, cameras, and smart home integration requirements.",
+    "project": "Hickory Ridge",
+    "client": "Marie & Frank Anderson",
+    "status": "In Review",
+    "updatedAt": "2024-07-05T13:20:00.000Z",
+    "tags": [
+      "Security",
+      "Installation",
+      "Smart Home"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Kevin Chen",
+      "location": "Concord, NH",
+      "revision": "R2",
+      "tradeFocus": "Security"
+    },
+    "documentType": "Installation Guide",
+    "author": "Sarah Martinez"
+  },
+  {
+    "id": "document-056",
+    "entityType": "Document",
+    "title": "Dogwood Lane – Smart Home Integration",
+    "summary": "Smart home integration specifications covering home automation systems, device connectivity, and control interfaces.",
+    "project": "Dogwood Lane",
+    "client": "Gloria & Raymond Davis",
+    "status": "Approved",
+    "updatedAt": "2024-07-10T15:30:00.000Z",
+    "tags": [
+      "Smart Home",
+      "Automation",
+      "Integration"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "David Foster",
+      "location": "Augusta, ME",
+      "revision": "R2",
+      "tradeFocus": "Smart Home"
+    },
+    "documentType": "Integration Guide",
+    "author": "Amanda Rodriguez"
+  },
+  {
+    "id": "document-057",
+    "entityType": "Document",
+    "title": "Magnolia Court – Home Theater Installation",
+    "summary": "Home theater installation specifications covering audio-visual equipment, wiring, and acoustic treatment requirements.",
+    "project": "Magnolia Court",
+    "client": "Cheryl & Wayne Brown",
+    "status": "In Review",
+    "updatedAt": "2024-07-15T12:45:00.000Z",
+    "tags": [
+      "Home Theater",
+      "Audio",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Thomas Kim",
+      "location": "Annapolis, MD",
+      "revision": "R1",
+      "tradeFocus": "Audio"
+    },
+    "documentType": "Installation Guide",
+    "author": "Christopher Wilson"
+  },
+  {
+    "id": "document-058",
+    "entityType": "Document",
+    "title": "Redwood Estates – Wine Cellar Construction",
+    "summary": "Wine cellar construction specifications covering climate control, storage systems, and ventilation requirements.",
+    "project": "Redwood Estates",
+    "client": "Diane & Gregory Miller",
+    "status": "Draft",
+    "updatedAt": "2024-07-20T09:15:00.000Z",
+    "tags": [
+      "Wine Cellar",
+      "Climate Control",
+      "Construction"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Rachel Taylor",
+      "location": "Dover, DE",
+      "revision": "R1",
+      "tradeFocus": "HVAC"
+    },
+    "documentType": "Construction Guide",
+    "author": "Michael Martinez"
+  },
+  {
+    "id": "document-059",
+    "entityType": "Document",
+    "title": "Cypress Gardens – Sauna Installation",
+    "summary": "Sauna installation specifications covering electrical requirements, ventilation, and safety compliance standards.",
+    "project": "Cypress Gardens",
+    "client": "Janice & Harold Garcia",
+    "status": "Approved",
+    "updatedAt": "2024-07-25T14:20:00.000Z",
+    "tags": [
+      "Sauna",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Finishes",
+      "projectManager": "Jennifer Lee",
+      "location": "Tallahassee, FL",
+      "revision": "R3",
+      "tradeFocus": "Electrical"
+    },
+    "documentType": "Installation Guide",
+    "author": "David Chen"
+  },
+  {
+    "id": "document-060",
+    "entityType": "Document",
+    "title": "Juniper Hills – Pool Installation Plan",
+    "summary": "Pool installation plan covering excavation, plumbing, electrical, and safety barrier requirements.",
+    "project": "Juniper Hills",
+    "client": "Martha & Albert Thompson",
+    "status": "In Review",
+    "updatedAt": "2024-07-30T11:35:00.000Z",
+    "tags": [
+      "Pool",
+      "Installation",
+      "Safety"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Kevin Anderson",
+      "location": "Atlanta, GA",
+      "revision": "R2",
+      "tradeFocus": "Pool"
+    },
+    "documentType": "Installation Plan",
+    "author": "Sarah Foster"
+  },
+  {
+    "id": "document-061",
+    "entityType": "Document",
+    "title": "Spruce Valley – Hot Tub Installation",
+    "summary": "Hot tub installation specifications covering electrical requirements, plumbing connections, and safety compliance standards.",
+    "project": "Spruce Valley",
+    "client": "Frances & Eugene White",
+    "status": "Approved",
+    "updatedAt": "2024-08-05T16:50:00.000Z",
+    "tags": [
+      "Hot Tub",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Lisa Rodriguez",
+      "location": "Baton Rouge, LA",
+      "revision": "R2",
+      "tradeFocus": "Electrical"
+    },
+    "documentType": "Installation Guide",
+    "author": "Christopher Kim"
+  },
+  {
+    "id": "document-062",
+    "entityType": "Document",
+    "title": "Fir Grove – Outdoor Kitchen Construction",
+    "summary": "Outdoor kitchen construction specifications covering gas line installation, countertop materials, and weatherproofing requirements.",
+    "project": "Fir Grove",
+    "client": "Evelyn & Arthur Anderson",
+    "status": "In Review",
+    "updatedAt": "2024-08-10T13:25:00.000Z",
+    "tags": [
+      "Outdoor Kitchen",
+      "Construction",
+      "Gas"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "David Wilson",
+      "location": "Jackson, MS",
+      "revision": "R1",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Construction Guide",
+    "author": "Amanda Taylor"
+  },
+  {
+    "id": "document-063",
+    "entityType": "Document",
+    "title": "Pinecone Ridge – Fire Pit Installation",
+    "summary": "Fire pit installation specifications covering gas and wood-burning options, safety requirements, and permit compliance.",
+    "project": "Pinecone Ridge",
+    "client": "Alice & Walter Davis",
+    "status": "Draft",
+    "updatedAt": "2024-08-15T10:40:00.000Z",
+    "tags": [
+      "Fire Pit",
+      "Installation",
+      "Safety"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Thomas Martinez",
+      "location": "Little Rock, AR",
+      "revision": "R1",
+      "tradeFocus": "Gas"
+    },
+    "documentType": "Installation Guide",
+    "author": "Michael Foster"
+  },
+  {
+    "id": "document-064",
+    "entityType": "Document",
+    "title": "Hemlock Falls – Pergola Construction",
+    "summary": "Pergola construction specifications covering structural requirements, material selection, and anchoring systems.",
+    "project": "Hemlock Falls",
+    "client": "Ruth & Clarence Brown",
+    "status": "Approved",
+    "updatedAt": "2024-08-20T15:15:00.000Z",
+    "tags": [
+      "Pergola",
+      "Construction",
+      "Structural"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Rachel Chen",
+      "location": "Oklahoma City, OK",
+      "revision": "R3",
+      "tradeFocus": "Framing"
+    },
+    "documentType": "Construction Guide",
+    "author": "Kevin Lee"
+  },
+  {
+    "id": "document-065",
+    "entityType": "Document",
+    "title": "Cedar Point – Gazebo Installation Plan",
+    "summary": "Gazebo installation plan covering foundation requirements, assembly procedures, and electrical connections for lighting.",
+    "project": "Cedar Point",
+    "client": "Betty & Roy Miller",
+    "status": "In Review",
+    "updatedAt": "2024-08-25T12:30:00.000Z",
+    "tags": [
+      "Gazebo",
+      "Installation",
+      "Foundation"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Jennifer Anderson",
+      "location": "Des Moines, IA",
+      "revision": "R2",
+      "tradeFocus": "Framing"
+    },
+    "documentType": "Installation Plan",
+    "author": "David Rodriguez"
+  },
+  {
+    "id": "document-066",
+    "entityType": "Document",
+    "title": "Sycamore Springs – Water Feature Installation",
+    "summary": "Water feature installation specifications covering fountain systems, pump installation, and electrical requirements.",
+    "project": "Sycamore Springs",
+    "client": "Helen & Carl Thompson",
+    "status": "Approved",
+    "updatedAt": "2024-08-30T14:45:00.000Z",
+    "tags": [
+      "Water Feature",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Lisa Wilson",
+      "location": "Pierre, SD",
+      "revision": "R2",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Installation Guide",
+    "author": "Christopher Martinez"
+  },
+  {
+    "id": "document-067",
+    "entityType": "Document",
+    "title": "Poplar Ridge – Sprinkler System Installation",
+    "summary": "Sprinkler system installation specifications covering zone layout, controller installation, and water pressure requirements.",
+    "project": "Poplar Ridge",
+    "client": "Dorothy & Ralph Garcia",
+    "status": "In Review",
+    "updatedAt": "2024-09-05T11:20:00.000Z",
+    "tags": [
+      "Sprinkler",
+      "Irrigation",
+      "Installation"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Thomas Foster",
+      "location": "Bismarck, ND",
+      "revision": "R1",
+      "tradeFocus": "Plumbing"
+    },
+    "documentType": "Installation Guide",
+    "author": "Amanda Kim"
+  },
+  {
+    "id": "document-068",
+    "entityType": "Document",
+    "title": "Birchwood Manor – Outdoor Lighting Plan",
+    "summary": "Outdoor lighting installation plan covering landscape lighting, security lighting, and electrical connections.",
+    "project": "Birchwood Manor",
+    "client": "Lois & Howard White",
+    "status": "Draft",
+    "updatedAt": "2024-09-10T16:35:00.000Z",
+    "tags": [
+      "Outdoor Lighting",
+      "Installation",
+      "Electrical"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Rachel Taylor",
+      "location": "Helena, MT",
+      "revision": "R1",
+      "tradeFocus": "Electrical"
+    },
+    "documentType": "Installation Plan",
+    "author": "Michael Chen"
+  },
+  {
+    "id": "document-069",
+    "entityType": "Document",
+    "title": "Oakwood Estates – Compost System Installation",
+    "summary": "Compost system installation specifications covering bin placement, drainage requirements, and maintenance procedures.",
+    "project": "Oakwood Estates",
+    "client": "Norma & Eugene Anderson",
+    "status": "Approved",
+    "updatedAt": "2024-09-15T13:10:00.000Z",
+    "tags": [
+      "Compost",
+      "Installation",
+      "Drainage"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "David Rodriguez",
+      "location": "Cheyenne, WY",
+      "revision": "R3",
+      "tradeFocus": "Landscaping"
+    },
+    "documentType": "Installation Guide",
+    "author": "Sarah Wilson"
+  },
+  {
+    "id": "document-070",
+    "entityType": "Document",
+    "title": "Pine Ridge Homes – Greenhouse Construction",
+    "summary": "Greenhouse construction specifications covering structural requirements, ventilation systems, and electrical connections.",
+    "project": "Pine Ridge Homes",
+    "client": "Phyllis & Stanley Davis",
+    "status": "In Review",
+    "updatedAt": "2024-09-20T10:55:00.000Z",
+    "tags": [
+      "Greenhouse",
+      "Construction",
+      "Ventilation"
+    ],
+    "metadata": {
+      "projectPhase": "Landscaping",
+      "projectManager": "Jennifer Lee",
+      "location": "Denver, CO",
+      "revision": "R2",
+      "tradeFocus": "Framing"
+    },
+    "documentType": "Construction Guide",
+    "author": "Kevin Anderson"
+  }
+]

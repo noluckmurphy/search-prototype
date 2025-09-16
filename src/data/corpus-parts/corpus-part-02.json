@@ -1,0 +1,1682 @@
+[
+  {
+    "id": "clientinvoice-011",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Harbor-2011",
+    "summary": "Client invoice for Harbor Point Residences covering plumbing progress.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Partial",
+    "updatedAt": "2023-05-15T10:40:11.015Z",
+    "tags": [
+      "Interior",
+      "Safety",
+      "Green Build"
+    ],
+    "metadata": {
+      "vendor": "Precision Plumbing",
+      "vendorTrade": "Plumbing",
+      "projectPhase": "Mechanical Rough-In",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 12829,
+    "issuedDate": "2023-05-02T10:40:11.015Z",
+    "dueDate": "2023-05-23T10:40:11.015Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-011-item-1",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Subcontractor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 3344,
+        "lineItemTotal": 6688,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-011-item-2",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Other for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1540,
+        "lineItemTotal": 4620,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-011-item-3",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Labor for interior paint on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 117,
+        "lineItemTotal": 1521,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-012",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Cedar-2012",
+    "summary": "Client invoice for Cedar Ridge Homes covering finish carpentry progress.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Overdue",
+    "updatedAt": "2023-06-05T18:17:32.039Z",
+    "tags": [
+      "Fire Protection",
+      "Procurement",
+      "Foundations"
+    ],
+    "metadata": {
+      "vendor": "Cascade Finishes",
+      "vendorTrade": "Finish Carpentry",
+      "projectPhase": "Closeout",
+      "costCode": "06-200 Finish Carpentry",
+      "paymentTerms": "Net 15"
+    },
+    "totalValue": 18710,
+    "issuedDate": "2023-05-30T18:17:32.039Z",
+    "dueDate": "2023-07-26T18:17:32.039Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-012-item-1",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Labor for exterior siding on Building core areas",
+        "lineItemQuantity": 26,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 85,
+        "lineItemTotal": 2210,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-012-item-2",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3300,
+        "lineItemTotal": 16500,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-013",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Granite-2013",
+    "summary": "Client invoice for Granite Ridge Estates covering hvac progress.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Partial",
+    "updatedAt": "2023-06-28T12:11:26.310Z",
+    "tags": [
+      "Fire Protection",
+      "Exterior",
+      "Interior"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Sitework",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 32476,
+    "issuedDate": "2023-06-10T12:11:26.310Z",
+    "dueDate": "2023-06-26T12:11:26.310Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-013-item-1",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Labor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 26,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 120,
+        "lineItemTotal": 3120,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-013-item-2",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Labor for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 28,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 127,
+        "lineItemTotal": 3556,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-013-item-3",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Subcontractor for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 5160,
+        "lineItemTotal": 25800,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-014",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Granite-2014",
+    "summary": "Client invoice for Granite Ridge Estates covering electrical progress.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Overdue",
+    "updatedAt": "2023-08-02T19:58:56.093Z",
+    "tags": [
+      "Green Build",
+      "HVAC",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Sitework",
+      "costCode": "16-420 Lighting Fixtures",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 29828,
+    "issuedDate": "2023-07-24T19:58:56.093Z",
+    "dueDate": "2023-08-27T19:58:56.093Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-014-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Subcontractor for main service panel on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 5399,
+        "lineItemTotal": 5399,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-014-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Subcontractor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4362,
+        "lineItemTotal": 17448,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-014-item-3",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Other for rooftop units on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2327,
+        "lineItemTotal": 6981,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-015",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Riverbend-2015",
+    "summary": "Client invoice for Riverbend Condos covering concrete progress.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "Paid",
+    "updatedAt": "2023-04-27T19:40:56.382Z",
+    "tags": [
+      "Procurement",
+      "Green Build",
+      "Foundations"
+    ],
+    "metadata": {
+      "vendor": "BlueSky Concrete",
+      "vendorTrade": "Concrete",
+      "projectPhase": "Finishes",
+      "costCode": "07-150 Roofing Assembly",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 18223,
+    "issuedDate": "2023-03-31T19:40:56.382Z",
+    "dueDate": "2023-05-23T19:40:56.382Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-015-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 895,
+        "lineItemTotal": 895,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-015-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Subcontractor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2888,
+        "lineItemTotal": 17328,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "clientinvoice-016",
+    "entityType": "ClientInvoice",
+    "title": "Invoice Lakeside-2016",
+    "summary": "Client invoice for Lakeside Villas covering other progress.",
+    "project": "Lakeside Villas",
+    "client": "Elena & Miguel Hernandez",
+    "status": "Draft",
+    "updatedAt": "2023-04-28T04:34:15.986Z",
+    "tags": [
+      "Green Build",
+      "Prefabrication",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Framing",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 7825,
+    "issuedDate": "2023-04-12T04:34:15.986Z",
+    "dueDate": "2023-05-11T04:34:15.986Z",
+    "lineItems": [
+      {
+        "lineItemId": "clientinvoice-016-item-1",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Labor for interior paint on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 119,
+        "lineItemTotal": 2618,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-016-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Labor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 127,
+        "lineItemTotal": 2286,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-016-item-3",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Subcontractor for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2921,
+        "lineItemTotal": 2921,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-001",
+    "entityType": "PurchaseOrder",
+    "title": "PO Marina-3001",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Pending",
+    "updatedAt": "2023-08-29T04:44:18.295Z",
+    "tags": [
+      "Prefabrication",
+      "Green Build",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Punch List",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 46250,
+    "issuedDate": "2023-08-24T04:44:18.295Z",
+    "dueDate": "2023-10-04T04:44:18.295Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-001-item-1",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3514,
+        "lineItemTotal": 3514,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-001-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Material for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2336,
+        "lineItemTotal": 9344,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-001-item-3",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4201,
+        "lineItemTotal": 8402,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-001-item-4",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Material for interior paint on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4165,
+        "lineItemTotal": 24990,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-002",
+    "entityType": "PurchaseOrder",
+    "title": "PO Sunset-3002",
+    "summary": "Purchase order issued to Ridge Roofing for roofing scope.",
+    "project": "Sunset Heights",
+    "client": "Jennifer & Michael Thompson",
+    "status": "Closed",
+    "updatedAt": "2023-07-27T00:46:25.275Z",
+    "tags": [
+      "Schedule",
+      "Foundations",
+      "HVAC"
+    ],
+    "metadata": {
+      "vendor": "Ridge Roofing",
+      "vendorTrade": "Roofing",
+      "projectPhase": "Foundation",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 16735,
+    "issuedDate": "2023-06-24T00:46:25.275Z",
+    "dueDate": "2023-08-08T00:46:25.275Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-002-item-1",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Material for interior paint on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1129,
+        "lineItemTotal": 1129,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-002-item-2",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Material for window package on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2601,
+        "lineItemTotal": 15606,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-003",
+    "entityType": "PurchaseOrder",
+    "title": "PO Cedar-3003",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Issued",
+    "updatedAt": "2023-09-02T06:40:17.203Z",
+    "tags": [
+      "Safety",
+      "HVAC",
+      "Green Build"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Closeout",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 28940,
+    "issuedDate": "2023-08-28T06:40:17.203Z",
+    "dueDate": "2023-10-18T06:40:17.203Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-003-item-1",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1477,
+        "lineItemTotal": 4431,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-003-item-2",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Labor for rooftop units on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 87,
+        "lineItemTotal": 957,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "purchaseorder-003-item-3",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 3779,
+        "lineItemTotal": 15116,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "purchaseorder-003-item-4",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Material for rooftop units on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2109,
+        "lineItemTotal": 8436,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-004",
+    "entityType": "PurchaseOrder",
+    "title": "PO Harbor-3004",
+    "summary": "Purchase order issued to Summit Electric for electrical scope.",
+    "project": "Harbor Point Residences",
+    "client": "Sarah & James Wilson",
+    "status": "Pending",
+    "updatedAt": "2023-03-13T13:08:08.596Z",
+    "tags": [
+      "Foundations",
+      "Prefabrication",
+      "Fire Protection"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Mechanical Rough-In",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 20405,
+    "issuedDate": "2023-02-28T13:08:08.596Z",
+    "dueDate": "2023-03-23T13:08:08.596Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-004-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Material for window package on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3294,
+        "lineItemTotal": 13176,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-004-item-2",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Other for main service panel on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2236,
+        "lineItemTotal": 2236,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-004-item-3",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Labor for interior paint on Building core areas",
+        "lineItemQuantity": 29,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 91,
+        "lineItemTotal": 2639,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "purchaseorder-004-item-4",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Labor for interior paint on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 107,
+        "lineItemTotal": 2354,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-005",
+    "entityType": "PurchaseOrder",
+    "title": "PO Lakeside-3005",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Lakeside Villas",
+    "client": "Elena & Miguel Hernandez",
+    "status": "Acknowledged",
+    "updatedAt": "2023-08-14T02:42:36.989Z",
+    "tags": [
+      "Safety",
+      "Interior",
+      "Procurement"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Framing",
+      "costCode": "16-420 Lighting Fixtures",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 29640,
+    "issuedDate": "2023-07-22T02:42:36.989Z",
+    "dueDate": "2023-09-18T02:42:36.989Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-005-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Other for window package on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2534,
+        "lineItemTotal": 15204,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-005-item-2",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Other for window package on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2406,
+        "lineItemTotal": 14436,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-006",
+    "entityType": "PurchaseOrder",
+    "title": "PO Mesa-3006",
+    "summary": "Purchase order issued to Evergreen Mechanical for hvac scope.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "Acknowledged",
+    "updatedAt": "2023-03-05T03:59:10.974Z",
+    "tags": [
+      "Interior",
+      "HVAC",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Exterior Finishes",
+      "costCode": "16-420 Lighting Fixtures",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 40484,
+    "issuedDate": "2023-02-15T03:59:10.974Z",
+    "dueDate": "2023-03-31T03:59:10.974Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-006-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Subcontractor for main service panel on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4636,
+        "lineItemTotal": 4636,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "purchaseorder-006-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Labor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 19,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 87,
+        "lineItemTotal": 1653,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "purchaseorder-006-item-3",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Material for rooftop units on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4991,
+        "lineItemTotal": 24955,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-006-item-4",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Subcontractor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 1848,
+        "lineItemTotal": 9240,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-007",
+    "entityType": "PurchaseOrder",
+    "title": "PO Pinecrest-3007",
+    "summary": "Purchase order issued to Ridge Roofing for roofing scope.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Closed",
+    "updatedAt": "2023-09-14T15:58:39.982Z",
+    "tags": [
+      "Prefabrication",
+      "Procurement",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Ridge Roofing",
+      "vendorTrade": "Roofing",
+      "projectPhase": "Pre-Construction",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 29877,
+    "issuedDate": "2023-08-15T15:58:39.982Z",
+    "dueDate": "2023-10-06T15:58:39.982Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-007-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Material for main service panel on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3625,
+        "lineItemTotal": 10875,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-007-item-2",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Material for main service panel on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2739,
+        "lineItemTotal": 10956,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-007-item-3",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2682,
+        "lineItemTotal": 8046,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-008",
+    "entityType": "PurchaseOrder",
+    "title": "PO Willow-3008",
+    "summary": "Purchase order issued to BlueSky Concrete for concrete scope.",
+    "project": "Willow Creek Ranch",
+    "client": "Carmen & Roberto Garcia",
+    "status": "Closed",
+    "updatedAt": "2024-02-22T08:01:37.980Z",
+    "tags": [
+      "Schedule",
+      "Safety",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "BlueSky Concrete",
+      "vendorTrade": "Concrete",
+      "projectPhase": "Design Development",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 43175,
+    "issuedDate": "2024-02-07T08:01:37.980Z",
+    "dueDate": "2024-02-25T08:01:37.980Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-008-item-1",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Labor for exterior siding on Building core areas",
+        "lineItemQuantity": 27,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 112,
+        "lineItemTotal": 3024,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "purchaseorder-008-item-2",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Other for main service panel on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5465,
+        "lineItemTotal": 10930,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-008-item-3",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Material for exterior siding on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5505,
+        "lineItemTotal": 27525,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-008-item-4",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Labor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 106,
+        "lineItemTotal": 1696,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-009",
+    "entityType": "PurchaseOrder",
+    "title": "PO Sunset-3009",
+    "summary": "Purchase order issued to Granite State Supply for material scope.",
+    "project": "Sunset Heights",
+    "client": "Jennifer & Michael Thompson",
+    "status": "Pending",
+    "updatedAt": "2024-02-29T20:52:33.929Z",
+    "tags": [
+      "HVAC",
+      "Interior",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Granite State Supply",
+      "vendorTrade": "Material",
+      "projectPhase": "Foundation",
+      "costCode": "07-150 Roofing Assembly",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 13558,
+    "issuedDate": "2024-02-01T20:52:33.929Z",
+    "dueDate": "2024-02-27T20:52:33.929Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-009-item-1",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Other for exterior siding on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 782,
+        "lineItemTotal": 2346,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-009-item-2",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Other for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2803,
+        "lineItemTotal": 11212,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-010",
+    "entityType": "PurchaseOrder",
+    "title": "PO Sunset-3010",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Sunset Heights",
+    "client": "Jennifer & Michael Thompson",
+    "status": "Acknowledged",
+    "updatedAt": "2023-11-20T09:30:01.348Z",
+    "tags": [
+      "Exterior",
+      "Foundations",
+      "Prefabrication"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Foundation",
+      "costCode": "03-310 Concrete Footings",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 31776,
+    "issuedDate": "2023-10-31T09:30:01.348Z",
+    "dueDate": "2023-12-08T09:30:01.348Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-010-item-1",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Subcontractor for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2974,
+        "lineItemTotal": 17844,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "purchaseorder-010-item-2",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1118,
+        "lineItemTotal": 3354,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-010-item-3",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Other for exterior siding on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3236,
+        "lineItemTotal": 9708,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-010-item-4",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Other for exterior siding on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 870,
+        "lineItemTotal": 870,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-011",
+    "entityType": "PurchaseOrder",
+    "title": "PO Willow-3011",
+    "summary": "Purchase order issued to Summit Electric for electrical scope.",
+    "project": "Willow Creek Ranch",
+    "client": "Carmen & Roberto Garcia",
+    "status": "Pending",
+    "updatedAt": "2024-02-24T02:44:05.618Z",
+    "tags": [
+      "HVAC",
+      "Exterior",
+      "Schedule"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Design Development",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 40508,
+    "issuedDate": "2024-02-08T02:44:05.618Z",
+    "dueDate": "2024-02-23T02:44:05.618Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-011-item-1",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Material for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2164,
+        "lineItemTotal": 10820,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-011-item-2",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Subcontractor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 3865,
+        "lineItemTotal": 19325,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "purchaseorder-011-item-3",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1815,
+        "lineItemTotal": 7260,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-011-item-4",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Labor for window package on Building core areas",
+        "lineItemQuantity": 29,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 107,
+        "lineItemTotal": 3103,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-012",
+    "entityType": "PurchaseOrder",
+    "title": "PO Willow-3012",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Willow Creek Ranch",
+    "client": "Carmen & Roberto Garcia",
+    "status": "Pending",
+    "updatedAt": "2023-05-24T00:53:43.687Z",
+    "tags": [
+      "Procurement",
+      "HVAC",
+      "Green Build"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Design Development",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 17025,
+    "issuedDate": "2023-05-16T00:53:43.687Z",
+    "dueDate": "2023-06-11T00:53:43.687Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-012-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Material for window package on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2349,
+        "lineItemTotal": 7047,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-012-item-2",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Material for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1663,
+        "lineItemTotal": 9978,
+        "lineItemType": "Material"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-013",
+    "entityType": "PurchaseOrder",
+    "title": "PO Mesa-3013",
+    "summary": "Purchase order issued to Evergreen Mechanical for hvac scope.",
+    "project": "Mesa Verde Townhomes",
+    "client": "Ana & David Martinez",
+    "status": "Issued",
+    "updatedAt": "2023-05-30T23:31:28.978Z",
+    "tags": [
+      "Prefabrication",
+      "Foundations",
+      "Schedule"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Exterior Finishes",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 8040,
+    "issuedDate": "2023-05-15T23:31:28.978Z",
+    "dueDate": "2023-06-08T23:31:28.978Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-013-item-1",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1275,
+        "lineItemTotal": 1275,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-013-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2255,
+        "lineItemTotal": 6765,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-014",
+    "entityType": "PurchaseOrder",
+    "title": "PO Cedar-3014",
+    "summary": "Purchase order issued to Summit Electric for electrical scope.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Issued",
+    "updatedAt": "2023-12-19T01:01:46.647Z",
+    "tags": [
+      "Prefabrication",
+      "Foundations",
+      "Green Build"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Closeout",
+      "costCode": "06-200 Finish Carpentry",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 36402,
+    "issuedDate": "2023-11-28T01:01:46.647Z",
+    "dueDate": "2023-12-25T01:01:46.647Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-014-item-1",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Subcontractor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4323,
+        "lineItemTotal": 17292,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "purchaseorder-014-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5561,
+        "lineItemTotal": 11122,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-014-item-3",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Material for interior paint on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 645,
+        "lineItemTotal": 2580,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "purchaseorder-014-item-4",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Other for main service panel on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5408,
+        "lineItemTotal": 5408,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-015",
+    "entityType": "PurchaseOrder",
+    "title": "PO Marina-3015",
+    "summary": "Purchase order issued to Northwest Scaffold for other scope.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Issued",
+    "updatedAt": "2023-06-24T09:00:53.665Z",
+    "tags": [
+      "Fire Protection",
+      "Procurement",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Northwest Scaffold",
+      "vendorTrade": "Other",
+      "projectPhase": "Punch List",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 45402,
+    "issuedDate": "2023-05-30T09:00:53.665Z",
+    "dueDate": "2023-06-17T09:00:53.665Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-015-item-1",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 2533,
+        "lineItemTotal": 15198,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "purchaseorder-015-item-2",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Other for rooftop units on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5034,
+        "lineItemTotal": 30204,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "purchaseorder-016",
+    "entityType": "PurchaseOrder",
+    "title": "PO Pinecrest-3016",
+    "summary": "Purchase order issued to Granite State Supply for material scope.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Acknowledged",
+    "updatedAt": "2024-03-04T12:11:17.277Z",
+    "tags": [
+      "Interior",
+      "Safety",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Granite State Supply",
+      "vendorTrade": "Material",
+      "projectPhase": "Pre-Construction",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 33558,
+    "issuedDate": "2024-02-04T12:11:17.277Z",
+    "dueDate": "2024-03-25T12:11:17.277Z",
+    "lineItems": [
+      {
+        "lineItemId": "purchaseorder-016-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Labor for main service panel on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 123,
+        "lineItemTotal": 2214,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "purchaseorder-016-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5224,
+        "lineItemTotal": 31344,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "bill-001",
+    "entityType": "Bill",
+    "title": "Bill from Summit Electric",
+    "summary": "Vendor bill from Summit Electric for recent electrical work.",
+    "project": "Marina Overlook",
+    "client": "Amanda & Christopher Davis",
+    "status": "Scheduled",
+    "updatedAt": "2023-03-08T17:05:08.389Z",
+    "tags": [
+      "Green Build",
+      "Exterior",
+      "Procurement"
+    ],
+    "metadata": {
+      "vendor": "Summit Electric",
+      "vendorTrade": "Electrical",
+      "projectPhase": "Punch List",
+      "costCode": "16-420 Lighting Fixtures",
+      "paymentTerms": "Net 45"
+    },
+    "totalValue": 22024,
+    "issuedDate": "2023-02-19T17:05:08.389Z",
+    "dueDate": "2023-03-31T17:05:08.389Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-001-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Other for main service panel on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 3178,
+        "lineItemTotal": 19068,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "bill-001-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 739,
+        "lineItemTotal": 2956,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "bill-002",
+    "entityType": "Bill",
+    "title": "Bill from Evergreen Mechanical",
+    "summary": "Vendor bill from Evergreen Mechanical for recent hvac work.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Approved",
+    "updatedAt": "2024-03-23T13:01:16.736Z",
+    "tags": [
+      "Exterior",
+      "Fire Protection",
+      "Safety"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Sitework",
+      "costCode": "05-120 Structural Steel",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 11731,
+    "issuedDate": "2024-02-21T13:01:16.736Z",
+    "dueDate": "2024-03-17T13:01:16.736Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-002-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Material for window package on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4914,
+        "lineItemTotal": 9828,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "bill-002-item-2",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Subcontractor for rooftop units on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 1903,
+        "lineItemTotal": 1903,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "bill-003",
+    "entityType": "Bill",
+    "title": "Bill from Evergreen Mechanical",
+    "summary": "Vendor bill from Evergreen Mechanical for recent hvac work.",
+    "project": "Granite Ridge Estates",
+    "client": "Patricia & Antonio Lopez",
+    "status": "Approved",
+    "updatedAt": "2023-08-16T09:26:27.941Z",
+    "tags": [
+      "HVAC",
+      "Green Build",
+      "Interior"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Sitework",
+      "costCode": "06-200 Finish Carpentry",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 22580,
+    "issuedDate": "2023-07-14T09:26:27.941Z",
+    "dueDate": "2023-08-13T09:26:27.941Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-003-item-1",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Other for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1472,
+        "lineItemTotal": 5888,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "bill-003-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2782,
+        "lineItemTotal": 16692,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "bill-004",
+    "entityType": "Bill",
+    "title": "Bill from Cascade Finishes",
+    "summary": "Vendor bill from Cascade Finishes for recent finish carpentry work.",
+    "project": "Pinecrest Estate",
+    "client": "Lisa & Robert Johnson",
+    "status": "Scheduled",
+    "updatedAt": "2023-03-17T07:09:23.383Z",
+    "tags": [
+      "Interior",
+      "Safety",
+      "Foundations"
+    ],
+    "metadata": {
+      "vendor": "Cascade Finishes",
+      "vendorTrade": "Finish Carpentry",
+      "projectPhase": "Pre-Construction",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 15"
+    },
+    "totalValue": 25448,
+    "issuedDate": "2023-02-22T07:09:23.383Z",
+    "dueDate": "2023-03-19T07:09:23.383Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-004-item-1",
+        "lineItemTitle": "Main service panel",
+        "lineItemDescription": "Material for main service panel on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4058,
+        "lineItemTotal": 24348,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "bill-004-item-2",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Labor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 10,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 110,
+        "lineItemTotal": 1100,
+        "lineItemType": "Labor"
+      }
+    ]
+  },
+  {
+    "id": "bill-005",
+    "entityType": "Bill",
+    "title": "Bill from Precision Plumbing",
+    "summary": "Vendor bill from Precision Plumbing for recent plumbing work.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Received",
+    "updatedAt": "2024-01-18T16:31:29.877Z",
+    "tags": [
+      "Interior",
+      "Green Build",
+      "Safety"
+    ],
+    "metadata": {
+      "vendor": "Precision Plumbing",
+      "vendorTrade": "Plumbing",
+      "projectPhase": "Closeout",
+      "costCode": "09-300 Tiling",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 34597,
+    "issuedDate": "2023-12-28T16:31:29.877Z",
+    "dueDate": "2024-02-03T16:31:29.877Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-005-item-1",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Subcontractor for window package on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 3198,
+        "lineItemTotal": 15990,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "bill-005-item-2",
+        "lineItemTitle": "Rooftop units",
+        "lineItemDescription": "Other for rooftop units on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4443,
+        "lineItemTotal": 17772,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "bill-005-item-3",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Subcontractor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 835,
+        "lineItemTotal": 835,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "bill-006",
+    "entityType": "Bill",
+    "title": "Bill from Evergreen Mechanical",
+    "summary": "Vendor bill from Evergreen Mechanical for recent hvac work.",
+    "project": "Cedar Ridge Homes",
+    "client": "Michelle & Daniel Brown",
+    "status": "Approved",
+    "updatedAt": "2023-03-17T14:45:53.753Z",
+    "tags": [
+      "Foundations",
+      "Fire Protection",
+      "Exterior"
+    ],
+    "metadata": {
+      "vendor": "Evergreen Mechanical",
+      "vendorTrade": "HVAC",
+      "projectPhase": "Closeout",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 69944,
+    "issuedDate": "2023-02-15T14:45:53.753Z",
+    "dueDate": "2023-04-04T14:45:53.753Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-006-item-1",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Material for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5354,
+        "lineItemTotal": 32124,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "bill-006-item-2",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Other for landscape irrigation on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5605,
+        "lineItemTotal": 33630,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "bill-006-item-3",
+        "lineItemTitle": "Fire sprinkler rough-in",
+        "lineItemDescription": "Subcontractor for fire sprinkler rough-in on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4190,
+        "lineItemTotal": 4190,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  },
+  {
+    "id": "bill-007",
+    "entityType": "Bill",
+    "title": "Bill from Granite State Supply",
+    "summary": "Vendor bill from Granite State Supply for recent material work.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "Scheduled",
+    "updatedAt": "2024-01-10T06:52:46.042Z",
+    "tags": [
+      "Foundations",
+      "Schedule",
+      "HVAC"
+    ],
+    "metadata": {
+      "vendor": "Granite State Supply",
+      "vendorTrade": "Material",
+      "projectPhase": "Finishes",
+      "costCode": "03-310 Concrete Footings",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 22135,
+    "issuedDate": "2023-12-13T06:52:46.042Z",
+    "dueDate": "2024-01-22T06:52:46.042Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-007-item-1",
+        "lineItemTitle": "Exterior siding",
+        "lineItemDescription": "Other for exterior siding on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1932,
+        "lineItemTotal": 1932,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "bill-007-item-2",
+        "lineItemTitle": "Foundation waterproofing",
+        "lineItemDescription": "Labor for foundation waterproofing on Building core areas",
+        "lineItemQuantity": 29,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 98,
+        "lineItemTotal": 2842,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "bill-007-item-3",
+        "lineItemTitle": "Window package",
+        "lineItemDescription": "Labor for window package on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 115,
+        "lineItemTotal": 1035,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "bill-007-item-4",
+        "lineItemTitle": "Interior paint",
+        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 5442,
+        "lineItemTotal": 16326,
+        "lineItemType": "Other"
+      }
+    ]
+  },
+  {
+    "id": "bill-008",
+    "entityType": "Bill",
+    "title": "Bill from Precision Plumbing",
+    "summary": "Vendor bill from Precision Plumbing for recent plumbing work.",
+    "project": "Riverbend Condos",
+    "client": "Maria & Carlos Rodriguez",
+    "status": "Received",
+    "updatedAt": "2023-03-26T01:41:46.025Z",
+    "tags": [
+      "Procurement",
+      "Fire Protection",
+      "Interior"
+    ],
+    "metadata": {
+      "vendor": "Precision Plumbing",
+      "vendorTrade": "Plumbing",
+      "projectPhase": "Finishes",
+      "costCode": "15-500 HVAC Equipment",
+      "paymentTerms": "Net 30"
+    },
+    "totalValue": 32754,
+    "issuedDate": "2023-02-24T01:41:46.025Z",
+    "dueDate": "2023-04-14T01:41:46.025Z",
+    "lineItems": [
+      {
+        "lineItemId": "bill-008-item-1",
+        "lineItemTitle": "Landscape irrigation",
+        "lineItemDescription": "Material for landscape irrigation on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 4200,
+        "lineItemTotal": 21000,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "bill-008-item-2",
+        "lineItemTitle": "Elevator cab finishes",
+        "lineItemDescription": "Labor for elevator cab finishes on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "hr",
+        "lineItemUnitPrice": 99,
+        "lineItemTotal": 1782,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "bill-008-item-3",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "unit",
+        "lineItemUnitPrice": 1330,
+        "lineItemTotal": 6650,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "bill-008-item-4",
+        "lineItemTitle": "Low-voltage wiring",
+        "lineItemDescription": "Subcontractor for low-voltage wiring on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 3322,
+        "lineItemTotal": 3322,
+        "lineItemType": "Subcontractor"
+      }
+    ]
+  }
+]
