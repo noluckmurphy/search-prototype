@@ -5,6 +5,7 @@ export interface SettingsState {
   searchDelayMs: number;
   groupLimits: Record<string, number>;
   lineItemsContextCount: number;
+  showLineItemsByDefault: boolean;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -15,6 +16,7 @@ function normalize(state: SettingsState): SettingsState {
     ...state,
     groupLimits: { ...state.groupLimits },
     lineItemsContextCount: state.lineItemsContextCount ?? 3,
+    showLineItemsByDefault: state.showLineItemsByDefault ?? true,
   };
 }
 

@@ -8,8 +8,30 @@ import {
 } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
-import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues } from '../utils/highlight';
+import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
 import { settingsStore } from '../state/settingsStore';
+
+// Helper function to detect if a query has monetary potential (for hybrid highlighting)
+function hasMonetaryPotential(query: string): boolean {
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return tokens.some(token => {
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || 
+           /^\d+(\.\d+)?$/.test(token) ||
+           /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) ||
+           /\d/.test(token); // Any token containing a digit
+  });
+}
+
+// Helper function to determine which highlighting function to use
+function getHighlightFunction(query: string, isMonetarySearch: boolean) {
+  if (isMonetarySearch) {
+    return highlightMonetaryValues;
+  } else if (hasMonetaryPotential(query)) {
+    return highlightHybrid;
+  } else {
+    return highlightText;
+  }
+}
 
 const FACET_LABELS: Record<FacetKey, string> = {
   entityType: 'Type',
@@ -296,8 +318,10 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
   const header = document.createElement('div');
   header.className = 'result-card__header';
 
+  const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+
   const title = document.createElement('h3');
-  title.innerHTML = query ? (isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query)) : item.title;
+  title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
 
   const badge = document.createElement('span');
   badge.className = 'result-card__badge';
@@ -307,7 +331,7 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
 
   const summary = document.createElement('p');
   summary.className = 'result-card__summary';
-  summary.innerHTML = query ? (isMonetarySearch ? highlightMonetaryValues(item.summary, query) : highlightText(item.summary, query)) : item.summary;
+  summary.innerHTML = query && highlightFn ? highlightFn(item.summary, query) : item.summary;
 
   const metaList = document.createElement('ul');
   metaList.className = 'result-card__meta';
@@ -315,10 +339,10 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
 
   card.append(header, summary, metaList);
 
-  // Add context line if the match is not in title or summary
+  // Add context line if the match is not in title, summary, or line items
   if (query) {
     const match = findBestMatch(item, query);
-    if (match && match.field !== 'title' && match.field !== 'summary') {
+    if (match && match.field !== 'title' && match.field !== 'summary' && !match.field.startsWith('lineItem')) {
       const context = document.createElement('div');
       context.className = 'search-context';
       const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 120, query);
@@ -380,12 +404,85 @@ function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: b
   return metas;
 }
 
+function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch?: boolean): boolean {
+  if (!query) return false;
+  
+  const financial = item as any;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) return false;
+
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+
+  // Check if any line item has actual highlighting matches
+  return items.some((lineItem: any) => {
+    const searchableFields = [
+      lineItem.lineItemTitle,
+      lineItem.lineItemDescription,
+      lineItem.lineItemType,
+      lineItem.lineItemQuantity?.toString(),
+      lineItem.lineItemQuantityUnitOfMeasure,
+      formatCurrency(lineItem.lineItemUnitPrice),
+      formatCurrency(lineItem.lineItemTotal)
+    ];
+    
+    return searchableFields.some((value) => {
+      if (!value) return false;
+      
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes('<mark');
+    });
+  });
+}
+
+function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMonetarySearch?: boolean): number[] {
+  if (!query) return [];
+  
+  const financial = item as any;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) return [];
+
+  const matchingIndices: number[] = [];
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+  
+  items.forEach((lineItem: any, index: number) => {
+    const searchableFields = [
+      lineItem.lineItemTitle,
+      lineItem.lineItemDescription,
+      lineItem.lineItemType,
+      lineItem.lineItemQuantity?.toString(),
+      lineItem.lineItemQuantityUnitOfMeasure,
+      formatCurrency(lineItem.lineItemUnitPrice),
+      formatCurrency(lineItem.lineItemTotal)
+    ];
+    
+    const hasMatch = searchableFields.some((value) => {
+      if (!value) return false;
+      
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes('<mark');
+    });
+    
+    if (hasMatch) {
+      matchingIndices.push(index);
+    }
+  });
+  
+  return matchingIndices;
+}
+
 function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement | null {
   const financial = item as any;
   const items = financial.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }
+
+  const settings = settingsStore.getState();
+  const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
+  
+  // If there are matches in line items, always show them (respect lineItemsContextCount setting)
+  // If no matches, respect the showLineItemsByDefault setting
+  const shouldShowLineItems = hasMatches || settings.showLineItemsByDefault;
 
   const wrapper = document.createElement('div');
   wrapper.className = 'result-card__line-items';
@@ -394,6 +491,66 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   heading.textContent = 'Line items';
   wrapper.append(heading);
 
+  // If we shouldn't show line items by default and there are no matches, show a toggle link
+  if (!shouldShowLineItems) {
+    const toggleLink = document.createElement('button');
+    toggleLink.className = 'line-items-toggle';
+    toggleLink.textContent = `Show line items (${items.length})`;
+    toggleLink.type = 'button';
+    
+    const table = document.createElement('table');
+    table.className = 'line-items-table';
+    table.style.display = 'none';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+      <th>Description</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total</th>
+    `;
+    thead.append(headerRow);
+    table.append(thead);
+
+    // Create table body
+    const tbody = document.createElement('tbody');
+    const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+    
+    items.forEach((line: any) => {
+      const row = document.createElement('tr');
+      const unitPrice = formatCurrency(line.lineItemUnitPrice);
+      const total = formatCurrency(line.lineItemTotal);
+      const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+      
+      row.innerHTML = `
+        <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+        <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+        <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+        <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+        <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
+      `;
+      tbody.append(row);
+    });
+    table.append(tbody);
+    
+    toggleLink.addEventListener('click', () => {
+      if (table.style.display === 'none') {
+        table.style.display = 'table';
+        toggleLink.textContent = 'Hide line items';
+      } else {
+        table.style.display = 'none';
+        toggleLink.textContent = `Show line items (${items.length})`;
+      }
+    });
+    
+    wrapper.append(toggleLink, table);
+    return wrapper;
+  }
+
+  // Show line items normally (either because there are matches or setting is enabled)
   const table = document.createElement('table');
   table.className = 'line-items-table';
 
@@ -413,9 +570,43 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   // Create table body
   const tbody = document.createElement('tbody');
   
-  const settings = settingsStore.getState();
   const contextCount = settings.lineItemsContextCount;
-  const displayItems = contextCount === 0 ? items : items.slice(0, contextCount);
+  const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+  
+  // Determine which items to show
+  let displayItems: any[];
+  let remainingItems: any[] = [];
+  
+  if (hasMatches && contextCount > 0) {
+    // When there are matches, always include matched items and show context around them
+    const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+    
+    if (matchingIndices.length > 0) {
+      // Find the range of items to show around matches
+      const minIndex = Math.min(...matchingIndices);
+      const maxIndex = Math.max(...matchingIndices);
+      
+      // Calculate start and end indices with context
+      const startIndex = Math.max(0, minIndex - contextCount);
+      const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+      
+      displayItems = items.slice(startIndex, endIndex);
+      remainingItems = [
+        ...items.slice(0, startIndex),
+        ...items.slice(endIndex)
+      ];
+    } else {
+      // Fallback: show first contextCount items
+      displayItems = items.slice(0, contextCount);
+      remainingItems = items.slice(contextCount);
+    }
+  } else {
+    // No matches or contextCount is 0: show all items
+    displayItems = items;
+    remainingItems = [];
+  }
+  
+  // Render visible items
   displayItems.forEach((line: any) => {
     const row = document.createElement('tr');
     const unitPrice = formatCurrency(line.lineItemUnitPrice);
@@ -423,28 +614,67 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     
     row.innerHTML = `
-      <td class="line-item__description">${query ? (isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query ? (isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query ? (isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity) : quantity}</td>
-      <td class="line-item__unit-price">${query ? (isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice) : unitPrice}</td>
-      <td class="line-item__total">${query ? (isMonetarySearch ? highlightMonetaryValues(total, query) : total) : total}</td>
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
     tbody.append(row);
   });
 
-  // Add "more items" row if there are additional items and we're not showing all
-  if (contextCount > 0 && items.length > contextCount) {
-    const moreRow = document.createElement('tr');
-    moreRow.className = 'line-item__more-row';
-    const remaining = items.length - contextCount;
-    moreRow.innerHTML = `
-      <td colspan="5" class="line-item__more">${remaining} more line item${remaining === 1 ? '' : 's'}…</td>
+  // Add remaining items (initially hidden) if there are any
+  const hiddenRows: HTMLTableRowElement[] = [];
+  remainingItems.forEach((line: any) => {
+    const row = document.createElement('tr');
+    row.style.display = 'none';
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    
+    row.innerHTML = `
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
-    tbody.append(moreRow);
-  }
+    tbody.append(row);
+    hiddenRows.push(row);
+  });
 
   table.append(tbody);
   wrapper.append(table);
+
+  // Add toggle button for remaining items if there are any
+  if (remainingItems.length > 0) {
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'line-items-toggle';
+    toggleButton.type = 'button';
+    const remainingCount = remainingItems.length;
+    toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? '' : 's'}`;
+    
+    toggleButton.addEventListener('click', () => {
+      const isHidden = hiddenRows[0]?.style.display === 'none';
+      
+      if (isHidden) {
+        // Show remaining items
+        hiddenRows.forEach(row => {
+          row.style.display = '';
+        });
+        toggleButton.textContent = `Hide ${remainingCount} line item${remainingCount === 1 ? '' : 's'}`;
+      } else {
+        // Hide remaining items
+        hiddenRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? '' : 's'}`;
+      }
+    });
+    
+    wrapper.append(toggleButton);
+  }
+
   return wrapper;
 }
 

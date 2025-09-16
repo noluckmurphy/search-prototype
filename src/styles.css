@@ -565,6 +565,24 @@ button.secondary {
   font-size: var(--font-size-sm);
 }
 
+.line-items-toggle {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.line-items-toggle:hover {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
 .line-items-table {
   width: 100%;
   border-collapse: collapse;

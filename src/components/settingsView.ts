@@ -67,6 +67,23 @@ export function createSettingsView(): SettingsViewHandles {
   lineItemsContextField.append(lineItemsContextSelect);
   resultsSection.append(lineItemsContextField);
 
+  const showLineItemsField = document.createElement('div');
+  showLineItemsField.className = 'settings-field';
+  showLineItemsField.innerHTML = `
+    <label for="show-line-items-default">Show line items by default</label>
+  `;
+
+  const showLineItemsCheckbox = document.createElement('input');
+  showLineItemsCheckbox.id = 'show-line-items-default';
+  showLineItemsCheckbox.type = 'checkbox';
+
+  const showLineItemsLabel = document.createElement('label');
+  showLineItemsLabel.htmlFor = 'show-line-items-default';
+  showLineItemsLabel.textContent = 'Show line items by default (uncheck to collapse behind "Show line items" link)';
+
+  showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
+  resultsSection.append(showLineItemsField);
+
   const groupSection = document.createElement('fieldset');
   groupSection.className = 'settings-group';
   groupSection.innerHTML = `
@@ -126,6 +143,7 @@ export function createSettingsView(): SettingsViewHandles {
     const state = settingsStore.getState();
     delayInput.value = String(state.searchDelayMs);
     lineItemsContextSelect.value = String(state.lineItemsContextCount);
+    showLineItemsCheckbox.checked = state.showLineItemsByDefault;
     renderGroupInputs(state.groupLimits);
   };
 
@@ -147,6 +165,7 @@ export function createSettingsView(): SettingsViewHandles {
     settingsStore.update({
       searchDelayMs: resolvedDelay,
       lineItemsContextCount: resolvedLineItemsContext,
+      showLineItemsByDefault: showLineItemsCheckbox.checked,
       groupLimits,
     });
 

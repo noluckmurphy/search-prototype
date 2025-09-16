@@ -152,6 +152,24 @@ function parseMonetaryQuery(query: string): { isMonetary: boolean; searchQuery: 
   };
 }
 
+function isNumericQuery(query: string): boolean {
+  const tokens = tokenize(query);
+  // Check if any token is purely numeric (could be a monetary amount)
+  return tokens.some(token => /^\d+(\.\d+)?$/.test(token));
+}
+
+function hasMonetaryPotential(query: string): boolean {
+  const tokens = tokenize(query);
+  // Check if query contains numeric tokens that could match monetary values
+  return tokens.some(token => {
+    // Match pure numbers, numbers with commas, currency symbols, or alphanumeric with numbers
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || 
+           /^\d+(\.\d+)?$/.test(token) ||
+           /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) ||
+           /\d/.test(token); // Any token containing a digit
+  });
+}
+
 function normalizeMonetaryValue(value: number | string): string {
   // Convert to number first to handle any string inputs
   const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -321,6 +339,23 @@ function matchesQuery(record: SearchRecord, query: string): boolean {
 
   const haystack = buildHaystack(record);
   return tokens.every((token) => haystack.includes(token));
+}
+
+function matchesHybridQuery(record: SearchRecord, query: string): boolean {
+  // First try regular text matching
+  const regularMatch = matchesQuery(record, query);
+  
+  // If regular match succeeds, return true
+  if (regularMatch) {
+    return true;
+  }
+  
+  // If no regular match and query has monetary potential, try monetary matching
+  if (hasMonetaryPotential(query)) {
+    return matchesMonetaryQuery(record, query);
+  }
+  
+  return false;
 }
 
 function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
@@ -577,6 +612,23 @@ function calculateRelevanceScore(record: SearchRecord, query: string): number {
   return score;
 }
 
+function calculateHybridRelevanceScore(record: SearchRecord, query: string): number {
+  // First calculate regular relevance score
+  const regularScore = calculateRelevanceScore(record, query);
+  
+  // If regular score is high enough, use it
+  if (regularScore > 0) {
+    return regularScore;
+  }
+  
+  // If no regular match and query has monetary potential, try monetary scoring
+  if (hasMonetaryPotential(query)) {
+    return calculateMonetaryRelevanceScore(record, query);
+  }
+  
+  return 0;
+}
+
 function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): number {
   const { amounts, textTokens, range } = extractMonetaryTokens(query);
   
@@ -711,8 +763,22 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
 
 function sortByRelevance(records: SearchRecord[], query: string, isMonetary: boolean = false): SearchRecord[] {
   return [...records].sort((a, b) => {
-    const scoreA = isMonetary ? calculateMonetaryRelevanceScore(a, query) : calculateRelevanceScore(a, query);
-    const scoreB = isMonetary ? calculateMonetaryRelevanceScore(b, query) : calculateRelevanceScore(b, query);
+    let scoreA: number;
+    let scoreB: number;
+    
+    if (isMonetary) {
+      // Explicit monetary search (query starts with $)
+      scoreA = calculateMonetaryRelevanceScore(a, query);
+      scoreB = calculateMonetaryRelevanceScore(b, query);
+    } else if (hasMonetaryPotential(query)) {
+      // Hybrid scoring for queries with numeric potential (like "123")
+      scoreA = calculateHybridRelevanceScore(a, query);
+      scoreB = calculateHybridRelevanceScore(b, query);
+    } else {
+      // Regular scoring for non-numeric queries
+      scoreA = calculateRelevanceScore(a, query);
+      scoreB = calculateRelevanceScore(b, query);
+    }
     
     // Primary sort by relevance score (descending)
     if (scoreA !== scoreB) {
@@ -735,7 +801,19 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   
   const corpus = await loadCorpus();
   const filtered = corpus.filter((record) => {
-    const matchesQueryResult = isMonetary ? matchesMonetaryQuery(record, searchQuery) : matchesQuery(record, searchQuery);
+    let matchesQueryResult: boolean;
+    
+    if (isMonetary) {
+      // Explicit monetary search (query starts with $)
+      matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
+    } else if (hasMonetaryPotential(searchQuery)) {
+      // Hybrid search for queries with numeric potential (like "123")
+      matchesQueryResult = matchesHybridQuery(record, searchQuery);
+    } else {
+      // Regular text search for non-numeric queries
+      matchesQueryResult = matchesQuery(record, searchQuery);
+    }
+    
     return matchesQueryResult && matchesSelections(record, selections);
   });
   

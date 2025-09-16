@@ -1,7 +1,29 @@
 import { SearchGroup, SearchRecord, SearchResponse } from '../types';
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
-import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues } from '../utils/highlight';
+import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
+
+// Helper function to detect if a query has monetary potential (for hybrid highlighting)
+function hasMonetaryPotential(query: string): boolean {
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return tokens.some(token => {
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || 
+           /^\d+(\.\d+)?$/.test(token) ||
+           /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) ||
+           /\d/.test(token); // Any token containing a digit
+  });
+}
+
+// Helper function to determine which highlighting function to use
+function getHighlightFunction(query: string, isMonetarySearch: boolean) {
+  if (isMonetarySearch) {
+    return highlightMonetaryValues;
+  } else if (hasMonetaryPotential(query)) {
+    return highlightHybrid;
+  } else {
+    return highlightText;
+  }
+}
 
 export interface SearchDialogState {
   visible: boolean;
@@ -163,14 +185,16 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
   const li = document.createElement('li');
   li.className = 'search-dialog__item';
 
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+
   const title = document.createElement('div');
   title.className = 'search-dialog__item-title';
-  title.innerHTML = isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query);
+  title.innerHTML = highlightFn(item.title, query);
 
   const meta = document.createElement('div');
   meta.className = 'search-dialog__item-meta';
   const metaText = buildItemMeta(item, query, isMonetarySearch);
-  meta.innerHTML = isMonetarySearch ? highlightMonetaryValues(metaText, query) : metaText;
+  meta.innerHTML = highlightFn(metaText, query);
 
   // Add context line showing what was matched
   const match = findBestMatch(item, query);
@@ -222,6 +246,8 @@ function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch
     return null;
   }
 
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+
   // Find line items that have actual highlighting matches (not just text matches)
   const matchingItems = items.filter((lineItem: any) => {
     const searchableFields = [
@@ -238,7 +264,7 @@ function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch
     return searchableFields.some(({ value }) => {
       if (!value) return false;
       
-      const highlighted = isMonetarySearch ? highlightMonetaryValues(value, query) : highlightText(value, query);
+      const highlighted = highlightFn(value, query);
       return highlighted.includes('<mark');
     });
   });
@@ -263,11 +289,11 @@ function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     
     row.innerHTML = `
-      <td class="mini-line-items__description">${isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)}</td>
-      <td class="mini-line-items__type">${isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)}</td>
-      <td class="mini-line-items__quantity">${isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity}</td>
-      <td class="mini-line-items__unit-price">${isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice}</td>
-      <td class="mini-line-items__total">${isMonetarySearch ? highlightMonetaryValues(total, query) : total}</td>
+      <td class="mini-line-items__description">${highlightFn(line.lineItemTitle, query)}</td>
+      <td class="mini-line-items__type">${highlightFn(line.lineItemType, query)}</td>
+      <td class="mini-line-items__quantity">${highlightFn(quantity, query)}</td>
+      <td class="mini-line-items__unit-price">${highlightFn(unitPrice, query)}</td>
+      <td class="mini-line-items__total">${highlightFn(total, query)}</td>
     `;
     table.append(row);
   });

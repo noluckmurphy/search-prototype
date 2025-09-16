@@ -1,12 +1,13 @@
 {
   "searchDelayMs": 100,
   "groupLimits": {
-    "Document": 5,
+    "Document": 4,
     "ClientInvoice": 4,
     "PurchaseOrder": 4,
     "Bill": 4,
     "Receipt": 4,
     "Payment": 4
   },
-  "lineItemsContextCount": 3
+  "lineItemsContextCount": 3,
+  "showLineItemsByDefault": true
 }

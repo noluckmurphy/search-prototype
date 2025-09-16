@@ -234,6 +234,56 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+function highlightHybrid(text, query) {
+  if (!query.trim()) {
+    return escapeHtml(text);
+  }
+  let highlightedText = escapeHtml(text);
+  const textLower = text.toLowerCase();
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (tokens.length > 0) {
+    const sortedTokens = [...tokens].sort((a, b) => b.length - a.length);
+    for (const token of sortedTokens) {
+      if (!textLower.includes(token)) {
+        continue;
+      }
+      const regex = new RegExp(`(${escapeRegex(token)})`, "gi");
+      highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
+  }
+  const { amounts, textTokens, range } = extractMonetaryTokens(query);
+  if (amounts.length > 0 || textTokens.length > 0 || range) {
+    if (amounts.length > 0) {
+      for (const amount of amounts) {
+        const amountStr = amount.toString();
+        const amountWithCommas = amount.toLocaleString();
+        const pattern = new RegExp(
+          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+          "g"
+        );
+        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+      }
+    }
+    if (range) {
+      const rangePatterns = [
+        new RegExp(`\\b${escapeRegex(range.min.toString())}\\s*-\\s*${escapeRegex(range.max.toString())}\\b`, "g"),
+        new RegExp(`\\b${escapeRegex(range.min.toString())}\\s+to\\s+${escapeRegex(range.max.toString())}\\b`, "gi"),
+        new RegExp(`\\b${escapeRegex(range.min.toString())}\\b`, "g"),
+        new RegExp(`\\b${escapeRegex(range.max.toString())}\\b`, "g")
+      ];
+      for (const pattern of rangePatterns) {
+        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$&</mark>');
+      }
+    }
+    if (textTokens.length > 0) {
+      for (const token of textTokens) {
+        const regex = new RegExp(`(${escapeRegex(token)})`, "gi");
+        highlightedText = highlightedText.replace(regex, '<mark class="monetary-highlight">$1</mark>');
+      }
+    }
+  }
+  return highlightedText;
+}
 function highlightMonetaryValues(text, query) {
   if (!query.trim()) {
     return escapeHtml(text);
@@ -253,6 +303,19 @@ function highlightMonetaryValues(text, query) {
       );
       highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
     }
+    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+      if (match.includes("<mark")) {
+        return match;
+      }
+      const numericValue = parseFloat(match.replace(/[$,\s]/g, ""));
+      for (const queryAmount of amounts) {
+        if (isPartialMonetaryMatch(queryAmount, numericValue)) {
+          return `<mark class="monetary-highlight">${match}</mark>`;
+        }
+      }
+      return match;
+    });
   }
   if (range) {
     const rangePatterns = [
@@ -338,8 +401,35 @@ function parseRangeQuery(query) {
 function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+function isPartialMonetaryMatch(queryAmount, dataValue) {
+  const queryStr = queryAmount.toString();
+  const dataStr = dataValue.toString();
+  if (dataStr.startsWith(queryStr)) {
+    return true;
+  }
+  const dataWithoutTrailingZeros = dataStr.replace(/0+$/, "");
+  if (dataWithoutTrailingZeros.startsWith(queryStr)) {
+    return true;
+  }
+  return false;
+}
 
 // src/components/searchDialog.ts
+function hasMonetaryPotential(query) {
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return tokens.some((token) => {
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || /^\d+(\.\d+)?$/.test(token) || /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) || /\d/.test(token);
+  });
+}
+function getHighlightFunction(query, isMonetarySearch) {
+  if (isMonetarySearch) {
+    return highlightMonetaryValues;
+  } else if (hasMonetaryPotential(query)) {
+    return highlightHybrid;
+  } else {
+    return highlightText;
+  }
+}
 function createSearchDialog(host, options) {
   const dialog = document.createElement("div");
   dialog.className = "search-dialog";
@@ -450,13 +540,14 @@ function renderGroup(group, query, isMonetarySearch) {
 function renderGroupItem(item, query, isMonetarySearch) {
   const li = document.createElement("li");
   li.className = "search-dialog__item";
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
   const title = document.createElement("div");
   title.className = "search-dialog__item-title";
-  title.innerHTML = isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query);
+  title.innerHTML = highlightFn(item.title, query);
   const meta = document.createElement("div");
   meta.className = "search-dialog__item-meta";
   const metaText = buildItemMeta(item, query, isMonetarySearch);
-  meta.innerHTML = isMonetarySearch ? highlightMonetaryValues(metaText, query) : metaText;
+  meta.innerHTML = highlightFn(metaText, query);
   const match = findBestMatch(item, query);
   if (match && match.field !== "title") {
     const context = document.createElement("div");
@@ -498,6 +589,7 @@ function renderMiniLineItems(item, query, isMonetarySearch) {
   if (items.length === 0) {
     return null;
   }
+  const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
   const matchingItems = items.filter((lineItem) => {
     const searchableFields = [
       { value: lineItem.lineItemTitle, field: "title" },
@@ -510,7 +602,7 @@ function renderMiniLineItems(item, query, isMonetarySearch) {
     ];
     return searchableFields.some(({ value }) => {
       if (!value) return false;
-      const highlighted = isMonetarySearch ? highlightMonetaryValues(value, query) : highlightText(value, query);
+      const highlighted = highlightFn(value, query);
       return highlighted.includes("<mark");
     });
   });
@@ -528,11 +620,11 @@ function renderMiniLineItems(item, query, isMonetarySearch) {
     const total = formatCurrency(line.lineItemTotal);
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     row.innerHTML = `
-      <td class="mini-line-items__description">${isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query)}</td>
-      <td class="mini-line-items__type">${isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query)}</td>
-      <td class="mini-line-items__quantity">${isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity}</td>
-      <td class="mini-line-items__unit-price">${isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice}</td>
-      <td class="mini-line-items__total">${isMonetarySearch ? highlightMonetaryValues(total, query) : total}</td>
+      <td class="mini-line-items__description">${highlightFn(line.lineItemTitle, query)}</td>
+      <td class="mini-line-items__type">${highlightFn(line.lineItemType, query)}</td>
+      <td class="mini-line-items__quantity">${highlightFn(quantity, query)}</td>
+      <td class="mini-line-items__unit-price">${highlightFn(unitPrice, query)}</td>
+      <td class="mini-line-items__total">${highlightFn(total, query)}</td>
     `;
     table.append(row);
   });
@@ -558,14 +650,15 @@ function escapeHtml2(value) {
 var defaults_default = {
   searchDelayMs: 100,
   groupLimits: {
-    Document: 5,
+    Document: 4,
     ClientInvoice: 4,
     PurchaseOrder: 4,
     Bill: 4,
     Receipt: 4,
     Payment: 4
   },
-  lineItemsContextCount: 3
+  lineItemsContextCount: 3,
+  showLineItemsByDefault: true
 };
 
 // src/state/store.ts
@@ -595,7 +688,8 @@ function normalize(state) {
   return {
     ...state,
     groupLimits: { ...state.groupLimits },
-    lineItemsContextCount: state.lineItemsContextCount ?? 3
+    lineItemsContextCount: state.lineItemsContextCount ?? 3,
+    showLineItemsByDefault: state.showLineItemsByDefault ?? true
   };
 }
 function mergeSettings(base, overrides) {
@@ -665,6 +759,21 @@ var settingsStore = {
 };
 
 // src/components/resultsView.ts
+function hasMonetaryPotential2(query) {
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return tokens.some((token) => {
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || /^\d+(\.\d+)?$/.test(token) || /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) || /\d/.test(token);
+  });
+}
+function getHighlightFunction2(query, isMonetarySearch) {
+  if (isMonetarySearch) {
+    return highlightMonetaryValues;
+  } else if (hasMonetaryPotential2(query)) {
+    return highlightHybrid;
+  } else {
+    return highlightText;
+  }
+}
 var FACET_LABELS = {
   entityType: "Type",
   project: "Project",
@@ -857,22 +966,23 @@ function renderResultCard(item, query, isMonetarySearch) {
   card.className = "result-card";
   const header2 = document.createElement("div");
   header2.className = "result-card__header";
+  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
   const title = document.createElement("h3");
-  title.innerHTML = query ? isMonetarySearch ? highlightMonetaryValues(item.title, query) : highlightText(item.title, query) : item.title;
+  title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
   const badge = document.createElement("span");
   badge.className = "result-card__badge";
   badge.textContent = formatEntityType(item.entityType);
   header2.append(title, badge);
   const summary = document.createElement("p");
   summary.className = "result-card__summary";
-  summary.innerHTML = query ? isMonetarySearch ? highlightMonetaryValues(item.summary, query) : highlightText(item.summary, query) : item.summary;
+  summary.innerHTML = query && highlightFn ? highlightFn(item.summary, query) : item.summary;
   const metaList = document.createElement("ul");
   metaList.className = "result-card__meta";
   metaList.append(...buildMetaItems(item, query, isMonetarySearch));
   card.append(header2, summary, metaList);
   if (query) {
     const match = findBestMatch(item, query);
-    if (match && match.field !== "title" && match.field !== "summary") {
+    if (match && match.field !== "title" && match.field !== "summary" && !match.field.startsWith("lineItem")) {
       const context = document.createElement("div");
       context.className = "search-context";
       const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 120, query);
@@ -921,17 +1031,119 @@ function buildMetaItems(item, query, isMonetarySearch) {
   }
   return metas;
 }
+function hasLineItemMatches(item, query, isMonetarySearch) {
+  if (!query) return false;
+  const financial = item;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) return false;
+  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
+  return items.some((lineItem) => {
+    const searchableFields = [
+      lineItem.lineItemTitle,
+      lineItem.lineItemDescription,
+      lineItem.lineItemType,
+      lineItem.lineItemQuantity?.toString(),
+      lineItem.lineItemQuantityUnitOfMeasure,
+      formatCurrency(lineItem.lineItemUnitPrice),
+      formatCurrency(lineItem.lineItemTotal)
+    ];
+    return searchableFields.some((value) => {
+      if (!value) return false;
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes("<mark");
+    });
+  });
+}
+function getMatchingLineItemIndices(item, query, isMonetarySearch) {
+  if (!query) return [];
+  const financial = item;
+  const items = financial.lineItems ?? [];
+  if (items.length === 0) return [];
+  const matchingIndices = [];
+  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
+  items.forEach((lineItem, index) => {
+    const searchableFields = [
+      lineItem.lineItemTitle,
+      lineItem.lineItemDescription,
+      lineItem.lineItemType,
+      lineItem.lineItemQuantity?.toString(),
+      lineItem.lineItemQuantityUnitOfMeasure,
+      formatCurrency(lineItem.lineItemUnitPrice),
+      formatCurrency(lineItem.lineItemTotal)
+    ];
+    const hasMatch = searchableFields.some((value) => {
+      if (!value) return false;
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes("<mark");
+    });
+    if (hasMatch) {
+      matchingIndices.push(index);
+    }
+  });
+  return matchingIndices;
+}
 function renderLineItems(item, query, isMonetarySearch) {
   const financial = item;
   const items = financial.lineItems ?? [];
   if (items.length === 0) {
     return null;
   }
+  const settings = settingsStore.getState();
+  const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
+  const shouldShowLineItems = hasMatches || settings.showLineItemsByDefault;
   const wrapper = document.createElement("div");
   wrapper.className = "result-card__line-items";
   const heading = document.createElement("h4");
   heading.textContent = "Line items";
   wrapper.append(heading);
+  if (!shouldShowLineItems) {
+    const toggleLink = document.createElement("button");
+    toggleLink.className = "line-items-toggle";
+    toggleLink.textContent = `Show line items (${items.length})`;
+    toggleLink.type = "button";
+    const table2 = document.createElement("table");
+    table2.className = "line-items-table";
+    table2.style.display = "none";
+    const thead2 = document.createElement("thead");
+    const headerRow2 = document.createElement("tr");
+    headerRow2.innerHTML = `
+      <th>Description</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total</th>
+    `;
+    thead2.append(headerRow2);
+    table2.append(thead2);
+    const tbody2 = document.createElement("tbody");
+    const highlightFn2 = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+    items.forEach((line) => {
+      const row = document.createElement("tr");
+      const unitPrice = formatCurrency(line.lineItemUnitPrice);
+      const total = formatCurrency(line.lineItemTotal);
+      const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+      row.innerHTML = `
+        <td class="line-item__description">${query && highlightFn2 ? highlightFn2(line.lineItemTitle, query) : line.lineItemTitle}</td>
+        <td class="line-item__type">${query && highlightFn2 ? highlightFn2(line.lineItemType, query) : line.lineItemType}</td>
+        <td class="line-item__quantity">${query && highlightFn2 ? highlightFn2(quantity, query) : quantity}</td>
+        <td class="line-item__unit-price">${query && highlightFn2 ? highlightFn2(unitPrice, query) : unitPrice}</td>
+        <td class="line-item__total">${query && highlightFn2 ? highlightFn2(total, query) : total}</td>
+      `;
+      tbody2.append(row);
+    });
+    table2.append(tbody2);
+    toggleLink.addEventListener("click", () => {
+      if (table2.style.display === "none") {
+        table2.style.display = "table";
+        toggleLink.textContent = "Hide line items";
+      } else {
+        table2.style.display = "none";
+        toggleLink.textContent = `Show line items (${items.length})`;
+      }
+    });
+    wrapper.append(toggleLink, table2);
+    return wrapper;
+  }
   const table = document.createElement("table");
   table.className = "line-items-table";
   const thead = document.createElement("thead");
@@ -946,34 +1158,85 @@ function renderLineItems(item, query, isMonetarySearch) {
   thead.append(headerRow);
   table.append(thead);
   const tbody = document.createElement("tbody");
-  const settings = settingsStore.getState();
   const contextCount = settings.lineItemsContextCount;
-  const displayItems = contextCount === 0 ? items : items.slice(0, contextCount);
+  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+  let displayItems;
+  let remainingItems = [];
+  if (hasMatches && contextCount > 0) {
+    const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+    if (matchingIndices.length > 0) {
+      const minIndex = Math.min(...matchingIndices);
+      const maxIndex = Math.max(...matchingIndices);
+      const startIndex = Math.max(0, minIndex - contextCount);
+      const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+      displayItems = items.slice(startIndex, endIndex);
+      remainingItems = [
+        ...items.slice(0, startIndex),
+        ...items.slice(endIndex)
+      ];
+    } else {
+      displayItems = items.slice(0, contextCount);
+      remainingItems = items.slice(contextCount);
+    }
+  } else {
+    displayItems = items;
+    remainingItems = [];
+  }
   displayItems.forEach((line) => {
     const row = document.createElement("tr");
     const unitPrice = formatCurrency(line.lineItemUnitPrice);
     const total = formatCurrency(line.lineItemTotal);
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     row.innerHTML = `
-      <td class="line-item__description">${query ? isMonetarySearch ? highlightMonetaryValues(line.lineItemTitle, query) : highlightText(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query ? isMonetarySearch ? highlightMonetaryValues(line.lineItemType, query) : highlightText(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query ? isMonetarySearch ? highlightMonetaryValues(quantity, query) : quantity : quantity}</td>
-      <td class="line-item__unit-price">${query ? isMonetarySearch ? highlightMonetaryValues(unitPrice, query) : unitPrice : unitPrice}</td>
-      <td class="line-item__total">${query ? isMonetarySearch ? highlightMonetaryValues(total, query) : total : total}</td>
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
     tbody.append(row);
   });
-  if (contextCount > 0 && items.length > contextCount) {
-    const moreRow = document.createElement("tr");
-    moreRow.className = "line-item__more-row";
-    const remaining = items.length - contextCount;
-    moreRow.innerHTML = `
-      <td colspan="5" class="line-item__more">${remaining} more line item${remaining === 1 ? "" : "s"}\u2026</td>
+  const hiddenRows = [];
+  remainingItems.forEach((line) => {
+    const row = document.createElement("tr");
+    row.style.display = "none";
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    row.innerHTML = `
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
-    tbody.append(moreRow);
-  }
+    tbody.append(row);
+    hiddenRows.push(row);
+  });
   table.append(tbody);
   wrapper.append(table);
+  if (remainingItems.length > 0) {
+    const toggleButton = document.createElement("button");
+    toggleButton.className = "line-items-toggle";
+    toggleButton.type = "button";
+    const remainingCount = remainingItems.length;
+    toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? "" : "s"}`;
+    toggleButton.addEventListener("click", () => {
+      const isHidden = hiddenRows[0]?.style.display === "none";
+      if (isHidden) {
+        hiddenRows.forEach((row) => {
+          row.style.display = "";
+        });
+        toggleButton.textContent = `Hide ${remainingCount} line item${remainingCount === 1 ? "" : "s"}`;
+      } else {
+        hiddenRows.forEach((row) => {
+          row.style.display = "none";
+        });
+        toggleButton.textContent = `Show ${remainingCount} more line item${remainingCount === 1 ? "" : "s"}`;
+      }
+    });
+    wrapper.append(toggleButton);
+  }
   return wrapper;
 }
 function getFieldLabel(field) {
@@ -1050,6 +1313,19 @@ function createSettingsView() {
   `;
   lineItemsContextField.append(lineItemsContextSelect);
   resultsSection.append(lineItemsContextField);
+  const showLineItemsField = document.createElement("div");
+  showLineItemsField.className = "settings-field";
+  showLineItemsField.innerHTML = `
+    <label for="show-line-items-default">Show line items by default</label>
+  `;
+  const showLineItemsCheckbox = document.createElement("input");
+  showLineItemsCheckbox.id = "show-line-items-default";
+  showLineItemsCheckbox.type = "checkbox";
+  const showLineItemsLabel = document.createElement("label");
+  showLineItemsLabel.htmlFor = "show-line-items-default";
+  showLineItemsLabel.textContent = 'Show line items by default (uncheck to collapse behind "Show line items" link)';
+  showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
+  resultsSection.append(showLineItemsField);
   const groupSection = document.createElement("fieldset");
   groupSection.className = "settings-group";
   groupSection.innerHTML = `
@@ -1096,6 +1372,7 @@ function createSettingsView() {
     const state = settingsStore.getState();
     delayInput.value = String(state.searchDelayMs);
     lineItemsContextSelect.value = String(state.lineItemsContextCount);
+    showLineItemsCheckbox.checked = state.showLineItemsByDefault;
     renderGroupInputs(state.groupLimits);
   };
   form.addEventListener("submit", (event) => {
@@ -1112,6 +1389,7 @@ function createSettingsView() {
     settingsStore.update({
       searchDelayMs: resolvedDelay,
       lineItemsContextCount: resolvedLineItemsContext,
+      showLineItemsByDefault: showLineItemsCheckbox.checked,
       groupLimits
     });
     window.location.reload();
@@ -1313,6 +1591,12 @@ function parseMonetaryQuery(query) {
     originalQuery: query
   };
 }
+function hasMonetaryPotential3(query) {
+  const tokens = tokenize(query);
+  return tokens.some((token) => {
+    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || /^\d+(\.\d+)?$/.test(token) || /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) || /\d/.test(token);
+  });
+}
 function parseCurrencyString2(amountStr) {
   const cleaned = amountStr.replace(/[$,\s]/g, "");
   if (cleaned.includes("-") || cleaned.toLowerCase().includes(" to ")) {
@@ -1421,6 +1705,16 @@ function matchesQuery(record, query) {
   }
   const haystack = buildHaystack(record);
   return tokens.every((token) => haystack.includes(token));
+}
+function matchesHybridQuery(record, query) {
+  const regularMatch = matchesQuery(record, query);
+  if (regularMatch) {
+    return true;
+  }
+  if (hasMonetaryPotential3(query)) {
+    return matchesMonetaryQuery(record, query);
+  }
+  return false;
 }
 function matchesMonetaryQuery(record, query) {
   const { amounts, textTokens, range } = extractMonetaryTokens2(query);
@@ -1609,6 +1903,16 @@ function calculateRelevanceScore(record, query) {
   }
   return score;
 }
+function calculateHybridRelevanceScore(record, query) {
+  const regularScore = calculateRelevanceScore(record, query);
+  if (regularScore > 0) {
+    return regularScore;
+  }
+  if (hasMonetaryPotential3(query)) {
+    return calculateMonetaryRelevanceScore(record, query);
+  }
+  return 0;
+}
 function calculateMonetaryRelevanceScore(record, query) {
   const { amounts, textTokens, range } = extractMonetaryTokens2(query);
   if (amounts.length === 0 && textTokens.length === 0 && !range) {
@@ -1709,8 +2013,18 @@ function calculateMonetaryRelevanceScore(record, query) {
 }
 function sortByRelevance(records, query, isMonetary = false) {
   return [...records].sort((a, b) => {
-    const scoreA = isMonetary ? calculateMonetaryRelevanceScore(a, query) : calculateRelevanceScore(a, query);
-    const scoreB = isMonetary ? calculateMonetaryRelevanceScore(b, query) : calculateRelevanceScore(b, query);
+    let scoreA;
+    let scoreB;
+    if (isMonetary) {
+      scoreA = calculateMonetaryRelevanceScore(a, query);
+      scoreB = calculateMonetaryRelevanceScore(b, query);
+    } else if (hasMonetaryPotential3(query)) {
+      scoreA = calculateHybridRelevanceScore(a, query);
+      scoreB = calculateHybridRelevanceScore(b, query);
+    } else {
+      scoreA = calculateRelevanceScore(a, query);
+      scoreB = calculateRelevanceScore(b, query);
+    }
     if (scoreA !== scoreB) {
       return scoreB - scoreA;
     }
@@ -1726,7 +2040,14 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   const corpus = await loadCorpus();
   const filtered = corpus.filter((record) => {
-    const matchesQueryResult = isMonetary ? matchesMonetaryQuery(record, searchQuery) : matchesQuery(record, searchQuery);
+    let matchesQueryResult;
+    if (isMonetary) {
+      matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
+    } else if (hasMonetaryPotential3(searchQuery)) {
+      matchesQueryResult = matchesHybridQuery(record, searchQuery);
+    } else {
+      matchesQueryResult = matchesQuery(record, searchQuery);
+    }
     return matchesQueryResult && matchesSelections(record, selections);
   });
   return searchQuery.trim() ? sortByRelevance(filtered, searchQuery, isMonetary) : sortByRecency(filtered);

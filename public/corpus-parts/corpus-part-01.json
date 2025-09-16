@@ -21,7 +21,19 @@
       "tradeFocus": "Roofing"
     },
     "documentType": "Punch List",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "lineItems": [
+      {
+        "lineItemId": "document-001-item-1",
+        "lineItemTitle": "Deck staining and sealing - 2 sq ft",
+        "lineItemDescription": "Labor for deck staining and sealing - 2 sq ft on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 825,
+        "lineItemTotal": 1650,
+        "lineItemType": "Labor"
+      }
+    ]
   },
   {
     "id": "document-002",
@@ -45,7 +57,29 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Specification Sheet",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "lineItems": [
+      {
+        "lineItemId": "document-002-item-1",
+        "lineItemTitle": "Cabinet countertop installation - 10 linear feet",
+        "lineItemDescription": "Other for cabinet countertop installation - 10 linear feet on Building core areas",
+        "lineItemQuantity": 10,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 1103,
+        "lineItemTotal": 11030,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-002-item-2",
+        "lineItemTitle": "Interior demolition - 9 sq ft",
+        "lineItemDescription": "Labor for interior demolition - 9 sq ft on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 750,
+        "lineItemTotal": 6750,
+        "lineItemType": "Labor"
+      }
+    ]
   },
   {
     "id": "document-003",
@@ -69,7 +103,49 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Inspection Report",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "lineItems": [
+      {
+        "lineItemId": "document-003-item-1",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Labor for cabinets work on Building core areas",
+        "lineItemQuantity": 19,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 19,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "document-003-item-2",
+        "lineItemTitle": "Kitchen cabinets installation - 35 linear feet",
+        "lineItemDescription": "Other for kitchen cabinets installation - 35 linear feet on Building core areas",
+        "lineItemQuantity": 35,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 1600,
+        "lineItemTotal": 56000,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-003-item-3",
+        "lineItemTitle": "Bathroom fixtures installation - 27 units",
+        "lineItemDescription": "Material for bathroom fixtures installation - 27 units on Building core areas",
+        "lineItemQuantity": 27,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 294,
+        "lineItemTotal": 7938,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-003-item-4",
+        "lineItemTitle": "Carpet installation - 12 sq ft",
+        "lineItemDescription": "Other for carpet installation - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 24,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-004",
@@ -93,7 +169,49 @@
       "tradeFocus": "Finish Carpentry"
     },
     "documentType": "Specification Sheet",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "lineItems": [
+      {
+        "lineItemId": "document-004-item-1",
+        "lineItemTitle": "Deck staining and sealing - 5 sq ft",
+        "lineItemDescription": "Subcontractor for deck staining and sealing - 5 sq ft on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 511,
+        "lineItemTotal": 2555,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-004-item-2",
+        "lineItemTitle": "Cabinet hardware installation - 10 pieces",
+        "lineItemDescription": "Material for cabinet hardware installation - 10 pieces on Building core areas",
+        "lineItemQuantity": 10,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 85,
+        "lineItemTotal": 850,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-004-item-3",
+        "lineItemTitle": "Demolition cleanup - 45 hours",
+        "lineItemDescription": "Equipment for demolition cleanup - 45 hours on Building core areas",
+        "lineItemQuantity": 45,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 460,
+        "lineItemTotal": 20700,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-004-item-4",
+        "lineItemTitle": "Bathroom fixtures installation - 15 units",
+        "lineItemDescription": "Other for bathroom fixtures installation - 15 units on Building core areas",
+        "lineItemQuantity": 15,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 18,
+        "lineItemTotal": 270,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-005",
@@ -117,7 +235,29 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Change Order",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "lineItems": [
+      {
+        "lineItemId": "document-005-item-1",
+        "lineItemTitle": "Concrete sealing and waterproofing - 4 sq ft",
+        "lineItemDescription": "Other for concrete sealing and waterproofing - 4 sq ft on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 4861,
+        "lineItemTotal": 19444,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-005-item-2",
+        "lineItemTitle": "Concrete delivery and placement - 9 cubic yards",
+        "lineItemDescription": "Subcontractor for concrete delivery and placement - 9 cubic yards on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 698,
+        "lineItemTotal": 6282,
+        "lineItemType": "Subcontractor"
+      }
+    ]
   },
   {
     "id": "document-006",
@@ -141,7 +281,29 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Punch List",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "lineItems": [
+      {
+        "lineItemId": "document-006-item-1",
+        "lineItemTitle": "Bathroom electrical work - 13 bathrooms",
+        "lineItemDescription": "Other for bathroom electrical work - 13 bathrooms on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 68,
+        "lineItemTotal": 884,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-006-item-2",
+        "lineItemTitle": "Custom cabinet work - 36 units",
+        "lineItemDescription": "Labor for custom cabinet work - 36 units on Building core areas",
+        "lineItemQuantity": 36,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 2840,
+        "lineItemTotal": 102240,
+        "lineItemType": "Labor"
+      }
+    ]
   },
   {
     "id": "document-007",
@@ -165,7 +327,19 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Permit Package",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "lineItems": [
+      {
+        "lineItemId": "document-007-item-1",
+        "lineItemTitle": "Demolition cleanup - 16 hours",
+        "lineItemDescription": "Other for demolition cleanup - 16 hours on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 819,
+        "lineItemTotal": 13104,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-008",
@@ -189,7 +363,49 @@
       "tradeFocus": "Landscaping"
     },
     "documentType": "Permit Package",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "lineItems": [
+      {
+        "lineItemId": "document-008-item-1",
+        "lineItemTitle": "Concrete repair and patching - 20 sq ft",
+        "lineItemDescription": "Labor for concrete repair and patching - 20 sq ft on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 989,
+        "lineItemTotal": 19780,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "document-008-item-2",
+        "lineItemTitle": "Concrete repair and patching - 22 sq ft",
+        "lineItemDescription": "Other for concrete repair and patching - 22 sq ft on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 847,
+        "lineItemTotal": 18634,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-008-item-3",
+        "lineItemTitle": "Bathroom renovation - 9 bathrooms",
+        "lineItemDescription": "Subcontractor for bathroom renovation - 9 bathrooms on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 507,
+        "lineItemTotal": 4563,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-008-item-4",
+        "lineItemTitle": "Bathroom renovation - 33 bathrooms",
+        "lineItemDescription": "Other for bathroom renovation - 33 bathrooms on Building core areas",
+        "lineItemQuantity": 33,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 3040,
+        "lineItemTotal": 100320,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-009",
@@ -213,7 +429,39 @@
       "tradeFocus": "Finish Carpentry"
     },
     "documentType": "Inspection Report",
-    "author": "Miguel Alvarez"
+    "author": "Miguel Alvarez",
+    "lineItems": [
+      {
+        "lineItemId": "document-009-item-1",
+        "lineItemTitle": "Concrete finishing work - 12 sq ft",
+        "lineItemDescription": "Labor for concrete finishing work - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 7406,
+        "lineItemTotal": 88872,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "document-009-item-2",
+        "lineItemTitle": "Demo and removal - 43 hours",
+        "lineItemDescription": "Other for demo and removal - 43 hours on Building core areas",
+        "lineItemQuantity": 43,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 10,
+        "lineItemTotal": 430,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-009-item-3",
+        "lineItemTitle": "Interior demolition - 36 sq ft",
+        "lineItemDescription": "Subcontractor for interior demolition - 36 sq ft on Building core areas",
+        "lineItemQuantity": 36,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 1178,
+        "lineItemTotal": 42408,
+        "lineItemType": "Subcontractor"
+      }
+    ]
   },
   {
     "id": "document-010",
@@ -237,7 +485,29 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Permit Package",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "lineItems": [
+      {
+        "lineItemId": "document-010-item-1",
+        "lineItemTitle": "Demo and removal - 13 hours",
+        "lineItemDescription": "Subcontractor for demo and removal - 13 hours on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 391,
+        "lineItemTotal": 5083,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-010-item-2",
+        "lineItemTitle": "Bathroom cabinets - 12 units",
+        "lineItemDescription": "Subcontractor for bathroom cabinets - 12 units on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 257,
+        "lineItemTotal": 3084,
+        "lineItemType": "Subcontractor"
+      }
+    ]
   },
   {
     "id": "document-011",
@@ -285,7 +555,49 @@
       "tradeFocus": "Sitework"
     },
     "documentType": "Punch List",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "lineItems": [
+      {
+        "lineItemId": "document-012-item-1",
+        "lineItemTitle": "Bathroom electrical work - 29 bathrooms",
+        "lineItemDescription": "Other for bathroom electrical work - 29 bathrooms on Building core areas",
+        "lineItemQuantity": 29,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 256,
+        "lineItemTotal": 7424,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-012-item-2",
+        "lineItemTitle": "Selective demolition - 9 sq ft",
+        "lineItemDescription": "Equipment for selective demolition - 9 sq ft on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 3034,
+        "lineItemTotal": 27306,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-012-item-3",
+        "lineItemTitle": "Concrete repair and patching - 6 sq ft",
+        "lineItemDescription": "Labor for concrete repair and patching - 6 sq ft on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 1445,
+        "lineItemTotal": 8670,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "document-012-item-4",
+        "lineItemTitle": "Deck demolition and removal - 31 sq ft",
+        "lineItemDescription": "Labor for deck demolition and removal - 31 sq ft on Building core areas",
+        "lineItemQuantity": 31,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 116,
+        "lineItemTotal": 3596,
+        "lineItemType": "Labor"
+      }
+    ]
   },
   {
     "id": "document-013",
@@ -309,7 +621,19 @@
       "tradeFocus": "HVAC"
     },
     "documentType": "Inspection Report",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "lineItems": [
+      {
+        "lineItemId": "document-013-item-1",
+        "lineItemTitle": "Exterior demolition - 24 sq ft",
+        "lineItemDescription": "Other for exterior demolition - 24 sq ft on Building core areas",
+        "lineItemQuantity": 24,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 21,
+        "lineItemTotal": 504,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-014",
@@ -333,7 +657,39 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Punch List",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "lineItems": [
+      {
+        "lineItemId": "document-014-item-1",
+        "lineItemTitle": "Demolition debris disposal - 30 cubic yards",
+        "lineItemDescription": "Subcontractor for demolition debris disposal - 30 cubic yards on Building core areas",
+        "lineItemQuantity": 30,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 173,
+        "lineItemTotal": 5190,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-014-item-2",
+        "lineItemTitle": "Countertop delivery and installation - 2 linear feet",
+        "lineItemDescription": "Other for countertop delivery and installation - 2 linear feet on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 2385,
+        "lineItemTotal": 4770,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-014-item-3",
+        "lineItemTitle": "Concrete stamping and texturing - 24 sq ft",
+        "lineItemDescription": "Material for concrete stamping and texturing - 24 sq ft on Building core areas",
+        "lineItemQuantity": 24,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 262,
+        "lineItemTotal": 6288,
+        "lineItemType": "Material"
+      }
+    ]
   },
   {
     "id": "document-015",
@@ -357,7 +713,49 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Inspection Report",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "lineItems": [
+      {
+        "lineItemId": "document-015-item-1",
+        "lineItemTitle": "Carpet delivery and handling - 33 sq ft",
+        "lineItemDescription": "Material for carpet delivery and handling - 33 sq ft on Building core areas",
+        "lineItemQuantity": 33,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 734,
+        "lineItemTotal": 24222,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-015-item-2",
+        "lineItemTitle": "Selective demolition - 44 sq ft",
+        "lineItemDescription": "Material for selective demolition - 44 sq ft on Building core areas",
+        "lineItemQuantity": 44,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 523,
+        "lineItemTotal": 23012,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-015-item-3",
+        "lineItemTitle": "Cabinet doors and drawers - 38 pieces",
+        "lineItemDescription": "Labor for cabinet doors and drawers - 38 pieces on Building core areas",
+        "lineItemQuantity": 38,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 15,
+        "lineItemTotal": 570,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "document-015-item-4",
+        "lineItemTitle": "Exterior demolition - 34 sq ft",
+        "lineItemDescription": "Equipment for exterior demolition - 34 sq ft on Building core areas",
+        "lineItemQuantity": 34,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 466,
+        "lineItemTotal": 15844,
+        "lineItemType": "Equipment"
+      }
+    ]
   },
   {
     "id": "document-016",
@@ -381,7 +779,49 @@
       "tradeFocus": "Roofing"
     },
     "documentType": "Permit Package",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "lineItems": [
+      {
+        "lineItemId": "document-016-item-1",
+        "lineItemTitle": "Carpet repair and patching - 18 sq ft",
+        "lineItemDescription": "Equipment for carpet repair and patching - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 29,
+        "lineItemTotal": 522,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-016-item-2",
+        "lineItemTitle": "Bathroom fixtures installation - 26 units",
+        "lineItemDescription": "Equipment for bathroom fixtures installation - 26 units on Building core areas",
+        "lineItemQuantity": 26,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 477,
+        "lineItemTotal": 12402,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-016-item-3",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Equipment for cabinets work on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 931,
+        "lineItemTotal": 18620,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-016-item-4",
+        "lineItemTitle": "Deck boards installation - 16 sq ft",
+        "lineItemDescription": "Other for deck boards installation - 16 sq ft on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 68,
+        "lineItemTotal": 1088,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-017",
@@ -405,7 +845,19 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Architectural Drawing",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "lineItems": [
+      {
+        "lineItemId": "document-017-item-1",
+        "lineItemTitle": "Concrete foundation pour - 44 cubic yards",
+        "lineItemDescription": "Other for concrete foundation pour - 44 cubic yards on Building core areas",
+        "lineItemQuantity": 44,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 314,
+        "lineItemTotal": 13816,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-018",
@@ -429,7 +881,39 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Change Order",
-    "author": "Miguel Alvarez"
+    "author": "Miguel Alvarez",
+    "lineItems": [
+      {
+        "lineItemId": "document-018-item-1",
+        "lineItemTitle": "Demolition work - 40 sq ft",
+        "lineItemDescription": "Material for demolition work - 40 sq ft on Building core areas",
+        "lineItemQuantity": 40,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 284,
+        "lineItemTotal": 11360,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-018-item-2",
+        "lineItemTitle": "Custom cabinet work - 33 units",
+        "lineItemDescription": "Other for custom cabinet work - 33 units on Building core areas",
+        "lineItemQuantity": 33,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 1273,
+        "lineItemTotal": 42009,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "document-018-item-3",
+        "lineItemTitle": "Cabinet hardware installation - 23 pieces",
+        "lineItemDescription": "Other for cabinet hardware installation - 23 pieces on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 281,
+        "lineItemTotal": 6463,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-019",
@@ -453,7 +937,49 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Specification Sheet",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "lineItems": [
+      {
+        "lineItemId": "document-019-item-1",
+        "lineItemTitle": "Bathroom electrical work - 26 bathrooms",
+        "lineItemDescription": "Subcontractor for bathroom electrical work - 26 bathrooms on Building core areas",
+        "lineItemQuantity": 26,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 485,
+        "lineItemTotal": 12610,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-019-item-2",
+        "lineItemTitle": "Concrete slab installation - 8 sq ft",
+        "lineItemDescription": "Equipment for concrete slab installation - 8 sq ft on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 55,
+        "lineItemTotal": 440,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "document-019-item-3",
+        "lineItemTitle": "Cabinet hardware installation - 46 pieces",
+        "lineItemDescription": "Material for cabinet hardware installation - 46 pieces on Building core areas",
+        "lineItemQuantity": 46,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 129,
+        "lineItemTotal": 5934,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "document-019-item-4",
+        "lineItemTitle": "Deck construction - 7 sq ft",
+        "lineItemDescription": "Other for deck construction - 7 sq ft on Building core areas",
+        "lineItemQuantity": 7,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 135,
+        "lineItemTotal": 945,
+        "lineItemType": "Other"
+      }
+    ]
   },
   {
     "id": "document-020",
@@ -477,7 +1003,39 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Permit Package",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "lineItems": [
+      {
+        "lineItemId": "document-020-item-1",
+        "lineItemTitle": "Demolition cleanup - 40 hours",
+        "lineItemDescription": "Subcontractor for demolition cleanup - 40 hours on Building core areas",
+        "lineItemQuantity": 40,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 80,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-020-item-2",
+        "lineItemTitle": "Cabinet refinishing - 28 units",
+        "lineItemDescription": "Subcontractor for cabinet refinishing - 28 units on Building core areas",
+        "lineItemQuantity": 28,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 306,
+        "lineItemTotal": 8568,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "document-020-item-3",
+        "lineItemTitle": "Bathroom tile work - 12 sq ft",
+        "lineItemDescription": "Labor for bathroom tile work - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 860,
+        "lineItemTotal": 10320,
+        "lineItemType": "Labor"
+      }
+    ]
   },
   {
     "id": "clientinvoice-001",
@@ -500,49 +1058,49 @@
       "costCode": "05-120 Structural Steel",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 37800,
+    "totalValue": 19786,
     "issuedDate": "2023-02-06T02:17:05.656Z",
     "dueDate": "2023-03-19T02:17:05.656Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-001-item-1",
-        "lineItemTitle": "Exterior siding",
-        "lineItemDescription": "Other for exterior siding on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 4602,
-        "lineItemTotal": 18408,
-        "lineItemType": "Other"
+        "lineItemTitle": "Bathroom electrical work - 3 bathrooms",
+        "lineItemDescription": "Subcontractor for bathroom electrical work - 3 bathrooms on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 928,
+        "lineItemTotal": 2784,
+        "lineItemType": "Subcontractor"
       },
       {
         "lineItemId": "clientinvoice-001-item-2",
-        "lineItemTitle": "Rooftop units",
-        "lineItemDescription": "Material for rooftop units on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 3298,
-        "lineItemTotal": 16490,
-        "lineItemType": "Material"
+        "lineItemTitle": "Custom cabinet work - 35 units",
+        "lineItemDescription": "Equipment for custom cabinet work - 35 units on Building core areas",
+        "lineItemQuantity": 35,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 209,
+        "lineItemTotal": 7315,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-001-item-3",
-        "lineItemTitle": "Main service panel",
-        "lineItemDescription": "Labor for main service panel on Building core areas",
-        "lineItemQuantity": 8,
-        "lineItemQuantityUnitOfMeasure": "hr",
-        "lineItemUnitPrice": 111,
-        "lineItemTotal": 888,
-        "lineItemType": "Labor"
+        "lineItemTitle": "Bathroom plumbing rough-in - 35 bathrooms",
+        "lineItemDescription": "Subcontractor for bathroom plumbing rough-in - 35 bathrooms on Building core areas",
+        "lineItemQuantity": 35,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 27,
+        "lineItemTotal": 945,
+        "lineItemType": "Subcontractor"
       },
       {
         "lineItemId": "clientinvoice-001-item-4",
-        "lineItemTitle": "Interior paint",
-        "lineItemDescription": "Subcontractor for interior paint on Building core areas",
-        "lineItemQuantity": 1,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 2014,
-        "lineItemTotal": 2014,
-        "lineItemType": "Subcontractor"
+        "lineItemTitle": "Deck railing installation - 31 linear feet",
+        "lineItemDescription": "Other for deck railing installation - 31 linear feet on Building core areas",
+        "lineItemQuantity": 31,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 282,
+        "lineItemTotal": 8742,
+        "lineItemType": "Other"
       }
     ]
   },
@@ -567,29 +1125,89 @@
       "costCode": "05-120 Structural Steel",
       "paymentTerms": "Net 45"
     },
-    "totalValue": 14330,
+    "totalValue": 384288,
     "issuedDate": "2024-01-01T14:11:31.444Z",
     "dueDate": "2024-01-31T14:11:31.444Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-002-item-1",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Material for landscape irrigation on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 826,
-        "lineItemTotal": 2478,
-        "lineItemType": "Material"
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Labor for cabinets work on Building core areas",
+        "lineItemQuantity": 7,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 408,
+        "lineItemTotal": 2856,
+        "lineItemType": "Labor"
       },
       {
         "lineItemId": "clientinvoice-002-item-2",
-        "lineItemTitle": "Elevator cab finishes",
-        "lineItemDescription": "Material for elevator cab finishes on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 2963,
-        "lineItemTotal": 11852,
+        "lineItemTitle": "Carpet cleaning and maintenance - 9 sq ft",
+        "lineItemDescription": "Subcontractor for carpet cleaning and maintenance - 9 sq ft on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 307,
+        "lineItemTotal": 2763,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-3",
+        "lineItemTitle": "Countertop fabrication - 11 linear feet",
+        "lineItemDescription": "Material for countertop fabrication - 11 linear feet on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 385,
+        "lineItemTotal": 4235,
         "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-4",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Other for cabinets work on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 355,
+        "lineItemTotal": 4615,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-5",
+        "lineItemTitle": "Deck railing installation - 40 linear feet",
+        "lineItemDescription": "Subcontractor for deck railing installation - 40 linear feet on Building core areas",
+        "lineItemQuantity": 40,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 8644,
+        "lineItemTotal": 345760,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-6",
+        "lineItemTitle": "Bathroom cabinets - 21 units",
+        "lineItemDescription": "Subcontractor for bathroom cabinets - 21 units on Building core areas",
+        "lineItemQuantity": 21,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 21,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-7",
+        "lineItemTitle": "Demo and removal - 40 hours",
+        "lineItemDescription": "Equipment for demo and removal - 40 hours on Building core areas",
+        "lineItemQuantity": 40,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 581,
+        "lineItemTotal": 23240,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-002-item-8",
+        "lineItemTitle": "Carpet repair and patching - 38 sq ft",
+        "lineItemDescription": "Labor for carpet repair and patching - 38 sq ft on Building core areas",
+        "lineItemQuantity": 38,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 21,
+        "lineItemTotal": 798,
+        "lineItemType": "Labor"
       }
     ]
   },
@@ -614,29 +1232,29 @@
       "costCode": "09-300 Tiling",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 26008,
+    "totalValue": 10008,
     "issuedDate": "2023-03-19T00:54:05.038Z",
     "dueDate": "2023-05-08T00:54:05.038Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-003-item-1",
-        "lineItemTitle": "Low-voltage wiring",
-        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 2086,
-        "lineItemTotal": 6258,
-        "lineItemType": "Material"
+        "lineItemTitle": "Carpet delivery and handling - 22 sq ft",
+        "lineItemDescription": "Labor for carpet delivery and handling - 22 sq ft on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 454,
+        "lineItemTotal": 9988,
+        "lineItemType": "Labor"
       },
       {
         "lineItemId": "clientinvoice-003-item-2",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Other for landscape irrigation on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 3950,
-        "lineItemTotal": 19750,
-        "lineItemType": "Other"
+        "lineItemTitle": "Deck demolition and removal - 20 sq ft",
+        "lineItemDescription": "Equipment for deck demolition and removal - 20 sq ft on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 20,
+        "lineItemType": "Equipment"
       }
     ]
   },
@@ -661,49 +1279,49 @@
       "costCode": "07-150 Roofing Assembly",
       "paymentTerms": "Net 45"
     },
-    "totalValue": 65315,
+    "totalValue": 25474,
     "issuedDate": "2023-09-19T11:52:58.884Z",
     "dueDate": "2023-11-17T11:52:58.884Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-004-item-1",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Other for landscape irrigation on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 4730,
-        "lineItemTotal": 18920,
-        "lineItemType": "Other"
-      },
-      {
-        "lineItemId": "clientinvoice-004-item-2",
-        "lineItemTitle": "Interior paint",
-        "lineItemDescription": "Subcontractor for interior paint on Building core areas",
-        "lineItemQuantity": 6,
+        "lineItemTitle": "Selective demolition - 8 sq ft",
+        "lineItemDescription": "Subcontractor for selective demolition - 8 sq ft on Building core areas",
+        "lineItemQuantity": 8,
         "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 4909,
-        "lineItemTotal": 29454,
+        "lineItemUnitPrice": 1235,
+        "lineItemTotal": 9880,
         "lineItemType": "Subcontractor"
       },
       {
+        "lineItemId": "clientinvoice-004-item-2",
+        "lineItemTitle": "Concrete sealing and waterproofing - 48 sq ft",
+        "lineItemDescription": "Equipment for concrete sealing and waterproofing - 48 sq ft on Building core areas",
+        "lineItemQuantity": 48,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 23,
+        "lineItemTotal": 1104,
+        "lineItemType": "Equipment"
+      },
+      {
         "lineItemId": "clientinvoice-004-item-3",
-        "lineItemTitle": "Foundation waterproofing",
-        "lineItemDescription": "Other for foundation waterproofing on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 3255,
-        "lineItemTotal": 9765,
-        "lineItemType": "Other"
+        "lineItemTitle": "Concrete repair and patching - 25 sq ft",
+        "lineItemDescription": "Subcontractor for concrete repair and patching - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 562,
+        "lineItemTotal": 14050,
+        "lineItemType": "Subcontractor"
       },
       {
         "lineItemId": "clientinvoice-004-item-4",
-        "lineItemTitle": "Window package",
-        "lineItemDescription": "Other for window package on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 1196,
-        "lineItemTotal": 7176,
-        "lineItemType": "Other"
+        "lineItemTitle": "Demolition work - 22 sq ft",
+        "lineItemDescription": "Labor for demolition work - 22 sq ft on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 20,
+        "lineItemTotal": 440,
+        "lineItemType": "Labor"
       }
     ]
   },
@@ -728,39 +1346,79 @@
       "costCode": "15-500 HVAC Equipment",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 26136,
+    "totalValue": 53835,
     "issuedDate": "2023-09-01T16:33:19.485Z",
     "dueDate": "2023-10-27T16:33:19.485Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-005-item-1",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 2892,
-        "lineItemTotal": 11568,
-        "lineItemType": "Subcontractor"
+        "lineItemTitle": "Demo and removal - 43 hours",
+        "lineItemDescription": "Equipment for demo and removal - 43 hours on Building core areas",
+        "lineItemQuantity": 43,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 383,
+        "lineItemTotal": 16469,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-005-item-2",
-        "lineItemTitle": "Main service panel",
-        "lineItemDescription": "Other for main service panel on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 4528,
-        "lineItemTotal": 13584,
+        "lineItemTitle": "Cabinet hardware installation - 1 pieces",
+        "lineItemDescription": "Other for cabinet hardware installation - 1 pieces on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 172,
+        "lineItemTotal": 172,
         "lineItemType": "Other"
       },
       {
         "lineItemId": "clientinvoice-005-item-3",
-        "lineItemTitle": "Main service panel",
-        "lineItemDescription": "Labor for main service panel on Building core areas",
-        "lineItemQuantity": 8,
-        "lineItemQuantityUnitOfMeasure": "hr",
-        "lineItemUnitPrice": 123,
-        "lineItemTotal": 984,
+        "lineItemTitle": "Concrete finishing work - 9 sq ft",
+        "lineItemDescription": "Other for concrete finishing work - 9 sq ft on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 611,
+        "lineItemTotal": 5499,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-4",
+        "lineItemTitle": "Cabinet refinishing - 38 units",
+        "lineItemDescription": "Labor for cabinet refinishing - 38 units on Building core areas",
+        "lineItemQuantity": 38,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 462,
+        "lineItemTotal": 17556,
         "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-5",
+        "lineItemTitle": "Cabinet hardware installation - 17 pieces",
+        "lineItemDescription": "Other for cabinet hardware installation - 17 pieces on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 624,
+        "lineItemTotal": 10608,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-6",
+        "lineItemTitle": "Concrete stamping and texturing - 41 sq ft",
+        "lineItemDescription": "Subcontractor for concrete stamping and texturing - 41 sq ft on Building core areas",
+        "lineItemQuantity": 41,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 85,
+        "lineItemTotal": 3485,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-005-item-7",
+        "lineItemTitle": "Bathroom cabinets - 46 units",
+        "lineItemDescription": "Equipment for bathroom cabinets - 46 units on Building core areas",
+        "lineItemQuantity": 46,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 46,
+        "lineItemType": "Equipment"
       }
     ]
   },
@@ -785,29 +1443,89 @@
       "costCode": "05-120 Structural Steel",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 8476,
+    "totalValue": 123751,
     "issuedDate": "2023-08-11T22:47:02.831Z",
     "dueDate": "2023-09-24T22:47:02.831Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-006-item-1",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Other for landscape irrigation on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 1301,
-        "lineItemTotal": 5204,
-        "lineItemType": "Other"
+        "lineItemTitle": "Deck construction - 3 sq ft",
+        "lineItemDescription": "Subcontractor for deck construction - 3 sq ft on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 850,
+        "lineItemTotal": 2550,
+        "lineItemType": "Subcontractor"
       },
       {
         "lineItemId": "clientinvoice-006-item-2",
-        "lineItemTitle": "Low-voltage wiring",
-        "lineItemDescription": "Material for low-voltage wiring on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 818,
-        "lineItemTotal": 3272,
+        "lineItemTitle": "Concrete repair and patching - 49 sq ft",
+        "lineItemDescription": "Subcontractor for concrete repair and patching - 49 sq ft on Building core areas",
+        "lineItemQuantity": 49,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 4,
+        "lineItemTotal": 196,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-3",
+        "lineItemTitle": "Countertop removal and disposal - 23 linear feet",
+        "lineItemDescription": "Material for countertop removal and disposal - 23 linear feet on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 454,
+        "lineItemTotal": 10442,
         "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-4",
+        "lineItemTitle": "Bathroom cabinets - 34 units",
+        "lineItemDescription": "Labor for bathroom cabinets - 34 units on Building core areas",
+        "lineItemQuantity": 34,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 2243,
+        "lineItemTotal": 76262,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-5",
+        "lineItemTitle": "Carpet cleaning and maintenance - 42 sq ft",
+        "lineItemDescription": "Subcontractor for carpet cleaning and maintenance - 42 sq ft on Building core areas",
+        "lineItemQuantity": 42,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 308,
+        "lineItemTotal": 12936,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-6",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Subcontractor for cabinets work on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 869,
+        "lineItemTotal": 869,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-7",
+        "lineItemTitle": "Concrete stamping and texturing - 37 sq ft",
+        "lineItemDescription": "Labor for concrete stamping and texturing - 37 sq ft on Building core areas",
+        "lineItemQuantity": 37,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 508,
+        "lineItemTotal": 18796,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-006-item-8",
+        "lineItemTitle": "Cabinet countertop installation - 25 linear feet",
+        "lineItemDescription": "Subcontractor for cabinet countertop installation - 25 linear feet on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 68,
+        "lineItemTotal": 1700,
+        "lineItemType": "Subcontractor"
       }
     ]
   },
@@ -832,29 +1550,109 @@
       "costCode": "05-120 Structural Steel",
       "paymentTerms": "Net 45"
     },
-    "totalValue": 2630,
+    "totalValue": 323180,
     "issuedDate": "2023-12-29T04:46:50.075Z",
     "dueDate": "2024-02-17T04:46:50.075Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-007-item-1",
-        "lineItemTitle": "Rooftop units",
-        "lineItemDescription": "Labor for rooftop units on Building core areas",
-        "lineItemQuantity": 17,
-        "lineItemQuantityUnitOfMeasure": "hr",
-        "lineItemUnitPrice": 121,
-        "lineItemTotal": 2057,
-        "lineItemType": "Labor"
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Equipment for cabinets work on Building core areas",
+        "lineItemQuantity": 14,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 4219,
+        "lineItemTotal": 59066,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-007-item-2",
-        "lineItemTitle": "Interior paint",
-        "lineItemDescription": "Other for interior paint on Building core areas",
-        "lineItemQuantity": 1,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 573,
-        "lineItemTotal": 573,
+        "lineItemTitle": "Cabinet hardware installation - 14 pieces",
+        "lineItemDescription": "Subcontractor for cabinet hardware installation - 14 pieces on Building core areas",
+        "lineItemQuantity": 14,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 905,
+        "lineItemTotal": 12670,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-3",
+        "lineItemTitle": "Concrete stamping and texturing - 11 sq ft",
+        "lineItemDescription": "Material for concrete stamping and texturing - 11 sq ft on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 26,
+        "lineItemTotal": 286,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-4",
+        "lineItemTitle": "Bathroom fixtures installation - 8 units",
+        "lineItemDescription": "Labor for bathroom fixtures installation - 8 units on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 674,
+        "lineItemTotal": 5392,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-5",
+        "lineItemTitle": "Exterior demolition - 22 sq ft",
+        "lineItemDescription": "Labor for exterior demolition - 22 sq ft on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 2977,
+        "lineItemTotal": 65494,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-6",
+        "lineItemTitle": "Countertop removal and disposal - 40 linear feet",
+        "lineItemDescription": "Equipment for countertop removal and disposal - 40 linear feet on Building core areas",
+        "lineItemQuantity": 40,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 80,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-7",
+        "lineItemTitle": "Deck repair and maintenance - 43 sq ft",
+        "lineItemDescription": "Other for deck repair and maintenance - 43 sq ft on Building core areas",
+        "lineItemQuantity": 43,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 176,
+        "lineItemTotal": 7568,
         "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-8",
+        "lineItemTitle": "Countertop delivery and installation - 28 linear feet",
+        "lineItemDescription": "Equipment for countertop delivery and installation - 28 linear feet on Building core areas",
+        "lineItemQuantity": 28,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 5359,
+        "lineItemTotal": 150052,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-9",
+        "lineItemTitle": "Deck demolition and removal - 14 sq ft",
+        "lineItemDescription": "Subcontractor for deck demolition and removal - 14 sq ft on Building core areas",
+        "lineItemQuantity": 14,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 1611,
+        "lineItemTotal": 22554,
+        "lineItemType": "Subcontractor"
+      },
+      {
+        "lineItemId": "clientinvoice-007-item-10",
+        "lineItemTitle": "Deck railing installation - 18 linear feet",
+        "lineItemDescription": "Material for deck railing installation - 18 linear feet on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 18,
+        "lineItemType": "Material"
       }
     ]
   },
@@ -879,39 +1677,89 @@
       "costCode": "09-300 Tiling",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 14913,
+    "totalValue": 237708,
     "issuedDate": "2023-11-27T18:59:29.884Z",
     "dueDate": "2023-12-24T18:59:29.884Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-008-item-1",
-        "lineItemTitle": "Fire sprinkler rough-in",
-        "lineItemDescription": "Other for fire sprinkler rough-in on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 880,
-        "lineItemTotal": 5280,
-        "lineItemType": "Other"
+        "lineItemTitle": "Deck railing installation - 9 linear feet",
+        "lineItemDescription": "Equipment for deck railing installation - 9 linear feet on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 1729,
+        "lineItemTotal": 15561,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-008-item-2",
-        "lineItemTitle": "Landscape irrigation",
-        "lineItemDescription": "Subcontractor for landscape irrigation on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 1932,
-        "lineItemTotal": 7728,
-        "lineItemType": "Subcontractor"
+        "lineItemTitle": "Cabinet refinishing - 1 units",
+        "lineItemDescription": "Equipment for cabinet refinishing - 1 units on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 415,
+        "lineItemTotal": 415,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-008-item-3",
-        "lineItemTitle": "Foundation waterproofing",
-        "lineItemDescription": "Material for foundation waterproofing on Building core areas",
-        "lineItemQuantity": 1,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 1905,
-        "lineItemTotal": 1905,
+        "lineItemTitle": "Bathroom cabinets - 41 units",
+        "lineItemDescription": "Other for bathroom cabinets - 41 units on Building core areas",
+        "lineItemQuantity": 41,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 338,
+        "lineItemTotal": 13858,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-4",
+        "lineItemTitle": "Demolition work - 18 sq ft",
+        "lineItemDescription": "Other for demolition work - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 4355,
+        "lineItemTotal": 78390,
+        "lineItemType": "Other"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-5",
+        "lineItemTitle": "Demolition debris disposal - 28 cubic yards",
+        "lineItemDescription": "Material for demolition debris disposal - 28 cubic yards on Building core areas",
+        "lineItemQuantity": 28,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 1724,
+        "lineItemTotal": 48272,
         "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-6",
+        "lineItemTitle": "Concrete stamping and texturing - 36 sq ft",
+        "lineItemDescription": "Labor for concrete stamping and texturing - 36 sq ft on Building core areas",
+        "lineItemQuantity": 36,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 1239,
+        "lineItemTotal": 44604,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-7",
+        "lineItemTitle": "Cabinet refinishing - 34 units",
+        "lineItemDescription": "Equipment for cabinet refinishing - 34 units on Building core areas",
+        "lineItemQuantity": 34,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 44,
+        "lineItemTotal": 1496,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-008-item-8",
+        "lineItemTitle": "Cabinet doors and drawers - 33 pieces",
+        "lineItemDescription": "Subcontractor for cabinet doors and drawers - 33 pieces on Building core areas",
+        "lineItemQuantity": 33,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 1064,
+        "lineItemTotal": 35112,
+        "lineItemType": "Subcontractor"
       }
     ]
   },
@@ -936,39 +1784,49 @@
       "costCode": "03-310 Concrete Footings",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 35761,
+    "totalValue": 100604,
     "issuedDate": "2023-08-12T17:18:05.607Z",
     "dueDate": "2023-09-10T17:18:05.607Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-009-item-1",
-        "lineItemTitle": "Rooftop units",
-        "lineItemDescription": "Material for rooftop units on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 4363,
-        "lineItemTotal": 17452,
-        "lineItemType": "Material"
+        "lineItemTitle": "Concrete slab installation - 8 sq ft",
+        "lineItemDescription": "Equipment for concrete slab installation - 8 sq ft on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 9986,
+        "lineItemTotal": 79888,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-009-item-2",
-        "lineItemTitle": "Elevator cab finishes",
-        "lineItemDescription": "Other for elevator cab finishes on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 889,
-        "lineItemTotal": 5334,
+        "lineItemTitle": "Concrete foundation pour - 45 cubic yards",
+        "lineItemDescription": "Other for concrete foundation pour - 45 cubic yards on Building core areas",
+        "lineItemQuantity": 45,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 130,
+        "lineItemTotal": 5850,
         "lineItemType": "Other"
       },
       {
         "lineItemId": "clientinvoice-009-item-3",
-        "lineItemTitle": "Interior paint",
-        "lineItemDescription": "Material for interior paint on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 4325,
-        "lineItemTotal": 12975,
-        "lineItemType": "Material"
+        "lineItemTitle": "Interior demolition - 28 sq ft",
+        "lineItemDescription": "Labor for interior demolition - 28 sq ft on Building core areas",
+        "lineItemQuantity": 28,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 307,
+        "lineItemTotal": 8596,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-009-item-4",
+        "lineItemTitle": "Demolition cleanup - 33 hours",
+        "lineItemDescription": "Labor for demolition cleanup - 33 hours on Building core areas",
+        "lineItemQuantity": 33,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 190,
+        "lineItemTotal": 6270,
+        "lineItemType": "Labor"
       }
     ]
   },
@@ -993,29 +1851,69 @@
       "costCode": "07-150 Roofing Assembly",
       "paymentTerms": "Net 15"
     },
-    "totalValue": 24194,
+    "totalValue": 494683,
     "issuedDate": "2024-02-07T16:11:20.090Z",
     "dueDate": "2024-03-04T16:11:20.090Z",
     "lineItems": [
       {
         "lineItemId": "clientinvoice-010-item-1",
-        "lineItemTitle": "Window package",
-        "lineItemDescription": "Material for window package on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 3724,
-        "lineItemTotal": 7448,
-        "lineItemType": "Material"
+        "lineItemTitle": "Concrete stamping and texturing - 16 sq ft",
+        "lineItemDescription": "Equipment for concrete stamping and texturing - 16 sq ft on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 20,
+        "lineItemTotal": 320,
+        "lineItemType": "Equipment"
       },
       {
         "lineItemId": "clientinvoice-010-item-2",
-        "lineItemTitle": "Interior paint",
-        "lineItemDescription": "Other for interior paint on Building core areas",
+        "lineItemTitle": "Exterior demolition - 31 sq ft",
+        "lineItemDescription": "Labor for exterior demolition - 31 sq ft on Building core areas",
+        "lineItemQuantity": 31,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 1246,
+        "lineItemTotal": 38626,
+        "lineItemType": "Labor"
+      },
+      {
+        "lineItemId": "clientinvoice-010-item-3",
+        "lineItemTitle": "Concrete repair and patching - 23 sq ft",
+        "lineItemDescription": "Equipment for concrete repair and patching - 23 sq ft on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 46,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-010-item-4",
+        "lineItemTitle": "Bathroom ventilation installation - 3 units",
+        "lineItemDescription": "Equipment for bathroom ventilation installation - 3 units on Building core areas",
         "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "unit",
-        "lineItemUnitPrice": 5582,
-        "lineItemTotal": 16746,
-        "lineItemType": "Other"
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 29773,
+        "lineItemTotal": 89319,
+        "lineItemType": "Equipment"
+      },
+      {
+        "lineItemId": "clientinvoice-010-item-5",
+        "lineItemTitle": "Selective demolition - 47 sq ft",
+        "lineItemDescription": "Material for selective demolition - 47 sq ft on Building core areas",
+        "lineItemQuantity": 47,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 7434,
+        "lineItemTotal": 349398,
+        "lineItemType": "Material"
+      },
+      {
+        "lineItemId": "clientinvoice-010-item-6",
+        "lineItemTitle": "Selective demolition - 41 sq ft",
+        "lineItemDescription": "Labor for selective demolition - 41 sq ft on Building core areas",
+        "lineItemQuantity": 41,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 414,
+        "lineItemTotal": 16974,
+        "lineItemType": "Labor"
       }
     ]
   }
