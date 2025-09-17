@@ -48,7 +48,7 @@ function getHighlightFunction(query: string, isMonetarySearch: boolean) {
   }
 }
 
-const FACET_LABELS: Record<FacetKey, string> = {
+  const FACET_LABELS: Record<FacetKey, string> = {
   entityType: 'Type',
   project: 'Project',
   status: 'Status',
@@ -61,6 +61,8 @@ const FACET_LABELS: Record<FacetKey, string> = {
   contactOrganization: 'Contact Organization',
   organizationType: 'Organization Type',
   tradeFocus: 'Trade Focus',
+  costCodeCategory: 'Cost Code Category',
+  costCode: 'Cost Code',
 };
 
 export interface ResultsViewOptions {
@@ -849,9 +851,23 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   const wrapper = document.createElement('div');
   wrapper.className = 'result-card__line-items';
 
-  const heading = document.createElement('h4');
-  heading.textContent = `Line item${items.length === 1 ? '' : 's'}`;
-  wrapper.append(heading);
+
+  // Helper function to group line items by cost code category
+  const groupLineItemsByCostCode = (items: any[]): Record<string, { categoryName: string; items: any[] }> => {
+    const groups: Record<string, { categoryName: string; items: any[] }> = {};
+    
+    items.forEach(item => {
+      const categoryId = item.costCodeCategory || 'buildertrend-default';
+      const categoryName = item.costCodeCategoryName || 'Buildertrend Default';
+      
+      if (!groups[categoryId]) {
+        groups[categoryId] = { categoryName, items: [] };
+      }
+      groups[categoryId].items.push(item);
+    });
+    
+    return groups;
+  };
 
   // Helper function to render a line item row
   const renderLineItemRow = (line: any, index: number): HTMLTableRowElement => {
@@ -861,14 +877,319 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
     
+    // Add cost code column if available
+    const costCodeDisplay = line.costCodeName || line.costCode || '';
+    
     row.innerHTML = `
       <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      ${costCodeDisplay ? `<td class="line-item__cost-code">${query && highlightFn ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ''}
       <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
       <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
       <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
       <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
     return row;
+  };
+
+  // Function to render table content (supports both grouped and ungrouped views)
+  const renderTableContent = (container?: HTMLElement) => {
+    const targetContainer = container || wrapper;
+    // Remove existing table if it exists
+    const existingTable = targetContainer.querySelector('.line-items-table');
+    if (existingTable) {
+      existingTable.remove();
+    }
+    
+    const table = document.createElement('table');
+    table.className = 'line-items-table';
+    
+    // Check if any line item has cost code data
+    const hasCostCodes = items.some((item: any) => item.costCode || item.costCodeName);
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    headerRow.innerHTML = `
+      <th>Description</th>
+      ${hasCostCodes ? '<th>Cost Code</th>' : ''}
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total</th>
+    `;
+    thead.append(headerRow);
+    table.append(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    if (hasCostCodes) {
+      // Render grouped by cost code category, but respect context settings
+      const contextCount = settings.lineItemsContextCount;
+      const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+      
+      // Determine which items to show based on matches and context
+      let itemsToShow: any[] = [];
+      
+      if (hasMatches && contextCount > 0) {
+        const matchingIndices = getMatchingLineItemIndices(item as any, query, isMonetarySearch);
+        
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            // Use smart grouping logic
+            const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            const displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+            
+            // Get items from display ranges
+            displayRanges.forEach(range => {
+              if (!range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  itemsToShow.push(items[i]);
+                }
+              }
+            });
+          } else {
+            // Original logic: show all items between first and last match
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            
+            itemsToShow = items.slice(startIndex, endIndex);
+          }
+        } else {
+          // Fallback: show first contextCount items
+          itemsToShow = items.slice(0, contextCount);
+        }
+      } else {
+        // No matches or contextCount is 0: show all items
+        itemsToShow = items;
+      }
+      
+      // Now group the filtered items by cost code category
+      const groups = groupLineItemsByCostCode(itemsToShow);
+      const sortedCategories = Object.keys(groups).sort((a, b) => {
+        // Sort categories by their numeric order (1000-1999, 2000-2999, etc.)
+        const getNumericOrder = (categoryId: string) => {
+          if (categoryId === 'buildertrend-default') return 9999; // Put at end
+          const match = categoryId.match(/(\d+)/);
+          return match ? parseInt(match[1]) : 9999;
+        };
+        return getNumericOrder(a) - getNumericOrder(b);
+      });
+      
+      sortedCategories.forEach(categoryId => {
+        const group = groups[categoryId];
+        
+        // Add category header row
+        const categoryRow = document.createElement('tr');
+        categoryRow.className = 'line-item__category-header';
+        const colspan = hasCostCodes ? 6 : 5;
+        categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
+        tbody.append(categoryRow);
+        
+        // Add line items for this category
+        group.items.forEach((item: any, index: number) => {
+          const row = renderLineItemRow(item, index);
+          tbody.append(row);
+        });
+      });
+      
+      // Add "Show all" button if there are hidden items
+      if (itemsToShow.length < items.length) {
+        const showAllRow = document.createElement('tr');
+        showAllRow.className = 'line-item__show-all';
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? '' : 's'}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        
+        const showAllButton = showAllRow.querySelector('.line-item__show-all-button') as HTMLButtonElement;
+        showAllButton.addEventListener('click', () => {
+          // Remove all existing rows
+          tbody.innerHTML = '';
+          
+          // Re-group with all items
+          const allGroups = groupLineItemsByCostCode(items);
+          const sortedCategories = Object.keys(allGroups).sort((a, b) => {
+            const getNumericOrder = (categoryId: string) => {
+              if (categoryId === 'buildertrend-default') return 9999;
+              const match = categoryId.match(/(\d+)/);
+              return match ? parseInt(match[1]) : 9999;
+            };
+            return getNumericOrder(a) - getNumericOrder(b);
+          });
+          
+          sortedCategories.forEach(categoryId => {
+            const group = allGroups[categoryId];
+            
+            // Add category header row
+            const categoryRow = document.createElement('tr');
+            categoryRow.className = 'line-item__category-header';
+            const colspan = hasCostCodes ? 6 : 5;
+            categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
+            tbody.append(categoryRow);
+            
+            // Add line items for this category
+            group.items.forEach((item: any, index: number) => {
+              const row = renderLineItemRow(item, index);
+              tbody.append(row);
+            });
+          });
+        });
+      }
+    } else {
+      // Render ungrouped (original logic)
+      const contextCount = settings.lineItemsContextCount;
+      const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
+      
+      // Determine which items to show initially
+      let displayRanges: Array<{ start: number; end: number; isCollapsed?: boolean }> = [];
+      let hiddenItems: any[] = [];
+      
+      if (hasMatches && contextCount > 0) {
+        const matchingIndices = getMatchingLineItemIndices(item as any, query, isMonetarySearch);
+        
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            // Use smart grouping logic
+            const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+            
+            // Calculate hidden items (items in collapsed ranges)
+            hiddenItems = [];
+            displayRanges.forEach(range => {
+              if (range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  hiddenItems.push(items[i]);
+                }
+              }
+            });
+          } else {
+            // Original logic: show all items between first and last match
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            
+            displayRanges = [{ start: startIndex, end: endIndex - 1 }];
+            hiddenItems = [
+              ...items.slice(0, startIndex),
+              ...items.slice(endIndex)
+            ];
+          }
+        } else {
+          // Fallback: show first contextCount items
+          displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
+          hiddenItems = items.slice(contextCount);
+        }
+      } else {
+        // No matches or contextCount is 0: show all items
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      }
+      
+      // Track collapsed rows and their replacement content
+      const collapsedRows: HTMLTableRowElement[] = [];
+      const collapsedContent: HTMLTableRowElement[][] = [];
+
+      // Render items according to display ranges
+      displayRanges.forEach((range) => {
+        if (range.isCollapsed) {
+          // Add collapsed placeholder row
+          const collapsedRow = document.createElement('tr');
+          collapsedRow.className = 'line-item__collapsed';
+          const itemCount = range.end - range.start + 1;
+          const colspan = hasCostCodes ? 6 : 5;
+          collapsedRow.innerHTML = `
+            <td colspan="${colspan}" class="line-item__collapsed-content">
+              <span class="line-item__collapsed-text">...</span>
+              <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? '' : 's'}</span>
+            </td>
+          `;
+          tbody.append(collapsedRow);
+          collapsedRows.push(collapsedRow);
+          
+          // Create the actual content rows for this collapsed range
+          const contentRows: HTMLTableRowElement[] = [];
+          for (let i = range.start; i <= range.end; i++) {
+            const lineItemRow = renderLineItemRow(items[i], i);
+            lineItemRow.style.display = 'none'; // Initially hidden
+            tbody.append(lineItemRow);
+            contentRows.push(lineItemRow);
+          }
+          collapsedContent.push(contentRows);
+          
+          // Add click handler to expand/collapse
+          collapsedRow.addEventListener('click', () => {
+            const isExpanded = contentRows[0].style.display !== 'none';
+            if (isExpanded) {
+              // Collapse
+              contentRows.forEach(row => row.style.display = 'none');
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">...</span>
+                  <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? '' : 's'}</span>
+                </td>
+              `;
+            } else {
+              // Expand
+              contentRows.forEach(row => row.style.display = '');
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">↑</span>
+                  <span class="line-item__collapsed-count">Hide ${itemCount} item${itemCount === 1 ? '' : 's'}</span>
+                </td>
+              `;
+            }
+          });
+        } else {
+          // Add regular rows for this range
+          for (let i = range.start; i <= range.end; i++) {
+            const row = renderLineItemRow(items[i], i);
+            tbody.append(row);
+          }
+        }
+      });
+
+      // Add "Show all" button if there are hidden items
+      if (hiddenItems.length > 0) {
+        const showAllRow = document.createElement('tr');
+        showAllRow.className = 'line-item__show-all';
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? '' : 's'}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        
+        const showAllButton = showAllRow.querySelector('.line-item__show-all-button') as HTMLButtonElement;
+        showAllButton.addEventListener('click', () => {
+          // Remove all existing rows
+          tbody.innerHTML = '';
+          
+          // Add all items
+          items.forEach((line: any, index: number) => {
+            const row = renderLineItemRow(line, index);
+            tbody.append(row);
+          });
+        });
+      }
+    }
+    
+    table.append(tbody);
+    targetContainer.append(table);
   };
 
   // If we shouldn't show line items by default and there are no matches, show a toggle link
@@ -878,231 +1199,30 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
     toggleLink.type = 'button';
     
-    const table = document.createElement('table');
-    table.className = 'line-items-table';
-    table.style.display = 'none';
-    
-    // Create table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-      <th>Description</th>
-      <th>Type</th>
-      <th>Quantity</th>
-      <th>Unit Price</th>
-      <th>Total</th>
-    `;
-    thead.append(headerRow);
-    table.append(thead);
-
-    // Create table body
-    const tbody = document.createElement('tbody');
-    const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
-    
-    items.forEach((line: any) => {
-      const row = document.createElement('tr');
-      const unitPrice = formatCurrency(line.lineItemUnitPrice);
-      const total = formatCurrency(line.lineItemTotal);
-      const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-      
-      row.innerHTML = `
-        <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-        <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-        <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-        <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-        <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
-      `;
-      tbody.append(row);
-    });
-    table.append(tbody);
+    const tableContainer = document.createElement('div');
+    tableContainer.style.display = 'none';
     
     toggleLink.addEventListener('click', () => {
-      if (table.style.display === 'none') {
-        table.style.display = 'table';
+      if (tableContainer.style.display === 'none') {
+        tableContainer.style.display = 'block';
         toggleLink.textContent = `Hide line item${items.length === 1 ? '' : 's'}`;
+        // Render table content when first shown
+        if (!tableContainer.querySelector('.line-items-table')) {
+          renderTableContent(tableContainer);
+        }
       } else {
-        table.style.display = 'none';
+        tableContainer.style.display = 'none';
         toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
       }
     });
     
-    wrapper.append(toggleLink, table);
+    wrapper.append(toggleLink, tableContainer);
     return wrapper;
   }
 
   // Show line items normally (either because there are matches or setting is enabled)
-  const table = document.createElement('table');
-  table.className = 'line-items-table';
-
-  // Create table header
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
-  headerRow.innerHTML = `
-    <th>Description</th>
-    <th>Type</th>
-    <th>Quantity</th>
-    <th>Unit Price</th>
-    <th>Total</th>
-  `;
-  thead.append(headerRow);
-  table.append(thead);
-
-  // Create table body
-  const tbody = document.createElement('tbody');
-  
-  const contextCount = settings.lineItemsContextCount;
-  const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
-  
-  // Determine which items to show initially
-  let displayRanges: Array<{ start: number; end: number; isCollapsed?: boolean }> = [];
-  let hiddenItems: any[] = [];
-  
-  if (hasMatches && contextCount > 0) {
-    const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
-    
-    if (matchingIndices.length > 0) {
-      if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
-        // Use smart grouping logic
-        const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
-        displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
-        
-        // Calculate hidden items (items in collapsed ranges)
-        hiddenItems = [];
-        displayRanges.forEach(range => {
-          if (range.isCollapsed) {
-            for (let i = range.start; i <= range.end; i++) {
-              hiddenItems.push(items[i]);
-            }
-          }
-        });
-      } else {
-        // Original logic: show all items between first and last match
-        const minIndex = Math.min(...matchingIndices);
-        const maxIndex = Math.max(...matchingIndices);
-        
-        const startIndex = Math.max(0, minIndex - contextCount);
-        const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-        
-        displayRanges = [{ start: startIndex, end: endIndex - 1 }];
-        hiddenItems = [
-          ...items.slice(0, startIndex),
-          ...items.slice(endIndex)
-        ];
-      }
-    } else {
-      // Fallback: show first contextCount items
-      displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
-      hiddenItems = items.slice(contextCount);
-    }
-  } else {
-    // No matches or contextCount is 0: show all items
-    displayRanges = [{ start: 0, end: items.length - 1 }];
-    hiddenItems = [];
-  }
-  
-  // Track collapsed rows and their replacement content
-  const collapsedRows: HTMLTableRowElement[] = [];
-  const collapsedContent: HTMLTableRowElement[][] = [];
-
-  // Render items according to display ranges
-  displayRanges.forEach((range) => {
-    if (range.isCollapsed) {
-      // Add collapsed placeholder row
-      const collapsedRow = document.createElement('tr');
-      collapsedRow.className = 'line-item__collapsed';
-      const itemCount = range.end - range.start + 1;
-      collapsedRow.innerHTML = `
-        <td colspan="5" class="line-item__collapsed-content">
-          <span class="line-item__collapsed-text">...</span>
-          <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? '' : 's'}</span>
-        </td>
-      `;
-      tbody.append(collapsedRow);
-      collapsedRows.push(collapsedRow);
-      
-      // Create the actual content rows for this collapsed range
-      const contentRows: HTMLTableRowElement[] = [];
-      for (let i = range.start; i <= range.end; i++) {
-        const lineItemRow = renderLineItemRow(items[i], i);
-        lineItemRow.style.display = 'none'; // Initially hidden
-        tbody.append(lineItemRow);
-        contentRows.push(lineItemRow);
-      }
-      collapsedContent.push(contentRows);
-    } else {
-      // Add regular line item rows for this range
-      for (let i = range.start; i <= range.end; i++) {
-        const lineItemRow = renderLineItemRow(items[i], i);
-        tbody.append(lineItemRow);
-      }
-    }
-  });
-
-  // Add hidden items (initially hidden) if there are any
-  const hiddenRows: HTMLTableRowElement[] = [];
-  hiddenItems.forEach((line: any) => {
-    const lineItemRow = renderLineItemRow(line, 0); // index doesn't matter for hidden items
-    lineItemRow.style.display = 'none';
-    tbody.append(lineItemRow);
-    hiddenRows.push(lineItemRow);
-  });
-
-  table.append(tbody);
-  wrapper.append(table);
-
-  // Calculate total hidden count (collapsed content + hidden items)
-  const totalCollapsedCount = collapsedContent.reduce((sum, rows) => sum + rows.length, 0);
-  const totalHiddenCount = totalCollapsedCount + hiddenItems.length;
-
-  // Add single toggle button for all hidden content if there are any
-  if (totalHiddenCount > 0) {
-    const toggleButton = document.createElement('button');
-    toggleButton.className = 'line-items-toggle';
-    toggleButton.type = 'button';
-    toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? '' : 's'}`;
-    
-    toggleButton.addEventListener('click', () => {
-      const isHidden = hiddenRows[0]?.style.display === 'none';
-      
-      if (isHidden) {
-        // Show all hidden content
-        // Hide collapsed placeholder rows
-        collapsedRows.forEach(row => {
-          row.style.display = 'none';
-        });
-        // Show collapsed content
-        collapsedContent.forEach(contentRows => {
-          contentRows.forEach(row => {
-            row.style.display = '';
-          });
-        });
-        // Show hidden items
-        hiddenRows.forEach(row => {
-          row.style.display = '';
-        });
-        toggleButton.textContent = `Hide ${totalHiddenCount} line item${totalHiddenCount === 1 ? '' : 's'}`;
-      } else {
-        // Hide all hidden content
-        // Show collapsed placeholder rows
-        collapsedRows.forEach(row => {
-          row.style.display = '';
-        });
-        // Hide collapsed content
-        collapsedContent.forEach(contentRows => {
-          contentRows.forEach(row => {
-            row.style.display = 'none';
-          });
-        });
-        // Hide hidden items
-        hiddenRows.forEach(row => {
-          row.style.display = 'none';
-        });
-        toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? '' : 's'}`;
-      }
-    });
-    
-    wrapper.append(toggleButton);
-  }
+  // Render the table content using the new function
+  renderTableContent();
 
   return wrapper;
 }

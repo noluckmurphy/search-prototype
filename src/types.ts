@@ -20,6 +20,11 @@ export interface LineItem {
   lineItemUnitPrice: number;
   lineItemTotal: number;
   lineItemType: LineItemType;
+  // Cost code metadata
+  costCode?: string; // The code number (e.g., "1000")
+  costCodeName?: string; // The full name (e.g., "1000 - Permits")
+  costCodeCategory?: string; // The category ID (e.g., "1000-1999")
+  costCodeCategoryName?: string; // The category name (e.g., "1000 - 1999 Preparation Preliminaries")
   // Metadata to mark which fields are monetary for search purposes
   fieldMetadata?: {
     lineItemTitle: 'monetary' | 'non-monetary';
@@ -147,7 +152,9 @@ export type FacetKey =
   | 'personType'
   | 'contactOrganization'
   | 'organizationType'
-  | 'tradeFocus';
+  | 'tradeFocus'
+  | 'costCodeCategory'
+  | 'costCode';
 
 export interface FacetValue {
   key: FacetKey;

@@ -1276,16 +1276,32 @@ button.secondary {
   text-transform: uppercase;
   letter-spacing: 0.025em;
 }
+.line-items-table th:first-child {
+  padding-left: 0;
+}
+.line-items-table th:last-child {
+  padding-right: 0;
+}
+.line-items-table th:nth-last-child(2),
+.line-items-table th:last-child {
+  text-align: right;
+}
 .line-items-table td {
   padding: var(--space-sm);
   border-bottom: 1px solid var(--color-border-subtle);
   vertical-align: top;
 }
+.line-items-table td:first-child {
+  padding-left: 0;
+}
+.line-items-table td:last-child {
+  padding-right: 0;
+}
 .line-items-table tr:last-child td {
   border-bottom: none;
 }
 .line-item__description {
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-text);
 }
 .line-item__type {
@@ -1337,6 +1353,53 @@ button.secondary {
 .line-item__more {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+.line-item__cost-code {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  background-color: var(--color-background-subtle);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-xs);
+  border: 1px solid var(--color-border-subtle);
+}
+.line-item__category-header {
+  background-color: var(--color-background-subtle);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.line-item__category-title {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  border-top: 2px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+.line-item__category-title:first-child {
+  border-top: none;
+}
+.line-item__show-all {
+  background-color: var(--color-background-subtle);
+}
+.line-item__show-all-content {
+  text-align: left;
+  padding: var(--space-xs);
+}
+.line-item__show-all-button {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.line-item__show-all-button:hover {
+  color: var(--color-text-primary);
 }
 @media (max-width: 768px) {
   .line-items-table {

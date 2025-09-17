@@ -3170,7 +3170,9 @@ var FACET_LABELS = {
   personType: "Person Type",
   contactOrganization: "Contact Organization",
   organizationType: "Organization Type",
-  tradeFocus: "Trade Focus"
+  tradeFocus: "Trade Focus",
+  costCodeCategory: "Cost Code Category",
+  costCode: "Cost Code"
 };
 function createResultsView(options) {
   const container = document.createElement("section");
@@ -3718,201 +3720,283 @@ function renderLineItems(item, query, isMonetarySearch) {
   const shouldShowLineItems = hasMatches || settings.showLineItemsByDefault;
   const wrapper = document.createElement("div");
   wrapper.className = "result-card__line-items";
-  const heading = document.createElement("h4");
-  heading.textContent = `Line item${items.length === 1 ? "" : "s"}`;
-  wrapper.append(heading);
+  const groupLineItemsByCostCode = (items2) => {
+    const groups = {};
+    items2.forEach((item2) => {
+      const categoryId = item2.costCodeCategory || "buildertrend-default";
+      const categoryName = item2.costCodeCategoryName || "Buildertrend Default";
+      if (!groups[categoryId]) {
+        groups[categoryId] = { categoryName, items: [] };
+      }
+      groups[categoryId].items.push(item2);
+    });
+    return groups;
+  };
   const renderLineItemRow = (line, index) => {
     const row = document.createElement("tr");
     const unitPrice = formatCurrency(line.lineItemUnitPrice);
     const total = formatCurrency(line.lineItemTotal);
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    const highlightFn2 = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+    const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+    const costCodeDisplay = line.costCodeName || line.costCode || "";
     row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn2 ? highlightFn2(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      <td class="line-item__type">${query && highlightFn2 ? highlightFn2(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn2 ? highlightFn2(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn2 ? highlightFn2(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn2 ? highlightFn2(total, query) : total}</td>
+      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      ${costCodeDisplay ? `<td class="line-item__cost-code">${query && highlightFn ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ""}
+      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
     `;
     return row;
+  };
+  const renderTableContent = (container) => {
+    const targetContainer = container || wrapper;
+    const existingTable = targetContainer.querySelector(".line-items-table");
+    if (existingTable) {
+      existingTable.remove();
+    }
+    const table = document.createElement("table");
+    table.className = "line-items-table";
+    const hasCostCodes = items.some((item2) => item2.costCode || item2.costCodeName);
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+      <th>Description</th>
+      ${hasCostCodes ? "<th>Cost Code</th>" : ""}
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total</th>
+    `;
+    thead.append(headerRow);
+    table.append(thead);
+    const tbody = document.createElement("tbody");
+    if (hasCostCodes) {
+      const contextCount = settings.lineItemsContextCount;
+      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+      let itemsToShow = [];
+      if (hasMatches && contextCount > 0) {
+        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            const groups2 = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            const displayRanges = calculateDisplayRanges(groups2, contextCount, items.length);
+            displayRanges.forEach((range) => {
+              if (!range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  itemsToShow.push(items[i]);
+                }
+              }
+            });
+          } else {
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            itemsToShow = items.slice(startIndex, endIndex);
+          }
+        } else {
+          itemsToShow = items.slice(0, contextCount);
+        }
+      } else {
+        itemsToShow = items;
+      }
+      const groups = groupLineItemsByCostCode(itemsToShow);
+      const sortedCategories = Object.keys(groups).sort((a, b) => {
+        const getNumericOrder = (categoryId) => {
+          if (categoryId === "buildertrend-default") return 9999;
+          const match = categoryId.match(/(\d+)/);
+          return match ? parseInt(match[1]) : 9999;
+        };
+        return getNumericOrder(a) - getNumericOrder(b);
+      });
+      sortedCategories.forEach((categoryId) => {
+        const group = groups[categoryId];
+        const categoryRow = document.createElement("tr");
+        categoryRow.className = "line-item__category-header";
+        const colspan = hasCostCodes ? 6 : 5;
+        categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
+        tbody.append(categoryRow);
+        group.items.forEach((item2, index) => {
+          const row = renderLineItemRow(item2, index);
+          tbody.append(row);
+        });
+      });
+      if (itemsToShow.length < items.length) {
+        const showAllRow = document.createElement("tr");
+        showAllRow.className = "line-item__show-all";
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? "" : "s"}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
+        showAllButton.addEventListener("click", () => {
+          tbody.innerHTML = "";
+          const allGroups = groupLineItemsByCostCode(items);
+          const sortedCategories2 = Object.keys(allGroups).sort((a, b) => {
+            const getNumericOrder = (categoryId) => {
+              if (categoryId === "buildertrend-default") return 9999;
+              const match = categoryId.match(/(\d+)/);
+              return match ? parseInt(match[1]) : 9999;
+            };
+            return getNumericOrder(a) - getNumericOrder(b);
+          });
+          sortedCategories2.forEach((categoryId) => {
+            const group = allGroups[categoryId];
+            const categoryRow = document.createElement("tr");
+            categoryRow.className = "line-item__category-header";
+            const colspan2 = hasCostCodes ? 6 : 5;
+            categoryRow.innerHTML = `<td colspan="${colspan2}" class="line-item__category-title">${group.categoryName}</td>`;
+            tbody.append(categoryRow);
+            group.items.forEach((item2, index) => {
+              const row = renderLineItemRow(item2, index);
+              tbody.append(row);
+            });
+          });
+        });
+      }
+    } else {
+      const contextCount = settings.lineItemsContextCount;
+      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+      let displayRanges = [];
+      let hiddenItems = [];
+      if (hasMatches && contextCount > 0) {
+        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+            hiddenItems = [];
+            displayRanges.forEach((range) => {
+              if (range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  hiddenItems.push(items[i]);
+                }
+              }
+            });
+          } else {
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            displayRanges = [{ start: startIndex, end: endIndex - 1 }];
+            hiddenItems = [
+              ...items.slice(0, startIndex),
+              ...items.slice(endIndex)
+            ];
+          }
+        } else {
+          displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
+          hiddenItems = items.slice(contextCount);
+        }
+      } else {
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      }
+      const collapsedRows = [];
+      const collapsedContent = [];
+      displayRanges.forEach((range) => {
+        if (range.isCollapsed) {
+          const collapsedRow = document.createElement("tr");
+          collapsedRow.className = "line-item__collapsed";
+          const itemCount = range.end - range.start + 1;
+          const colspan = hasCostCodes ? 6 : 5;
+          collapsedRow.innerHTML = `
+            <td colspan="${colspan}" class="line-item__collapsed-content">
+              <span class="line-item__collapsed-text">...</span>
+              <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+            </td>
+          `;
+          tbody.append(collapsedRow);
+          collapsedRows.push(collapsedRow);
+          const contentRows = [];
+          for (let i = range.start; i <= range.end; i++) {
+            const lineItemRow = renderLineItemRow(items[i], i);
+            lineItemRow.style.display = "none";
+            tbody.append(lineItemRow);
+            contentRows.push(lineItemRow);
+          }
+          collapsedContent.push(contentRows);
+          collapsedRow.addEventListener("click", () => {
+            const isExpanded = contentRows[0].style.display !== "none";
+            if (isExpanded) {
+              contentRows.forEach((row) => row.style.display = "none");
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">...</span>
+                  <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+                </td>
+              `;
+            } else {
+              contentRows.forEach((row) => row.style.display = "");
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">\u2191</span>
+                  <span class="line-item__collapsed-count">Hide ${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+                </td>
+              `;
+            }
+          });
+        } else {
+          for (let i = range.start; i <= range.end; i++) {
+            const row = renderLineItemRow(items[i], i);
+            tbody.append(row);
+          }
+        }
+      });
+      if (hiddenItems.length > 0) {
+        const showAllRow = document.createElement("tr");
+        showAllRow.className = "line-item__show-all";
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? "" : "s"}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
+        showAllButton.addEventListener("click", () => {
+          tbody.innerHTML = "";
+          items.forEach((line, index) => {
+            const row = renderLineItemRow(line, index);
+            tbody.append(row);
+          });
+        });
+      }
+    }
+    table.append(tbody);
+    targetContainer.append(table);
   };
   if (!shouldShowLineItems) {
     const toggleLink = document.createElement("button");
     toggleLink.className = "line-items-toggle";
     toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
     toggleLink.type = "button";
-    const table2 = document.createElement("table");
-    table2.className = "line-items-table";
-    table2.style.display = "none";
-    const thead2 = document.createElement("thead");
-    const headerRow2 = document.createElement("tr");
-    headerRow2.innerHTML = `
-      <th>Description</th>
-      <th>Type</th>
-      <th>Quantity</th>
-      <th>Unit Price</th>
-      <th>Total</th>
-    `;
-    thead2.append(headerRow2);
-    table2.append(thead2);
-    const tbody2 = document.createElement("tbody");
-    const highlightFn2 = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-    items.forEach((line) => {
-      const row = document.createElement("tr");
-      const unitPrice = formatCurrency(line.lineItemUnitPrice);
-      const total = formatCurrency(line.lineItemTotal);
-      const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-      row.innerHTML = `
-        <td class="line-item__description">${query && highlightFn2 ? highlightFn2(line.lineItemTitle, query) : line.lineItemTitle}</td>
-        <td class="line-item__type">${query && highlightFn2 ? highlightFn2(line.lineItemType, query) : line.lineItemType}</td>
-        <td class="line-item__quantity">${query && highlightFn2 ? highlightFn2(quantity, query) : quantity}</td>
-        <td class="line-item__unit-price">${query && highlightFn2 ? highlightFn2(unitPrice, query) : unitPrice}</td>
-        <td class="line-item__total">${query && highlightFn2 ? highlightFn2(total, query) : total}</td>
-      `;
-      tbody2.append(row);
-    });
-    table2.append(tbody2);
+    const tableContainer = document.createElement("div");
+    tableContainer.style.display = "none";
     toggleLink.addEventListener("click", () => {
-      if (table2.style.display === "none") {
-        table2.style.display = "table";
+      if (tableContainer.style.display === "none") {
+        tableContainer.style.display = "block";
         toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
+        if (!tableContainer.querySelector(".line-items-table")) {
+          renderTableContent(tableContainer);
+        }
       } else {
-        table2.style.display = "none";
+        tableContainer.style.display = "none";
         toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
       }
     });
-    wrapper.append(toggleLink, table2);
+    wrapper.append(toggleLink, tableContainer);
     return wrapper;
   }
-  const table = document.createElement("table");
-  table.className = "line-items-table";
-  const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  headerRow.innerHTML = `
-    <th>Description</th>
-    <th>Type</th>
-    <th>Quantity</th>
-    <th>Unit Price</th>
-    <th>Total</th>
-  `;
-  thead.append(headerRow);
-  table.append(thead);
-  const tbody = document.createElement("tbody");
-  const contextCount = settings.lineItemsContextCount;
-  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-  let displayRanges = [];
-  let hiddenItems = [];
-  if (hasMatches && contextCount > 0) {
-    const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
-    if (matchingIndices.length > 0) {
-      if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
-        const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
-        displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
-        hiddenItems = [];
-        displayRanges.forEach((range) => {
-          if (range.isCollapsed) {
-            for (let i = range.start; i <= range.end; i++) {
-              hiddenItems.push(items[i]);
-            }
-          }
-        });
-      } else {
-        const minIndex = Math.min(...matchingIndices);
-        const maxIndex = Math.max(...matchingIndices);
-        const startIndex = Math.max(0, minIndex - contextCount);
-        const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-        displayRanges = [{ start: startIndex, end: endIndex - 1 }];
-        hiddenItems = [
-          ...items.slice(0, startIndex),
-          ...items.slice(endIndex)
-        ];
-      }
-    } else {
-      displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
-      hiddenItems = items.slice(contextCount);
-    }
-  } else {
-    displayRanges = [{ start: 0, end: items.length - 1 }];
-    hiddenItems = [];
-  }
-  const collapsedRows = [];
-  const collapsedContent = [];
-  displayRanges.forEach((range) => {
-    if (range.isCollapsed) {
-      const collapsedRow = document.createElement("tr");
-      collapsedRow.className = "line-item__collapsed";
-      const itemCount = range.end - range.start + 1;
-      collapsedRow.innerHTML = `
-        <td colspan="5" class="line-item__collapsed-content">
-          <span class="line-item__collapsed-text">...</span>
-          <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
-        </td>
-      `;
-      tbody.append(collapsedRow);
-      collapsedRows.push(collapsedRow);
-      const contentRows = [];
-      for (let i = range.start; i <= range.end; i++) {
-        const lineItemRow = renderLineItemRow(items[i], i);
-        lineItemRow.style.display = "none";
-        tbody.append(lineItemRow);
-        contentRows.push(lineItemRow);
-      }
-      collapsedContent.push(contentRows);
-    } else {
-      for (let i = range.start; i <= range.end; i++) {
-        const lineItemRow = renderLineItemRow(items[i], i);
-        tbody.append(lineItemRow);
-      }
-    }
-  });
-  const hiddenRows = [];
-  hiddenItems.forEach((line) => {
-    const lineItemRow = renderLineItemRow(line, 0);
-    lineItemRow.style.display = "none";
-    tbody.append(lineItemRow);
-    hiddenRows.push(lineItemRow);
-  });
-  table.append(tbody);
-  wrapper.append(table);
-  const totalCollapsedCount = collapsedContent.reduce((sum, rows) => sum + rows.length, 0);
-  const totalHiddenCount = totalCollapsedCount + hiddenItems.length;
-  if (totalHiddenCount > 0) {
-    const toggleButton = document.createElement("button");
-    toggleButton.className = "line-items-toggle";
-    toggleButton.type = "button";
-    toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? "" : "s"}`;
-    toggleButton.addEventListener("click", () => {
-      const isHidden = hiddenRows[0]?.style.display === "none";
-      if (isHidden) {
-        collapsedRows.forEach((row) => {
-          row.style.display = "none";
-        });
-        collapsedContent.forEach((contentRows) => {
-          contentRows.forEach((row) => {
-            row.style.display = "";
-          });
-        });
-        hiddenRows.forEach((row) => {
-          row.style.display = "";
-        });
-        toggleButton.textContent = `Hide ${totalHiddenCount} line item${totalHiddenCount === 1 ? "" : "s"}`;
-      } else {
-        collapsedRows.forEach((row) => {
-          row.style.display = "";
-        });
-        collapsedContent.forEach((contentRows) => {
-          contentRows.forEach((row) => {
-            row.style.display = "none";
-          });
-        });
-        hiddenRows.forEach((row) => {
-          row.style.display = "none";
-        });
-        toggleButton.textContent = `Show ${totalHiddenCount} more line item${totalHiddenCount === 1 ? "" : "s"}`;
-      }
-    });
-    wrapper.append(toggleButton);
-  }
+  renderTableContent();
   return wrapper;
 }
 function getFieldLabel(field) {
@@ -4651,6 +4735,8 @@ var FACET_KEYS = [
   "contactOrganization",
   "organizationType",
   "tradeFocus",
+  "costCodeCategory",
+  "costCode",
   "groupBy"
 ];
 var CORPUS = [];
@@ -4770,6 +4856,10 @@ function buildHaystack(record) {
   } else if (isFinancialRecord(record)) {
     record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
+      if (item.costCode) base.push(item.costCode);
+      if (item.costCodeName) base.push(item.costCodeName);
+      if (item.costCodeCategory) base.push(item.costCodeCategory);
+      if (item.costCodeCategoryName) base.push(item.costCodeCategoryName);
     });
   } else if (isPersonRecord(record)) {
     base.push(
@@ -5168,6 +5258,32 @@ function getFacetValue(record, key) {
       }
       const metadataTrade = record.metadata?.tradeFocus;
       return typeof metadataTrade === "string" ? metadataTrade : void 0;
+    }
+    case "costCodeCategory": {
+      if (isFinancialRecord(record) && record.lineItems.length > 0) {
+        const categories = record.lineItems.map((item) => item.costCodeCategory).filter(Boolean);
+        if (categories.length > 0) {
+          const categoryCounts = categories.reduce((acc, cat) => {
+            acc[cat] = (acc[cat] || 0) + 1;
+            return acc;
+          }, {});
+          return Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0][0];
+        }
+      }
+      return void 0;
+    }
+    case "costCode": {
+      if (isFinancialRecord(record) && record.lineItems.length > 0) {
+        const codes = record.lineItems.map((item) => item.costCode).filter(Boolean);
+        if (codes.length > 0) {
+          const codeCounts = codes.reduce((acc, code) => {
+            acc[code] = (acc[code] || 0) + 1;
+            return acc;
+          }, {});
+          return Object.entries(codeCounts).sort(([, a], [, b]) => b - a)[0][0];
+        }
+      }
+      return void 0;
     }
     case "groupBy":
       return void 0;

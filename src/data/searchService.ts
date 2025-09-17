@@ -51,6 +51,8 @@ const FACET_KEYS: FacetKey[] = [
   'contactOrganization',
   'organizationType',
   'tradeFocus',
+  'costCodeCategory',
+  'costCode',
   'groupBy',
 ];
 
@@ -188,6 +190,11 @@ function buildHaystack(record: SearchRecord): string {
   } else if (isFinancialRecord(record)) {
     record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
+      // Add cost code information to searchable content
+      if (item.costCode) base.push(item.costCode);
+      if (item.costCodeName) base.push(item.costCodeName);
+      if (item.costCodeCategory) base.push(item.costCodeCategory);
+      if (item.costCodeCategoryName) base.push(item.costCodeCategoryName);
     });
   } else if (isPersonRecord(record)) {
     base.push(
@@ -753,6 +760,42 @@ function getFacetValue(record: SearchRecord, key: FacetKey): string | undefined 
       }
       const metadataTrade = record.metadata?.tradeFocus;
       return typeof metadataTrade === 'string' ? metadataTrade : undefined;
+    }
+    case 'costCodeCategory': {
+      // For financial records, return the most common cost code category among line items
+      if (isFinancialRecord(record) && record.lineItems.length > 0) {
+        const categories = record.lineItems
+          .map(item => item.costCodeCategory)
+          .filter(Boolean);
+        if (categories.length > 0) {
+          // Return the most common category
+          const categoryCounts = categories.reduce((acc, cat) => {
+            acc[cat!] = (acc[cat!] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          return Object.entries(categoryCounts)
+            .sort(([,a], [,b]) => b - a)[0][0];
+        }
+      }
+      return undefined;
+    }
+    case 'costCode': {
+      // For financial records, return the most common cost code among line items
+      if (isFinancialRecord(record) && record.lineItems.length > 0) {
+        const codes = record.lineItems
+          .map(item => item.costCode)
+          .filter(Boolean);
+        if (codes.length > 0) {
+          // Return the most common code
+          const codeCounts = codes.reduce((acc, code) => {
+            acc[code!] = (acc[code!] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          return Object.entries(codeCounts)
+            .sort(([,a], [,b]) => b - a)[0][0];
+        }
+      }
+      return undefined;
     }
     case 'groupBy':
       // This facet is handled specially - it's not a property of individual records

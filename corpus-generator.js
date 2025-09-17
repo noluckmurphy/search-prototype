@@ -311,6 +311,151 @@ function generatePrice(quantity, unitType, lineItemType, entityType = null) {
   return Math.round(basePrice);
 }
 
+// Simple cost code assignment logic (since we can't import the TypeScript module in JS)
+function assignCostCode(lineItemTitle, lineItemDescription) {
+  const searchText = `${lineItemTitle} ${lineItemDescription}`.toLowerCase();
+  
+  // Smart keyword matching
+  const keywordMappings = {
+    'cabinet': '5100',
+    'countertop': '5100',
+    'appliance': '5130',
+    'demolition': '1180',
+    'demo': '1180',
+    'concrete': '2060',
+    'foundation': '2060',
+    'footing': '2060',
+    'framing': '3010',
+    'lumber': '3010',
+    'roofing': '4000',
+    'roof': '4000',
+    'window': '4060',
+    'door': '4080',
+    'insulation': '4100',
+    'drywall': '5000',
+    'flooring': '5020',
+    'tile': '5020',
+    'carpet': '5020',
+    'painting': '5080',
+    'plumbing': '5150',
+    'electrical': '5170',
+    'hvac': '5190',
+    'cleanup': '6000',
+    'cleaning': '6000',
+    'deck': '6040',
+    'fence': '6060',
+    'landscaping': '6100',
+    'pool': '6110',
+    'punchlist': '6130',
+    'permit': '1000',
+    'design': '1020',
+    'survey': '1030',
+    'excavation': '2000',
+    'grading': '2010',
+    'masonry': '4040',
+    'brick': '4040',
+    'siding': '4120',
+    'trim': '5040',
+    'molding': '5040'
+  };
+  
+  // Try to find a match
+  for (const [keyword, code] of Object.entries(keywordMappings)) {
+    if (searchText.includes(keyword)) {
+      return {
+        code: code,
+        name: `${code} - ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} work`,
+        fullName: `${code} - ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} work`,
+        categoryId: getCategoryIdByCode(code),
+        categoryName: getCategoryNameByCode(code)
+      };
+    }
+  }
+  
+  // If no match, return random weighted distribution
+  return getRandomCostCode();
+}
+
+function getCategoryIdByCode(code) {
+  if (code >= '1000' && code <= '1999') return '1000-1999';
+  if (code >= '2000' && code <= '2999') return '2000-2999';
+  if (code >= '3000' && code <= '3999') return '3000-3999';
+  if (code >= '4000' && code <= '4999') return '4000-4999';
+  if (code >= '5000' && code <= '5999') return '5000-5999';
+  if (code >= '6000' && code <= '6999') return '6000-6999';
+  if (code >= '7000' && code <= '7999') return '7000-7999';
+  return 'buildertrend-default';
+}
+
+function getCategoryNameByCode(code) {
+  const categoryId = getCategoryIdByCode(code);
+  const categoryNames = {
+    '1000-1999': '1000 - 1999 Preparation Preliminaries',
+    '2000-2999': '2000 - 2999 Excavation and Foundation',
+    '3000-3999': '3000 - 3999 Rough Structure',
+    '4000-4999': '4000 - 4999 Full Enclosure',
+    '5000-5999': '5000 - 5999 Finishing Trades',
+    '6000-6999': '6000 - 6999 Completion and Inspection',
+    '7000-7999': '7000 - 7999 Operations',
+    'buildertrend-default': 'Buildertrend Default'
+  };
+  return categoryNames[categoryId] || 'Unknown Category';
+}
+
+function getRandomCostCode() {
+  // 2% chance for Buildertrend Flat Rate
+  if (Math.random() < 0.02) {
+    return {
+      code: 'buildertrend-flat-rate',
+      name: 'Buildertrend Flat Rate',
+      fullName: 'Buildertrend Flat Rate',
+      categoryId: 'buildertrend-default',
+      categoryName: 'Buildertrend Default'
+    };
+  }
+  
+  // Weighted distribution across categories
+  const categoryWeights = {
+    '5000-5999': 0.25, // Finishing Trades - most common
+    '4000-4999': 0.20, // Full Enclosure
+    '3000-3999': 0.15, // Rough Structure
+    '6000-6999': 0.15, // Completion and Inspection
+    '2000-2999': 0.10, // Excavation and Foundation
+    '7000-7999': 0.10, // Operations
+    '1000-1999': 0.05  // Preparation Preliminaries - least common
+  };
+  
+  const random = Math.random();
+  let cumulative = 0;
+  
+  for (const [categoryId, weight] of Object.entries(categoryWeights)) {
+    cumulative += weight;
+    if (random <= cumulative) {
+      // Generate a random code within the category range
+      const baseCode = parseInt(categoryId.split('-')[0]);
+      const randomOffset = Math.floor(Math.random() * 20) * 10; // 0-190 in steps of 10
+      const code = (baseCode + randomOffset).toString();
+      
+      return {
+        code: code,
+        name: `${code} - Construction work`,
+        fullName: `${code} - Construction work`,
+        categoryId: categoryId,
+        categoryName: getCategoryNameByCode(code)
+      };
+    }
+  }
+  
+  // Fallback
+  return {
+    code: 'buildertrend-flat-rate',
+    name: 'Buildertrend Flat Rate',
+    fullName: 'Buildertrend Flat Rate',
+    categoryId: 'buildertrend-default',
+    categoryName: 'Buildertrend Default'
+  };
+}
+
 // Generate a single line item
 function generateLineItem(lineItemId, term, entityType = null) {
   const termVariations = TERM_VARIATIONS[term] || [term];
@@ -335,6 +480,9 @@ function generateLineItem(lineItemId, term, entityType = null) {
     const unitPrice = generatePrice(quantity, unitType, lineItemType, entityType);
     const total = quantity * unitPrice;
     
+    // Assign cost code
+    const costCode = assignCostCode(title, description);
+    
     return {
       lineItemId: lineItemId,
       lineItemTitle: title,
@@ -344,6 +492,10 @@ function generateLineItem(lineItemId, term, entityType = null) {
       lineItemUnitPrice: unitPrice,
       lineItemTotal: total,
       lineItemType: lineItemType,
+      costCode: costCode.code,
+      costCodeName: costCode.name,
+      costCodeCategory: costCode.categoryId,
+      costCodeCategoryName: costCode.categoryName,
       fieldMetadata: {
         lineItemTitle: 'non-monetary',
         lineItemDescription: 'non-monetary',
@@ -362,15 +514,25 @@ function generateLineItem(lineItemId, term, entityType = null) {
     const unitPrice = generatePrice(quantity, unitType, lineItemType, entityType);
     const total = quantity * unitPrice;
     
+    title = `${selectedTerm} work`;
+    description = `${lineItemType} for ${selectedTerm} work on Building core areas`;
+    
+    // Assign cost code
+    const costCode = assignCostCode(title, description);
+    
     return {
       lineItemId: lineItemId,
-      lineItemTitle: `${selectedTerm} work`,
-      lineItemDescription: `${lineItemType} for ${selectedTerm} work on Building core areas`,
+      lineItemTitle: title,
+      lineItemDescription: description,
       lineItemQuantity: quantity,
       lineItemQuantityUnitOfMeasure: unitType,
       lineItemUnitPrice: unitPrice,
       lineItemTotal: total,
       lineItemType: lineItemType,
+      costCode: costCode.code,
+      costCodeName: costCode.name,
+      costCodeCategory: costCode.categoryId,
+      costCodeCategoryName: costCode.categoryName,
       fieldMetadata: {
         lineItemTitle: 'non-monetary',
         lineItemDescription: 'non-monetary',

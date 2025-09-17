@@ -1,0 +1,98 @@
+﻿CostCodeCategory,CostCode
+1000 - 1999 Preparation Preliminaries,1000 - Permits
+1000 - 1999 Preparation Preliminaries,1010 - Plans/blueprints
+1000 - 1999 Preparation Preliminaries,1020 - Design/engineering
+1000 - 1999 Preparation Preliminaries,1030 - Surveys
+1000 - 1999 Preparation Preliminaries,1040 - Site supervision
+1000 - 1999 Preparation Preliminaries,1050 - Equipment rental
+1000 - 1999 Preparation Preliminaries,1060 - Temporary electric
+1000 - 1999 Preparation Preliminaries,1070 - Individual wells
+1000 - 1999 Preparation Preliminaries,1080 - Water service
+1000 - 1999 Preparation Preliminaries,1090 - Septic system
+1000 - 1999 Preparation Preliminaries,1100 - Sewer system
+1000 - 1999 Preparation Preliminaries,1110 - Gas service
+1000 - 1999 Preparation Preliminaries,1120 - Electric service
+1000 - 1999 Preparation Preliminaries,1130 - Telephone service
+1000 - 1999 Preparation Preliminaries,1140 - Other utility connections
+1000 - 1999 Preparation Preliminaries,1150 - Lot clearing
+1000 - 1999 Preparation Preliminaries,1160 - Fill dirt and materials
+1000 - 1999 Preparation Preliminaries,1170 - Demolition material
+1000 - 1999 Preparation Preliminaries,1180 - Demolition labor
+2000 - 2999 Excavation and Foundation,2000 - Excavation and backfill
+2000 - 2999 Excavation and Foundation,2010 - Rough grading
+2000 - 2999 Excavation and Foundation,2020 - Earth hauling
+2000 - 2999 Excavation and Foundation,2030 - Shoring
+2000 - 2999 Excavation and Foundation,2040 - Underground plumbing material
+2000 - 2999 Excavation and Foundation,2050 - Underground plumbing labor
+2000 - 2999 Excavation and Foundation,2060 - Footings and foundation material
+2000 - 2999 Excavation and Foundation,2070 - Footings and foundation labor
+2000 - 2999 Excavation and Foundation,2080 - Rebar and reinforcing steel
+2000 - 2999 Excavation and Foundation,2090 - Waterproofing
+2000 - 2999 Excavation and Foundation,2100 - Termite protection
+3000 - 3999 Rough Structure,3000 - Structural steel
+3000 - 3999 Rough Structure,3010 - Framing materials
+3000 - 3999 Rough Structure,3020 - Framing labor
+3000 - 3999 Rough Structure,3030 - Rough plumbing material
+3000 - 3999 Rough Structure,3040 - Rough plumbing labor
+3000 - 3999 Rough Structure,3050 - Rough electrical material
+3000 - 3999 Rough Structure,3060 - Rough electrical labor
+3000 - 3999 Rough Structure,3070 - Rough hvac material
+3000 - 3999 Rough Structure,3080 - Rough hvac labor
+4000 - 4999 Full Enclosure,4000 - Roofing material
+4000 - 4999 Full Enclosure,4010 - Roofing labor
+4000 - 4999 Full Enclosure,4020 - Gutters and downspouts
+4000 - 4999 Full Enclosure,4030 - Fireplace
+4000 - 4999 Full Enclosure,4040 - Masonry material
+4000 - 4999 Full Enclosure,4050 - Masonry labor
+4000 - 4999 Full Enclosure,4060 - Window material
+4000 - 4999 Full Enclosure,4070 - Window install labor
+4000 - 4999 Full Enclosure,4080 - Exterior door material
+4000 - 4999 Full Enclosure,4090 - Exterior door install labor
+4000 - 4999 Full Enclosure,4100 - Insulation material
+4000 - 4999 Full Enclosure,4110 - Insulation labor
+4000 - 4999 Full Enclosure,4120 - Exterior siding and trim materials
+4000 - 4999 Full Enclosure,4130 - Exterior siding and trim labor
+4000 - 4999 Full Enclosure,4140 - Exterior painting material
+4000 - 4999 Full Enclosure,4150 - Exterior painting labor
+5000 - 5999 Finishing Trades,5000 - Drywall material
+5000 - 5999 Finishing Trades,5010 - Drywall labor
+5000 - 5999 Finishing Trades,5020 - Flooring and tile materials
+5000 - 5999 Finishing Trades,5030 - Flooring and tile labor
+5000 - 5999 Finishing Trades,5040 - Interior trim material
+5000 - 5999 Finishing Trades,5050 - Interior trim labor
+5000 - 5999 Finishing Trades,5060 - Interior doors material
+5000 - 5999 Finishing Trades,5070 - Interior door install labor
+5000 - 5999 Finishing Trades,5080 - Interior painting material
+5000 - 5999 Finishing Trades,5090 - Interior painting labor
+5000 - 5999 Finishing Trades,5100 - Cabinets and countertops material
+5000 - 5999 Finishing Trades,5110 - Cabinets and countertops labor
+5000 - 5999 Finishing Trades,5120 - Shower doors/mirrors/accessories
+5000 - 5999 Finishing Trades,5130 - Appliances
+5000 - 5999 Finishing Trades,5140 - Appliance install labor
+5000 - 5999 Finishing Trades,5150 - Finish plumbing material
+5000 - 5999 Finishing Trades,5160 - Finish plumbing labor
+5000 - 5999 Finishing Trades,5170 - Finish electrical material
+5000 - 5999 Finishing Trades,5180 - Finish electrical labor
+5000 - 5999 Finishing Trades,5190 - Finish hvac material
+5000 - 5999 Finishing Trades,5200 - Finish hvac labor
+6000 - 6999 Completion and Inspection,6000 - Cleanup
+6000 - 6999 Completion and Inspection,6010 - Final grade
+6000 - 6999 Completion and Inspection,"6020 - Flatwork (driveway, patio, etc.) material"
+6000 - 6999 Completion and Inspection,"6030 - Flatwork (driveway, patio, etc.) labor"
+6000 - 6999 Completion and Inspection,6040 - Deck materials
+6000 - 6999 Completion and Inspection,6050 - Deck install labor
+6000 - 6999 Completion and Inspection,6060 - Fences materials
+6000 - 6999 Completion and Inspection,6070 - Fences labor
+6000 - 6999 Completion and Inspection,6080 - Irrigation system
+6000 - 6999 Completion and Inspection,6090 - Landscaping material
+6000 - 6999 Completion and Inspection,6100 - Landscaping labor
+6000 - 6999 Completion and Inspection,6110 - Pool material
+6000 - 6999 Completion and Inspection,6120 - Pool labor
+6000 - 6999 Completion and Inspection,6130 - Punchlist
+7000 - 7999 Operations,7000 - Overhead and business costs
+7000 - 7999 Operations,7010 - Contingency
+7000 - 7999 Operations,7020 - Tax
+7000 - 7999 Operations,7030 - Builder fee
+7000 - 7999 Operations,7040 - Change order management fee
+7000 - 7999 Operations,7050 - Warranty fee
+Buildertrend Default,Buildertrend Flat Rate
