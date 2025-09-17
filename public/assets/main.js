@@ -1590,6 +1590,11 @@ function matchesMonetaryQuery(query, dataValue) {
   const queryStr = queryDollars.toString();
   const dataStr = dataDollars.toString();
   const originalQuery = query.replace(/[$\s]/g, "");
+  const hasExplicitDecimal = originalQuery.includes(".");
+  if (hasExplicitDecimal) {
+    const tolerance = 0.01;
+    return Math.abs(queryDollars - dataDollars) <= tolerance;
+  }
   const commaZeroMatch = originalQuery.match(/^(\d+),0$/);
   if (commaZeroMatch) {
     const [, integerPart] = commaZeroMatch;
@@ -2807,6 +2812,8 @@ function renderRecentSearchesState(selectedIndex) {
     if (selectedIndex === index) {
       item.classList.add("search-dialog__recent-item--selected");
     }
+    const contentContainer = document.createElement("div");
+    contentContainer.className = "search-dialog__recent-content";
     const queryText = document.createElement("div");
     queryText.className = "search-dialog__recent-query";
     queryText.textContent = search.query;
@@ -2822,7 +2829,19 @@ function renderRecentSearchesState(selectedIndex) {
     timeText.className = "search-dialog__recent-time";
     timeText.textContent = search.timeAgo;
     metaText.append(timeText);
-    item.append(queryText, metaText);
+    contentContainer.append(queryText, metaText);
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "search-dialog__recent-delete";
+    deleteButton.setAttribute("aria-label", `Delete search: ${search.query}`);
+    deleteButton.innerHTML = "\xD7";
+    deleteButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      recentSearches.removeSearch(search.id);
+      const event = new CustomEvent("refresh-dialog");
+      window.dispatchEvent(event);
+    });
+    item.append(contentContainer, deleteButton);
     item.addEventListener("click", () => {
       const event = new CustomEvent("search-query", {
         detail: { query: search.query }

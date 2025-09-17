@@ -37,3 +37,12 @@ test-monetary-boolean-simple.js
 test-monetary-highlighting-fix.js
 test-monetary-value-fix.js
 test-new-architecture.html
+test-123-matching.js
+test-close-match.js
+test-extract-tokens.js
+test-fix.js
+test-monetary-string.js
+test-public-version.js
+test-text-matching.js
+test-wider-viewport.html
+debug-recent-searches.html

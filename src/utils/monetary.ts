@@ -114,9 +114,19 @@ export function matchesMonetaryQuery(query: string, dataValue: number): boolean 
   const queryStr = queryDollars.toString();
   const dataStr = dataDollars.toString();
   
+  // Check if the original query had explicit decimal places (like "$123.00")
+  const originalQuery = query.replace(/[$\s]/g, '');
+  const hasExplicitDecimal = originalQuery.includes('.');
+  
+  // If the query had explicit decimal places, be much more restrictive
+  // Only allow exact matches or very close matches (within $0.01)
+  if (hasExplicitDecimal) {
+    const tolerance = 0.01;
+    return Math.abs(queryDollars - dataDollars) <= tolerance;
+  }
+  
   // Special case: if the original query was in the format "$X,0" (like "$5,0"),
   // we need to check both interpretations: as "X" and as "X0"
-  const originalQuery = query.replace(/[$\s]/g, '');
   const commaZeroMatch = originalQuery.match(/^(\d+),0$/);
   if (commaZeroMatch) {
     const [, integerPart] = commaZeroMatch;

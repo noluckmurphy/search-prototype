@@ -580,6 +580,10 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
       item.classList.add('search-dialog__recent-item--selected');
     }
     
+    // Create the main content container
+    const contentContainer = document.createElement('div');
+    contentContainer.className = 'search-dialog__recent-content';
+    
     // Create the query text
     const queryText = document.createElement('div');
     queryText.className = 'search-dialog__recent-query';
@@ -603,7 +607,25 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
     timeText.textContent = search.timeAgo;
     metaText.append(timeText);
     
-    item.append(queryText, metaText);
+    contentContainer.append(queryText, metaText);
+    
+    // Create the delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'search-dialog__recent-delete';
+    deleteButton.setAttribute('aria-label', `Delete search: ${search.query}`);
+    deleteButton.innerHTML = '×';
+    
+    // Add delete button click handler
+    deleteButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent triggering the item click
+      recentSearches.removeSearch(search.id);
+      // Re-render the dialog to show updated list
+      const event = new CustomEvent('refresh-dialog');
+      window.dispatchEvent(event);
+    });
+    
+    item.append(contentContainer, deleteButton);
     
     // Add click handler to perform the search
     item.addEventListener('click', () => {
