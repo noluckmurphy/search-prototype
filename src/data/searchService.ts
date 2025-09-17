@@ -229,8 +229,8 @@ function tokenize(query: string): string[] {
 interface BooleanQuery {
   type: 'boolean';
   operator: 'AND' | 'OR' | 'NOT';
-  left: string | BooleanQuery;
-  right?: string | BooleanQuery;
+  left: string | ParsedQuery;
+  right?: string | ParsedQuery;
 }
 
 interface SimpleQuery {
