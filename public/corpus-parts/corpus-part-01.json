@@ -1422,7 +1422,7 @@
       "costCode": "05-120 Structural Steel",
       "paymentTerms": "Net 30"
     },
-    "totalValue": 50173,
+    "totalValue": 50185.75,
     "issuedDate": "2023-02-06T02:17:05.656Z",
     "dueDate": "2023-03-19T02:17:05.656Z",
     "lineItems": [
@@ -1568,6 +1568,25 @@
         "lineItemUnitPrice": 248,
         "lineItemTotal": 496,
         "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "clientinvoice-001-item-test",
+        "lineItemTitle": "Test decimal value - 12.75 units",
+        "lineItemDescription": "Test line item with decimal value for comma parsing verification",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 12.75,
+        "lineItemTotal": 12.75,
+        "lineItemType": "Material",
         "fieldMetadata": {
           "lineItemTitle": "non-monetary",
           "lineItemDescription": "non-monetary",

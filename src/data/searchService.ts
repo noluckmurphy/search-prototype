@@ -225,6 +225,69 @@ function tokenize(query: string): string[] {
     .filter(Boolean);
 }
 
+// Boolean query types
+interface BooleanQuery {
+  type: 'boolean';
+  operator: 'AND' | 'OR' | 'NOT';
+  left: string | BooleanQuery;
+  right?: string | BooleanQuery;
+}
+
+interface SimpleQuery {
+  type: 'simple';
+  query: string;
+}
+
+type ParsedQuery = BooleanQuery | SimpleQuery;
+
+function parseBooleanQuery(query: string): ParsedQuery {
+  const trimmed = query.trim();
+  
+  // Check for boolean operators with proper spacing
+  // Only match uppercase operators with spaces before and after
+  const andMatch = trimmed.match(/^(.+?)\s+AND\s+(.+)$/);
+  const orMatch = trimmed.match(/^(.+?)\s+OR\s+(.+)$/);
+  const notMatch = trimmed.match(/^(.+?)\s+NOT\s+(.+)$/);
+  
+  if (andMatch) {
+    return {
+      type: 'boolean',
+      operator: 'AND',
+      left: parseBooleanQuery(andMatch[1].trim()),
+      right: parseBooleanQuery(andMatch[2].trim())
+    };
+  }
+  
+  if (orMatch) {
+    return {
+      type: 'boolean',
+      operator: 'OR',
+      left: parseBooleanQuery(orMatch[1].trim()),
+      right: parseBooleanQuery(orMatch[2].trim())
+    };
+  }
+  
+  if (notMatch) {
+    return {
+      type: 'boolean',
+      operator: 'NOT',
+      left: parseBooleanQuery(notMatch[1].trim()),
+      right: parseBooleanQuery(notMatch[2].trim())
+    };
+  }
+  
+  // No boolean operators found, return as simple query
+  return {
+    type: 'simple',
+    query: trimmed
+  };
+}
+
+function isBooleanQuery(query: string): boolean {
+  const parsed = parseBooleanQuery(query);
+  return parsed.type === 'boolean';
+}
+
 function parseMonetaryQuery(query: string): { isMonetary: boolean; searchQuery: string; originalQuery: string } {
   const trimmedQuery = query.trim();
   
@@ -392,6 +455,43 @@ function matchesQuery(record: SearchRecord, query: string): boolean {
 
   const haystack = buildHaystack(record);
   return tokens.every((token) => haystack.includes(token));
+}
+
+function matchesBooleanQuery(record: SearchRecord, parsedQuery: ParsedQuery): boolean {
+  if (parsedQuery.type === 'simple') {
+    // For simple queries, use the existing matching logic
+    return matchesQuery(record, parsedQuery.query);
+  }
+  
+  const booleanQuery = parsedQuery as BooleanQuery;
+  
+  // Evaluate left side
+  const leftMatch = typeof booleanQuery.left === 'string' 
+    ? matchesQuery(record, booleanQuery.left)
+    : matchesBooleanQuery(record, booleanQuery.left);
+  
+  // Handle NOT operator (only has left side)
+  if (booleanQuery.operator === 'NOT') {
+    return !leftMatch;
+  }
+  
+  // Handle AND and OR operators (have both left and right sides)
+  if (!booleanQuery.right) {
+    return leftMatch;
+  }
+  
+  const rightMatch = typeof booleanQuery.right === 'string'
+    ? matchesQuery(record, booleanQuery.right)
+    : matchesBooleanQuery(record, booleanQuery.right);
+  
+  switch (booleanQuery.operator) {
+    case 'AND':
+      return leftMatch && rightMatch;
+    case 'OR':
+      return leftMatch || rightMatch;
+    default:
+      return leftMatch;
+  }
 }
 
 function matchesHybridQuery(record: SearchRecord, query: string): boolean {
@@ -719,6 +819,44 @@ function calculateRelevanceScore(record: SearchRecord, query: string): number {
   return score;
 }
 
+function calculateBooleanRelevanceScore(record: SearchRecord, parsedQuery: ParsedQuery): number {
+  if (parsedQuery.type === 'simple') {
+    return calculateRelevanceScore(record, parsedQuery.query);
+  }
+  
+  const booleanQuery = parsedQuery as BooleanQuery;
+  
+  // Calculate scores for left and right sides
+  const leftScore = typeof booleanQuery.left === 'string' 
+    ? calculateRelevanceScore(record, booleanQuery.left)
+    : calculateBooleanRelevanceScore(record, booleanQuery.left);
+  
+  if (booleanQuery.operator === 'NOT') {
+    // For NOT queries, return a base score if the left side matches
+    // This ensures NOT queries still get some relevance scoring
+    return leftScore > 0 ? 10 : 0;
+  }
+  
+  if (!booleanQuery.right) {
+    return leftScore;
+  }
+  
+  const rightScore = typeof booleanQuery.right === 'string'
+    ? calculateRelevanceScore(record, booleanQuery.right)
+    : calculateBooleanRelevanceScore(record, booleanQuery.right);
+  
+  switch (booleanQuery.operator) {
+    case 'AND':
+      // For AND, both sides must match, so use the minimum score
+      return Math.min(leftScore, rightScore);
+    case 'OR':
+      // For OR, use the maximum score (best match)
+      return Math.max(leftScore, rightScore);
+    default:
+      return leftScore;
+  }
+}
+
 function calculateHybridRelevanceScore(record: SearchRecord, query: string): number {
   // First calculate regular relevance score
   const regularScore = calculateRelevanceScore(record, query);
@@ -931,7 +1069,15 @@ function sortByRelevance(records: SearchRecord[], query: string, isMonetary: boo
     let scoreA: number;
     let scoreB: number;
     
-    if (isMonetary) {
+    // Check if this is a boolean query
+    const isBoolean = isBooleanQuery(query);
+    const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+    
+    if (isBoolean && parsedQuery) {
+      // Boolean scoring
+      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+    } else if (isMonetary) {
       // Explicit monetary search (query starts with $)
       scoreA = calculateMonetaryRelevanceScore(a, query);
       scoreB = calculateMonetaryRelevanceScore(b, query);
@@ -972,6 +1118,10 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   
   console.log('Starting search for:', searchQuery, 'with corpus size:', corpus.length);
   
+  // Check if this is a boolean query
+  const isBoolean = isBooleanQuery(searchQuery);
+  const parsedQuery = isBoolean ? parseBooleanQuery(searchQuery) : null;
+  
   corpus.forEach((record, index) => {
     let matchesQueryResult: boolean;
     
@@ -992,7 +1142,11 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
       return; // Always skip regular matching for Buildertrend records
     }
     
-    if (isMonetary) {
+    // Determine which matching logic to use
+    if (isBoolean && parsedQuery) {
+      // Boolean search
+      matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
+    } else if (isMonetary) {
       // Explicit monetary search (query starts with $)
       matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
     } else if (hasMonetaryPotential(searchQuery)) {
@@ -1014,7 +1168,8 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   console.log('Search results for "' + searchQuery + '":', {
     buildertrendMatches: buildertrendMatches.length,
     otherMatches: sortedOtherMatches.length,
-    total: buildertrendMatches.length + sortedOtherMatches.length
+    total: buildertrendMatches.length + sortedOtherMatches.length,
+    isBoolean: isBoolean
   });
   
   // Return Buildertrend matches first, then other matches

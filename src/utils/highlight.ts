@@ -14,7 +14,8 @@ export function highlightText(text: string, query: string): string {
     return escapeHtml(text);
   }
 
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  // Check if this is a boolean query and extract search terms
+  const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
     return escapeHtml(text);
   }
@@ -39,6 +40,51 @@ export function highlightText(text: string, query: string): string {
 }
 
 /**
+ * Extracts search terms from a query, filtering out boolean operators
+ */
+function extractSearchTermsFromQuery(query: string): string[] {
+  // Check if this is a boolean query
+  if (isBooleanQuery(query)) {
+    return extractTermsFromBooleanQuery(query);
+  }
+  
+  // For simple queries, return all tokens
+  return query.toLowerCase().split(/\s+/).filter(Boolean);
+}
+
+/**
+ * Checks if a query contains boolean operators
+ */
+function isBooleanQuery(query: string): boolean {
+  const trimmed = query.trim();
+  return /\s+(AND|OR|NOT)\s+/.test(trimmed);
+}
+
+/**
+ * Extracts search terms from a boolean query, excluding operators
+ */
+function extractTermsFromBooleanQuery(query: string): string[] {
+  const trimmed = query.trim();
+  const terms: string[] = [];
+  
+  // Split by boolean operators and extract terms
+  const parts = trimmed.split(/\s+(AND|OR|NOT)\s+/);
+  
+  for (const part of parts) {
+    // Skip boolean operators
+    if (part === 'AND' || part === 'OR' || part === 'NOT') {
+      continue;
+    }
+    
+    // Extract individual terms from each part
+    const partTerms = part.toLowerCase().split(/\s+/).filter(Boolean);
+    terms.push(...partTerms);
+  }
+  
+  return terms;
+}
+
+/**
  * Finds the best matching field and content for a search record
  */
 export function findBestMatch(record: SearchRecord, query: string): HighlightMatch | null {
@@ -46,7 +92,7 @@ export function findBestMatch(record: SearchRecord, query: string): HighlightMat
     return null;
   }
 
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
     return null;
   }
@@ -190,7 +236,7 @@ export function highlightHybrid(text: string, query: string): string {
   // Start with escaped HTML
   let highlightedText = escapeHtml(text);
   const textLower = text.toLowerCase();
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const tokens = extractSearchTermsFromQuery(query);
   
   // Apply regular text highlighting (yellow) first
   if (tokens.length > 0) {
@@ -314,6 +360,31 @@ export function highlightMonetaryValues(text: string, query: string): string {
       }
     }
     
+    // Special handling for comma pattern matches (like "$5,06")
+    // Check if the original query has comma patterns that should match prefix values
+    const originalQuery = query.replace(/[$\s]/g, '');
+    const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+    if (commaPatternMatch) {
+      const [, integerPart, decimalPart] = commaPatternMatch;
+      const prefixPattern = `${integerPart}${decimalPart}`; // "506" for "$5,06"
+      
+      // Highlight monetary values that start with this prefix pattern
+      // Account for comma thousands separators in formatted currency (e.g., "$5,068")
+      // For "506", we want to match both "$5068" and "$5,068"
+      const prefixPatternRegex = new RegExp(
+        `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
+        'g'
+      );
+      
+      highlightedText = highlightedText.replace(prefixPatternRegex, (match) => {
+        // Skip if already highlighted to prevent double wrapping
+        if (match.includes('<mark')) {
+          return match;
+        }
+        return `<mark class="monetary-highlight">${match}</mark>`;
+      });
+    }
+    
     if (!isExplicitMonetary) {
       // Additionally, handle partial matches for monetary values (only for non-explicit searches)
       // This handles cases like searching for "127" and highlighting "$1,275"
@@ -429,16 +500,9 @@ function parseCurrencyString(amountStr: string): number | null {
     return null; // Will be handled separately
   }
   
-  // Handle comma as decimal separator (European format like "55,13")
-  // If there's exactly one comma and it's followed by 1-2 digits at the end, treat it as decimal
-  const commaAsDecimalMatch = cleaned.match(/^(\d+),(\d{1,2})$/);
-  if (commaAsDecimalMatch) {
-    const [, integerPart, decimalPart] = commaAsDecimalMatch;
-    cleaned = `${integerPart}.${decimalPart.padEnd(2, '0')}`;
-  } else {
-    // Remove commas as thousands separators (like "1,234.56")
-    cleaned = cleaned.replace(/,/g, '');
-  }
+  // Remove commas as thousands separators (like "1,234.56")
+  // For US/Canadian/Australian/New Zealand users, commas are only thousands separators
+  cleaned = cleaned.replace(/,/g, '');
   
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? null : parsed;
@@ -578,6 +642,31 @@ export function highlightMonetaryValuesWithPartialMatches(text: string, query: s
         );
         highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-exact">$1</mark>');
       }
+    }
+    
+    // Special handling for comma pattern matches (like "$5,06")
+    // Check if the original query has comma patterns that should match prefix values
+    const originalQuery = query.replace(/[$\s]/g, '');
+    const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+    if (commaPatternMatch) {
+      const [, integerPart, decimalPart] = commaPatternMatch;
+      const prefixPattern = `${integerPart}${decimalPart}`; // "506" for "$5,06"
+      
+      // Highlight monetary values that start with this prefix pattern
+      // Account for comma thousands separators in formatted currency (e.g., "$5,068")
+      // For "506", we want to match both "$5068" and "$5,068"
+      const prefixPatternRegex = new RegExp(
+        `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
+        'g'
+      );
+      
+      highlightedText = highlightedText.replace(prefixPatternRegex, (match) => {
+        // Skip if already highlighted to prevent double wrapping
+        if (match.includes('<mark')) {
+          return match;
+        }
+        return `<mark class="monetary-highlight-partial">${match}</mark>`;
+      });
     }
     
     // Second pass: highlight partial matches with yellow

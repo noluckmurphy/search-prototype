@@ -24,16 +24,9 @@ export function parseMonetaryString(value: string): MonetaryValue | null {
     return null;
   }
   
-  // Handle comma as decimal separator (European format like "55,13")
-  // If there's exactly one comma and it's followed by 1-2 digits at the end, treat it as decimal
-  const commaAsDecimalMatch = cleaned.match(/^(\d+),(\d{1,2})$/);
-  if (commaAsDecimalMatch) {
-    const [, integerPart, decimalPart] = commaAsDecimalMatch;
-    cleaned = `${integerPart}.${decimalPart.padEnd(2, '0')}`;
-  } else {
-    // Remove commas as thousands separators (like "1,234.56")
-    cleaned = cleaned.replace(/,/g, '');
-  }
+  // Remove commas as thousands separators (like "1,234.56")
+  // For US/Canadian/Australian/New Zealand users, commas are only thousands separators
+  cleaned = cleaned.replace(/,/g, '');
   
   // Parse as float
   const parsed = parseFloat(cleaned);
@@ -121,8 +114,48 @@ export function matchesMonetaryQuery(query: string, dataValue: number): boolean 
   const queryStr = queryDollars.toString();
   const dataStr = dataDollars.toString();
   
-  // Check if data starts with query (prefix matching)
-  // This is the key fix: $1530 should match $15309, but $123 should NOT match $1232
+  // Special case: if the original query was in the format "$X,0" (like "$5,0"),
+  // we need to check both interpretations: as "X" and as "X0"
+  const originalQuery = query.replace(/[$\s]/g, '');
+  const commaZeroMatch = originalQuery.match(/^(\d+),0$/);
+  if (commaZeroMatch) {
+    const [, integerPart] = commaZeroMatch;
+    const alternativeQueryStr = integerPart; // "5" for "$5,0"
+    const alternativeQueryStr2 = `${integerPart}0`; // "50" for "$5,0"
+    
+    // Check if data matches either interpretation
+    // For the "5" interpretation, only allow exact matches
+    if (dataStr === alternativeQueryStr) {
+      return true;
+    }
+    
+    // For the "50" interpretation, allow any value that starts with "50"
+    if (dataStr.startsWith(alternativeQueryStr2)) {
+      return true;
+    }
+  }
+  
+  // Special case: if the original query was in the format "$X,Y" (like "$5,06"),
+  // treat it as a prefix pattern for values starting with "XY"
+  const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+  if (commaPatternMatch) {
+    const [, integerPart, decimalPart] = commaPatternMatch;
+    const prefixPattern = `${integerPart}${decimalPart}`; // "506" for "$5,06"
+    
+    // Check if data starts with this prefix pattern
+    if (dataStr.startsWith(prefixPattern)) {
+      return true;
+    }
+  }
+  
+  // Use the helper function for regular prefix matching
+  return matchesPrefixPattern(queryStr, dataStr);
+}
+
+/**
+ * Helper function to check if a data string matches a query string using prefix matching rules
+ */
+function matchesPrefixPattern(queryStr: string, dataStr: string): boolean {
   if (dataStr.startsWith(queryStr)) {
     // Handle decimal values differently from whole numbers
     const queryHasDecimal = queryStr.includes('.');
@@ -130,30 +163,29 @@ export function matchesMonetaryQuery(query: string, dataValue: number): boolean 
     
     if (queryHasDecimal && dataHasDecimal) {
       // For decimal values, allow prefix matching if the query is a prefix of the data
-      // This allows "12.7" to match "12.75", "12.78", etc.
       return true;
     } else if (!queryHasDecimal && !dataHasDecimal) {
-      // For whole numbers, only allow prefix matching if the next digit is 0
-      // This prevents 123 from matching 1232, 1234, etc.
+      // For whole numbers, allow prefix matching but be more permissive for longer queries
+      // This allows "506" to match "5068", but prevents "12" from matching "1234"
       if (dataStr.length > queryStr.length) {
-        const nextDigit = dataStr[queryStr.length];
-        return nextDigit === '0';
+        // For queries of 3+ digits, allow any next digit (e.g., "506" matches "5068")
+        // For queries of 1-2 digits, only allow if next digit is 0 (e.g., "12" doesn't match "123")
+        if (queryStr.length >= 3) {
+          return true;
+        } else {
+          const nextDigit = dataStr[queryStr.length];
+          return nextDigit === '0';
+        }
       }
-      return true; // Same length, already handled by exact match above
+      return true;
     } else {
-      // Mixed case: query is decimal but data is whole number, or vice versa
-      // Be more restrictive in these cases
+      // Mixed case: be more restrictive
       return false;
     }
   }
   
   // Check if query starts with data (for cases where query is longer)
-  // This handles cases where the query is more specific than the data
-  // BUT be more restrictive - only allow this if the query is significantly longer
   if (queryStr.startsWith(dataStr)) {
-    // Only allow this if the query is at least 4 digits longer than the data
-    // AND the data is at least 2 digits long (prevents single digits from matching)
-    // This prevents 208 from matching 208777, but allows 12 to match 123
     return queryStr.length >= dataStr.length + 4 && dataStr.length >= 2;
   }
   

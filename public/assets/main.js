@@ -231,7 +231,7 @@ function highlightText(text, query) {
   if (!query.trim()) {
     return escapeHtml(text);
   }
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
     return escapeHtml(text);
   }
@@ -247,11 +247,34 @@ function highlightText(text, query) {
   }
   return highlightedText;
 }
+function extractSearchTermsFromQuery(query) {
+  if (isBooleanQuery(query)) {
+    return extractTermsFromBooleanQuery(query);
+  }
+  return query.toLowerCase().split(/\s+/).filter(Boolean);
+}
+function isBooleanQuery(query) {
+  const trimmed = query.trim();
+  return /\s+(AND|OR|NOT)\s+/.test(trimmed);
+}
+function extractTermsFromBooleanQuery(query) {
+  const trimmed = query.trim();
+  const terms = [];
+  const parts = trimmed.split(/\s+(AND|OR|NOT)\s+/);
+  for (const part of parts) {
+    if (part === "AND" || part === "OR" || part === "NOT") {
+      continue;
+    }
+    const partTerms = part.toLowerCase().split(/\s+/).filter(Boolean);
+    terms.push(...partTerms);
+  }
+  return terms;
+}
 function findBestMatch(record, query) {
   if (!query.trim()) {
     return null;
   }
-  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
     return null;
   }
@@ -379,13 +402,7 @@ function parseCurrencyString(amountStr) {
   if (cleaned.includes("-") || cleaned.toLowerCase().includes(" to ")) {
     return null;
   }
-  const commaAsDecimalMatch = cleaned.match(/^(\d+),(\d{1,2})$/);
-  if (commaAsDecimalMatch) {
-    const [, integerPart, decimalPart] = commaAsDecimalMatch;
-    cleaned = `${integerPart}.${decimalPart.padEnd(2, "0")}`;
-  } else {
-    cleaned = cleaned.replace(/,/g, "");
-  }
+  cleaned = cleaned.replace(/,/g, "");
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? null : parsed;
 }
@@ -476,6 +493,22 @@ function highlightMonetaryValuesWithPartialMatches(text, query) {
         );
         highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-exact">$1</mark>');
       }
+    }
+    const originalQuery = query.replace(/[$\s]/g, "");
+    const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+    if (commaPatternMatch) {
+      const [, integerPart, decimalPart] = commaPatternMatch;
+      const prefixPattern = `${integerPart}${decimalPart}`;
+      const prefixPatternRegex = new RegExp(
+        `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
+        "g"
+      );
+      highlightedText = highlightedText.replace(prefixPatternRegex, (match) => {
+        if (match.includes("<mark")) {
+          return match;
+        }
+        return `<mark class="monetary-highlight-partial">${match}</mark>`;
+      });
     }
     const hasExactMatches = highlightedText.includes("monetary-highlight-exact");
     const shouldDoPartialMatching = !isExplicitMonetary || !hasExactMatches;
@@ -1010,6 +1043,12 @@ function createSearchDialog(host, options) {
       }
     });
   }
+  window.addEventListener("refresh-dialog", () => {
+    if (previousState2?.visible) {
+      console.log("\u{1F504} Refreshing dialog due to recent searches clear");
+      setState(previousState2);
+    }
+  });
   const setState = (state) => {
     console.log("\u{1F504} setState called:", {
       oldSelectedIndex: previousState2?.selectedIndex,
@@ -1224,6 +1263,55 @@ function renderRecentSearchesState(selectedIndex) {
     list.append(item);
   });
   wrapper.append(list);
+  const footer = document.createElement("div");
+  footer.className = "search-dialog__footer";
+  const shortcutsContainer = document.createElement("div");
+  shortcutsContainer.className = "search-dialog__shortcuts";
+  const escShortcut = document.createElement("div");
+  escShortcut.className = "search-dialog__shortcut";
+  const escKey = document.createElement("kbd");
+  escKey.className = "search-dialog__shortcut-key";
+  escKey.textContent = "esc";
+  const escText = document.createElement("span");
+  escText.className = "search-dialog__shortcut-text";
+  escText.textContent = "to close";
+  escShortcut.append(escKey, escText);
+  const enterShortcut = document.createElement("div");
+  enterShortcut.className = "search-dialog__shortcut";
+  const enterKey = document.createElement("kbd");
+  enterKey.className = "search-dialog__shortcut-key";
+  enterKey.innerHTML = "\u21B5";
+  const enterText = document.createElement("span");
+  enterText.className = "search-dialog__shortcut-text";
+  enterText.textContent = "to select";
+  enterShortcut.append(enterKey, enterText);
+  const arrowsShortcut = document.createElement("div");
+  arrowsShortcut.className = "search-dialog__shortcut";
+  const arrowsContainer = document.createElement("div");
+  arrowsContainer.className = "search-dialog__shortcut-arrows";
+  const upArrow = document.createElement("kbd");
+  upArrow.className = "search-dialog__shortcut-key";
+  upArrow.innerHTML = "\u2191";
+  const downArrow = document.createElement("kbd");
+  downArrow.className = "search-dialog__shortcut-key";
+  downArrow.innerHTML = "\u2193";
+  arrowsContainer.append(upArrow, downArrow);
+  const arrowsText = document.createElement("span");
+  arrowsText.className = "search-dialog__shortcut-text";
+  arrowsText.textContent = "to navigate";
+  arrowsShortcut.append(arrowsContainer, arrowsText);
+  shortcutsContainer.append(escShortcut, enterShortcut, arrowsShortcut);
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "clear-recent-button";
+  clearButton.textContent = "Clear recent searches";
+  clearButton.addEventListener("click", () => {
+    recentSearches.clearAll();
+    const event = new CustomEvent("refresh-dialog");
+    window.dispatchEvent(event);
+  });
+  footer.append(shortcutsContainer, clearButton);
+  wrapper.append(footer);
   return wrapper;
 }
 function renderShortQueryState() {
@@ -4254,13 +4342,7 @@ function parseMonetaryString(value) {
   if (!cleaned || cleaned === "") {
     return null;
   }
-  const commaAsDecimalMatch = cleaned.match(/^(\d+),(\d{1,2})$/);
-  if (commaAsDecimalMatch) {
-    const [, integerPart, decimalPart] = commaAsDecimalMatch;
-    cleaned = `${integerPart}.${decimalPart.padEnd(2, "0")}`;
-  } else {
-    cleaned = cleaned.replace(/,/g, "");
-  }
+  cleaned = cleaned.replace(/,/g, "");
   const parsed = parseFloat(cleaned);
   if (isNaN(parsed)) {
     return null;
@@ -4309,6 +4391,30 @@ function matchesMonetaryQuery(query, dataValue) {
   const dataDollars = dataMonetary.amount / 100;
   const queryStr = queryDollars.toString();
   const dataStr = dataDollars.toString();
+  const originalQuery = query.replace(/[$\s]/g, "");
+  const commaZeroMatch = originalQuery.match(/^(\d+),0$/);
+  if (commaZeroMatch) {
+    const [, integerPart] = commaZeroMatch;
+    const alternativeQueryStr = integerPart;
+    const alternativeQueryStr2 = `${integerPart}0`;
+    if (dataStr === alternativeQueryStr) {
+      return true;
+    }
+    if (dataStr.startsWith(alternativeQueryStr2)) {
+      return true;
+    }
+  }
+  const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+  if (commaPatternMatch) {
+    const [, integerPart, decimalPart] = commaPatternMatch;
+    const prefixPattern = `${integerPart}${decimalPart}`;
+    if (dataStr.startsWith(prefixPattern)) {
+      return true;
+    }
+  }
+  return matchesPrefixPattern(queryStr, dataStr);
+}
+function matchesPrefixPattern(queryStr, dataStr) {
   if (dataStr.startsWith(queryStr)) {
     const queryHasDecimal = queryStr.includes(".");
     const dataHasDecimal = dataStr.includes(".");
@@ -4316,8 +4422,12 @@ function matchesMonetaryQuery(query, dataValue) {
       return true;
     } else if (!queryHasDecimal && !dataHasDecimal) {
       if (dataStr.length > queryStr.length) {
-        const nextDigit = dataStr[queryStr.length];
-        return nextDigit === "0";
+        if (queryStr.length >= 3) {
+          return true;
+        } else {
+          const nextDigit = dataStr[queryStr.length];
+          return nextDigit === "0";
+        }
       }
       return true;
     } else {
@@ -4514,6 +4624,44 @@ function buildHaystack(record) {
 function tokenize(query) {
   return query.toLowerCase().split(/\s+/).map((token) => token.trim()).filter(Boolean);
 }
+function parseBooleanQuery(query) {
+  const trimmed = query.trim();
+  const andMatch = trimmed.match(/^(.+?)\s+AND\s+(.+)$/);
+  const orMatch = trimmed.match(/^(.+?)\s+OR\s+(.+)$/);
+  const notMatch = trimmed.match(/^(.+?)\s+NOT\s+(.+)$/);
+  if (andMatch) {
+    return {
+      type: "boolean",
+      operator: "AND",
+      left: parseBooleanQuery(andMatch[1].trim()),
+      right: parseBooleanQuery(andMatch[2].trim())
+    };
+  }
+  if (orMatch) {
+    return {
+      type: "boolean",
+      operator: "OR",
+      left: parseBooleanQuery(orMatch[1].trim()),
+      right: parseBooleanQuery(orMatch[2].trim())
+    };
+  }
+  if (notMatch) {
+    return {
+      type: "boolean",
+      operator: "NOT",
+      left: parseBooleanQuery(notMatch[1].trim()),
+      right: parseBooleanQuery(notMatch[2].trim())
+    };
+  }
+  return {
+    type: "simple",
+    query: trimmed
+  };
+}
+function isBooleanQuery2(query) {
+  const parsed = parseBooleanQuery(query);
+  return parsed.type === "boolean";
+}
 function parseMonetaryQuery(query) {
   const trimmedQuery = query.trim();
   if (trimmedQuery.startsWith("$")) {
@@ -4637,6 +4785,28 @@ function matchesQuery(record, query) {
   }
   const haystack = buildHaystack(record);
   return tokens.every((token) => haystack.includes(token));
+}
+function matchesBooleanQuery(record, parsedQuery) {
+  if (parsedQuery.type === "simple") {
+    return matchesQuery(record, parsedQuery.query);
+  }
+  const booleanQuery = parsedQuery;
+  const leftMatch = typeof booleanQuery.left === "string" ? matchesQuery(record, booleanQuery.left) : matchesBooleanQuery(record, booleanQuery.left);
+  if (booleanQuery.operator === "NOT") {
+    return !leftMatch;
+  }
+  if (!booleanQuery.right) {
+    return leftMatch;
+  }
+  const rightMatch = typeof booleanQuery.right === "string" ? matchesQuery(record, booleanQuery.right) : matchesBooleanQuery(record, booleanQuery.right);
+  switch (booleanQuery.operator) {
+    case "AND":
+      return leftMatch && rightMatch;
+    case "OR":
+      return leftMatch || rightMatch;
+    default:
+      return leftMatch;
+  }
 }
 function matchesHybridQuery(record, query) {
   const regularMatch = matchesQuery(record, query);
@@ -4874,6 +5044,28 @@ function calculateRelevanceScore(record, query) {
   }
   return score;
 }
+function calculateBooleanRelevanceScore(record, parsedQuery) {
+  if (parsedQuery.type === "simple") {
+    return calculateRelevanceScore(record, parsedQuery.query);
+  }
+  const booleanQuery = parsedQuery;
+  const leftScore = typeof booleanQuery.left === "string" ? calculateRelevanceScore(record, booleanQuery.left) : calculateBooleanRelevanceScore(record, booleanQuery.left);
+  if (booleanQuery.operator === "NOT") {
+    return leftScore > 0 ? 10 : 0;
+  }
+  if (!booleanQuery.right) {
+    return leftScore;
+  }
+  const rightScore = typeof booleanQuery.right === "string" ? calculateRelevanceScore(record, booleanQuery.right) : calculateBooleanRelevanceScore(record, booleanQuery.right);
+  switch (booleanQuery.operator) {
+    case "AND":
+      return Math.min(leftScore, rightScore);
+    case "OR":
+      return Math.max(leftScore, rightScore);
+    default:
+      return leftScore;
+  }
+}
 function calculateHybridRelevanceScore(record, query) {
   const regularScore = calculateRelevanceScore(record, query);
   if (regularScore > 0) {
@@ -5025,7 +5217,12 @@ function sortByRelevance(records, query, isMonetary = false) {
   return [...records].sort((a, b) => {
     let scoreA;
     let scoreB;
-    if (isMonetary) {
+    const isBoolean = isBooleanQuery2(query);
+    const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+    if (isBoolean && parsedQuery) {
+      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+    } else if (isMonetary) {
       scoreA = calculateMonetaryRelevanceScore(a, query);
       scoreB = calculateMonetaryRelevanceScore(b, query);
     } else if (hasMonetaryPotential(query)) {
@@ -5052,6 +5249,8 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
   const buildertrendMatches = [];
   const otherMatches = [];
   console.log("Starting search for:", searchQuery, "with corpus size:", corpus.length);
+  const isBoolean = isBooleanQuery2(searchQuery);
+  const parsedQuery = isBoolean ? parseBooleanQuery(searchQuery) : null;
   corpus.forEach((record, index) => {
     let matchesQueryResult;
     if (isBuildertrendRecord(record)) {
@@ -5069,7 +5268,9 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
       }
       return;
     }
-    if (isMonetary) {
+    if (isBoolean && parsedQuery) {
+      matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
+    } else if (isMonetary) {
       matchesQueryResult = matchesMonetaryQuery2(record, searchQuery);
     } else if (hasMonetaryPotential(searchQuery)) {
       matchesQueryResult = matchesHybridQuery(record, searchQuery);
@@ -5084,7 +5285,8 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
   console.log('Search results for "' + searchQuery + '":', {
     buildertrendMatches: buildertrendMatches.length,
     otherMatches: sortedOtherMatches.length,
-    total: buildertrendMatches.length + sortedOtherMatches.length
+    total: buildertrendMatches.length + sortedOtherMatches.length,
+    isBoolean
   });
   return [...buildertrendMatches, ...sortedOtherMatches];
 }

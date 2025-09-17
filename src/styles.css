@@ -48,15 +48,16 @@ p, div, span, a, li, ul, ol {
 }
 
 /* Monetary value highlighting - light green for numeric matches */
-.monetary-highlight {
+.monetary-highlight, .monetary-highlight-partial {
   background-color: #dcfce7;
-  color: red;
+  color: #33b05e;
   padding: 0.1em 0.2em;
   border-radius: 0.2em;
   font-weight: inherit;
+  border: 1px solid #258b49;
 }
 
-.monetary-highlight-exact, .monetary-highlight-range, .monetary-highlight-partial {
+.monetary-highlight-exact, .monetary-highlight-range {
   background-color: #dcfce7; /* Light green for exact matches */
   color: #186733;
   padding: 0.1em 0.2em;
@@ -564,6 +565,29 @@ main {
 .see-all-button {
   font-weight: 600;
   margin: 0;
+}
+
+.clear-recent-button {
+  font-weight: 600;
+  margin: 0;
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-recent-button:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.clear-recent-button:active {
+  background: #991b1b;
+  border-color: #991b1b;
 }
 
 /* Search Dialog Keyboard Shortcuts */

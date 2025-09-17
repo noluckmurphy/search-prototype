@@ -319,6 +319,15 @@ export function createSearchDialog(
     });
   }
 
+  // Listen for refresh-dialog events to re-render when recent searches are cleared
+  window.addEventListener('refresh-dialog', () => {
+    if (previousState?.visible) {
+      console.log('🔄 Refreshing dialog due to recent searches clear');
+      // Force a re-render by calling setState with the current state
+      setState(previousState);
+    }
+  });
+
   const setState = (state: SearchDialogState) => {
     console.log('🔄 setState called:', {
       oldSelectedIndex: previousState?.selectedIndex,
@@ -619,6 +628,71 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
   });
   
   wrapper.append(list);
+  
+  // Add footer with keyboard shortcuts and clear button
+  const footer = document.createElement('div');
+  footer.className = 'search-dialog__footer';
+  
+  // Create keyboard shortcuts container
+  const shortcutsContainer = document.createElement('div');
+  shortcutsContainer.className = 'search-dialog__shortcuts';
+  
+  // ESC to close
+  const escShortcut = document.createElement('div');
+  escShortcut.className = 'search-dialog__shortcut';
+  const escKey = document.createElement('kbd');
+  escKey.className = 'search-dialog__shortcut-key';
+  escKey.textContent = 'esc';
+  const escText = document.createElement('span');
+  escText.className = 'search-dialog__shortcut-text';
+  escText.textContent = 'to close';
+  escShortcut.append(escKey, escText);
+  
+  // Enter to select
+  const enterShortcut = document.createElement('div');
+  enterShortcut.className = 'search-dialog__shortcut';
+  const enterKey = document.createElement('kbd');
+  enterKey.className = 'search-dialog__shortcut-key';
+  enterKey.innerHTML = '↵'; // Enter symbol
+  const enterText = document.createElement('span');
+  enterText.className = 'search-dialog__shortcut-text';
+  enterText.textContent = 'to select';
+  enterShortcut.append(enterKey, enterText);
+  
+  // Arrows to navigate
+  const arrowsShortcut = document.createElement('div');
+  arrowsShortcut.className = 'search-dialog__shortcut';
+  const arrowsContainer = document.createElement('div');
+  arrowsContainer.className = 'search-dialog__shortcut-arrows';
+  const upArrow = document.createElement('kbd');
+  upArrow.className = 'search-dialog__shortcut-key';
+  upArrow.innerHTML = '↑';
+  const downArrow = document.createElement('kbd');
+  downArrow.className = 'search-dialog__shortcut-key';
+  downArrow.innerHTML = '↓';
+  arrowsContainer.append(upArrow, downArrow);
+  const arrowsText = document.createElement('span');
+  arrowsText.className = 'search-dialog__shortcut-text';
+  arrowsText.textContent = 'to navigate';
+  arrowsShortcut.append(arrowsContainer, arrowsText);
+  
+  shortcutsContainer.append(escShortcut, enterShortcut, arrowsShortcut);
+  
+  // Create clear button
+  const clearButton = document.createElement('button');
+  clearButton.type = 'button';
+  clearButton.className = 'clear-recent-button';
+  clearButton.textContent = 'Clear recent searches';
+  clearButton.addEventListener('click', () => {
+    recentSearches.clearAll();
+    // Re-render the dialog to show empty state
+    const event = new CustomEvent('refresh-dialog');
+    window.dispatchEvent(event);
+  });
+  
+  footer.append(shortcutsContainer, clearButton);
+  wrapper.append(footer);
+  
   return wrapper;
 }
 
