@@ -18,6 +18,14 @@ import {
   isPersonRecord,
 } from '../types';
 import { settingsStore } from '../state/settingsStore';
+import { 
+  matchesMonetaryQuery as matchesMonetaryValue, 
+  extractMonetaryAmounts, 
+  hasMonetaryValue,
+  parseMonetaryString,
+  numberToMonetary,
+  areMonetaryValuesEqual
+} from '../utils/monetary';
 
 const GROUP_ORDER: SearchEntityType[] = [
   'Buildertrend',
@@ -244,135 +252,76 @@ function isNumericQuery(query: string): boolean {
 }
 
 function hasMonetaryPotential(query: string): boolean {
-  const tokens = tokenize(query);
-  // Check if query contains numeric tokens that could match monetary values
-  return tokens.some(token => {
-    // Match pure numbers, numbers with commas, currency symbols, or alphanumeric with numbers
-    return /^\d+(,\d{3})*(\.\d+)?$/.test(token) || 
-           /^\d+(\.\d+)?$/.test(token) ||
-           /^\$?\d+(,\d{3})*(\.\d+)?$/.test(token) ||
-           /\d/.test(token); // Any token containing a digit
-  });
+  return hasMonetaryValue(query);
 }
 
-function normalizeMonetaryValue(value: number | string): string {
-  // Convert to number first to handle any string inputs
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  
-  // Handle NaN or invalid numbers
-  if (isNaN(num)) {
-    return '';
-  }
-  
-  // Normalize to remove trailing zeros and unnecessary decimal places
-  // e.g., 123.00 -> 123, 123.40 -> 123.4, 123.45 -> 123.45
-  return num.toString();
-}
-
-function parseCurrencyString(amountStr: string): number | null {
-  // Remove currency symbols, commas, and whitespace
-  const cleaned = amountStr.replace(/[$,\s]/g, '');
-  
-  // Handle range queries (e.g., "100-200", "100 to 200")
-  if (cleaned.includes('-') || cleaned.toLowerCase().includes(' to ')) {
-    return null; // Will be handled separately
-  }
-  
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? null : parsed;
-}
-
-function normalizeForComparison(value: number | string): string {
-  // Convert to string and remove commas and currency symbols for consistent comparison
-  const str = typeof value === 'string' ? value : value.toString();
-  return str.replace(/[,$]/g, '');
-}
+// Old monetary functions removed - now using monetary utility module
 
 function matchesMonetaryString(queryStr: string, dataValue: number): boolean {
-  // Normalize both query and data value for comparison
-  const normalizedQuery = normalizeForComparison(queryStr);
-  const normalizedData = normalizeForComparison(dataValue.toString());
+  return matchesMonetaryValue(queryStr, dataValue);
+}
+
+/**
+ * Determines which monetary matches will be visible (highlighted) in the UI
+ * This helps prioritize results that users can actually see the match in
+ */
+function getVisibleMonetaryMatches(record: FinancialRecord, query: string): {
+  hasVisibleMatches: boolean;
+  hasExactVisibleMatches: boolean;
+  visibleMatchTypes: string[];
+} {
+  const { amounts } = extractMonetaryTokens(query);
   
-  // Check for exact string match (handles comma differences)
-  if (normalizedQuery === normalizedData) {
-    return true;
+  if (amounts.length === 0) {
+    return { hasVisibleMatches: false, hasExactVisibleMatches: false, visibleMatchTypes: [] };
   }
   
-  // UX Principle: The more explicit the user input, the more restrictive we should be
-  // Analyze the specificity of the query to determine matching behavior
+  const visibleMatchTypes: string[] = [];
+  let hasVisibleMatches = false;
+  let hasExactVisibleMatches = false;
   
-  const queryHasDecimal = queryStr.includes('.');
-  const queryDigitsAfterDecimal = queryHasDecimal ? queryStr.split('.')[1]?.length || 0 : 0;
-  const querySignificantDigits = normalizedQuery.length;
-  
-  // If user provided decimals (like $800.00), be very restrictive
-  if (queryHasDecimal) {
-    // For queries with explicit decimals, only match if:
-    // 1. Exact match (already handled above)
-    // 2. The data value starts with the same significant digits in the same positions
-    //    and the precision doesn't conflict
-    
-    // Convert data value to same precision as query for comparison
-    const dataAsDecimal = dataValue.toString();
-    const dataHasDecimal = dataAsDecimal.includes('.');
-    
-      if (queryDigitsAfterDecimal > 0) {
-        // User specified decimal places - be very precise
-        const queryWithoutTrailingZeros = normalizedQuery.replace(/0+$/, '');
-        const dataWithoutTrailingZeros = normalizedData.replace(/0+$/, '');
-        
-        // Only match if the significant digits align exactly
-        // For decimal queries, be very restrictive - only exact matches or where data is a prefix of query
-        return dataWithoutTrailingZeros === queryWithoutTrailingZeros ||
-               (dataWithoutTrailingZeros.length <= queryWithoutTrailingZeros.replace(/\.$/, '').length && 
-                queryWithoutTrailingZeros.replace(/\.$/, '').startsWith(dataWithoutTrailingZeros));
-    } else {
-      // User typed something like "$800." - match whole numbers starting with those digits
-      return normalizedData.startsWith(normalizedQuery);
+  // Check if total value will be highlighted (visible in the main record display)
+  for (const queryAmount of amounts) {
+    if (record.totalValue === queryAmount) {
+      visibleMatchTypes.push('totalValue');
+      hasVisibleMatches = true;
+      hasExactVisibleMatches = true;
+    } else if (matchesMonetaryValue(query, record.totalValue)) {
+      visibleMatchTypes.push('totalValue');
+      hasVisibleMatches = true;
     }
   }
   
-  // For queries without decimals, apply progressive restriction based on specificity
-  if (querySignificantDigits >= 4) {
-    // 4+ digits (like "8000") - very restrictive, must start with exact digits
-    // For very long queries, be extremely restrictive - only allow exact matches or longer values that start with the query
-    if (normalizedData.length >= querySignificantDigits) {
-      return normalizedData.startsWith(normalizedQuery);
-    } else {
-      // Don't allow shorter values to match longer queries for 4+ digits
-      // This prevents "6" from matching "696013456"
-      return false;
-    }
-  } else if (querySignificantDigits >= 3) {
-    // 3 digits (like "123") - be more restrictive for explicit monetary queries
-    // Only match if:
-    // 1. Exact match (already handled above)
-    // 2. Data value is longer and starts with the query AND has zeros after (e.g., 123 matches 1230, 12300, but NOT 1233, 1234)
-    // 3. Do NOT match shorter values - user provided 3 digits, so be restrictive
-    if (normalizedData.length > querySignificantDigits) {
-      // Data is longer - only match if it starts with query AND the next digit is 0
-      // This prevents 123 from matching 1233, 1234, etc.
-      if (normalizedData.startsWith(normalizedQuery)) {
-        const nextDigit = normalizedData[querySignificantDigits];
-        return nextDigit === '0';
+  // Check if any line items will be highlighted (visible in the line items table)
+  for (const lineItem of record.lineItems) {
+    for (const queryAmount of amounts) {
+      // Check line item total
+      if (lineItem.lineItemTotal === queryAmount) {
+        visibleMatchTypes.push('lineItemTotal');
+        hasVisibleMatches = true;
+        hasExactVisibleMatches = true;
+      } else if (matchesMonetaryValue(query, lineItem.lineItemTotal)) {
+        visibleMatchTypes.push('lineItemTotal');
+        hasVisibleMatches = true;
       }
-      return false;
-    } else {
-      // Same length or shorter - only exact match (already handled above)
-      return false;
+      
+      // Check line item unit price
+      if (lineItem.lineItemUnitPrice === queryAmount) {
+        visibleMatchTypes.push('lineItemUnitPrice');
+        hasVisibleMatches = true;
+        hasExactVisibleMatches = true;
+      } else if (matchesMonetaryValue(query, lineItem.lineItemUnitPrice)) {
+        visibleMatchTypes.push('lineItemUnitPrice');
+        hasVisibleMatches = true;
+      }
     }
-  } else if (querySignificantDigits >= 2) {
-    // 2 digits (like "80") - moderate restriction, must start with same 2 digits
-    if (normalizedData.length >= 2) {
-      return normalizedData.startsWith(normalizedQuery);
-    } else {
-      return normalizedQuery.startsWith(normalizedData);
-    }
-  } else {
-    // 1 digit (like "8") - most restrictive, only exact first digit match
-    // This is the "first digit" rule - only for single digit queries
-    return normalizedData[0] === normalizedQuery[0];
   }
+  
+  return {
+    hasVisibleMatches,
+    hasExactVisibleMatches,
+    visibleMatchTypes: [...new Set(visibleMatchTypes)] // Remove duplicates
+  };
 }
 
 function isCloseMatch(value1: number, value2: number, tolerance: number = 0.01): boolean {
@@ -417,11 +366,17 @@ function extractMonetaryTokens(query: string): { amounts: number[]; textTokens: 
     return { amounts, textTokens, range };
   }
   
+  // Use the new monetary utility to extract amounts
+  const monetaryAmounts = extractMonetaryAmounts(query);
+  for (const monetary of monetaryAmounts) {
+    // Convert from cents back to dollars for compatibility
+    amounts.push(monetary.amount / 100);
+  }
+  
+  // Add non-monetary tokens
   for (const token of tokens) {
-    const parsed = parseCurrencyString(token);
-    if (parsed !== null) {
-      amounts.push(parsed);
-    } else {
+    const parsed = parseMonetaryString(token);
+    if (!parsed) {
       textTokens.push(token);
     }
   }
@@ -534,16 +489,32 @@ function matchesMonetaryQuery(record: SearchRecord, query: string): boolean {
   }
 
   // For non-explicit monetary searches (like "123"), allow text token matching
-  // but still be more restrictive about what we match against
+  // but ONLY match against fields marked as monetary in the metadata
   if (textTokens.length > 0) {
     for (const lineItem of financialRecord.lineItems) {
-      // Only match against line item titles and types, not descriptions or quantities
-      const lineItemText = [
-        lineItem.lineItemTitle,
-        lineItem.lineItemType
-      ].join(' ').toLowerCase();
-
-      if (textTokens.every(token => lineItemText.includes(token))) {
+      // Only match against fields marked as monetary in the metadata
+      const monetaryFields: string[] = [];
+      
+      if (lineItem.fieldMetadata) {
+        // Check each field and only include monetary ones
+        if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
+          monetaryFields.push(lineItem.lineItemTitle);
+        }
+        if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
+          monetaryFields.push(lineItem.lineItemDescription);
+        }
+        if (lineItem.fieldMetadata.lineItemType === 'monetary') {
+          monetaryFields.push(lineItem.lineItemType);
+        }
+      } else {
+        // Fallback: if no metadata, only match against monetary value fields
+        // This ensures backward compatibility
+        monetaryFields.push(lineItem.lineItemType); // Only type field for now
+      }
+      
+      const lineItemText = monetaryFields.join(' ').toLowerCase();
+      
+      if (lineItemText && textTokens.every(token => lineItemText.includes(token))) {
         return true;
       }
     }
@@ -779,6 +750,34 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
   const financialRecord = record;
   let score = 0;
   
+  // Enhanced scoring: prioritize matches that will be highlighted in the UI
+  const visibleMatches = getVisibleMonetaryMatches(financialRecord, query);
+  
+  // Boost score for records with visible matches
+  if (visibleMatches.hasVisibleMatches) {
+    score += 2000; // High boost for visible matches
+    
+    // Additional scoring based on match types
+    for (const matchType of visibleMatches.visibleMatchTypes) {
+      switch (matchType) {
+        case 'totalValue':
+          score += 500; // High priority for total value matches (most visible)
+          break;
+        case 'lineItemTotal':
+          score += 300; // Medium priority for line item totals
+          break;
+        case 'lineItemUnitPrice':
+          score += 200; // Lower priority for unit prices
+          break;
+      }
+    }
+  }
+  
+  // Additional boost for exact visible matches
+  if (visibleMatches.hasExactVisibleMatches) {
+    score += 1000; // Extra boost for exact visible matches
+  }
+  
   // Handle range queries
   if (range) {
     // Check total value range matches
@@ -876,27 +875,52 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
   
   if (!isExplicitMonetary && textTokens.length > 0) {
     // For non-explicit monetary searches (like "123"), allow text token matching
-    // but still be more restrictive about what we match against
+    // but ONLY match against fields marked as monetary in the metadata
     for (const lineItem of financialRecord.lineItems) {
-      // Only match against line item titles and types, not descriptions or quantities
-      const lineItemText = [
-        lineItem.lineItemTitle,
-        lineItem.lineItemType
-      ].join(' ').toLowerCase();
+      // Only match against fields marked as monetary in the metadata
+      const monetaryFields: string[] = [];
       
-      const lineItemMatches = textTokens.filter(token => lineItemText.includes(token)).length;
-      score += lineItemMatches * 50;
+      if (lineItem.fieldMetadata) {
+        // Check each field and only include monetary ones
+        if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
+          monetaryFields.push(lineItem.lineItemTitle);
+        }
+        if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
+          monetaryFields.push(lineItem.lineItemDescription);
+        }
+        if (lineItem.fieldMetadata.lineItemType === 'monetary') {
+          monetaryFields.push(lineItem.lineItemType);
+        }
+      } else {
+        // Fallback: if no metadata, only match against monetary value fields
+        // This ensures backward compatibility
+        monetaryFields.push(lineItem.lineItemType); // Only type field for now
+      }
+      
+      const lineItemText = monetaryFields.join(' ').toLowerCase();
+      
+      if (lineItemText) {
+        const lineItemMatches = textTokens.filter(token => lineItemText.includes(token)).length;
+        score += lineItemMatches * 50;
+      }
     }
     
     // Small bonus for title/summary matches in financial records
-    const titleLower = record.title.toLowerCase();
-    const summaryLower = record.summary.toLowerCase();
-    
-    const titleMatches = textTokens.filter(token => titleLower.includes(token)).length;
-    score += titleMatches * 10;
-    
-    const summaryMatches = textTokens.filter(token => summaryLower.includes(token)).length;
-    score += summaryMatches * 5;
+    // Only if they are marked as monetary in metadata
+    if (financialRecord.fieldMetadata) {
+      const titleLower = record.title.toLowerCase();
+      const summaryLower = record.summary.toLowerCase();
+      
+      if (financialRecord.fieldMetadata.title === 'monetary') {
+        const titleMatches = textTokens.filter(token => titleLower.includes(token)).length;
+        score += titleMatches * 10;
+      }
+      
+      if (financialRecord.fieldMetadata.summary === 'monetary') {
+        const summaryMatches = textTokens.filter(token => summaryLower.includes(token)).length;
+        score += summaryMatches * 5;
+      }
+    }
   }
   
   return score;
@@ -1141,6 +1165,22 @@ function wait(ms: number): Promise<void> {
   });
 }
 
+/**
+ * Generate a normally distributed random number using Box-Muller transform
+ * @param mean - The mean of the distribution
+ * @param variance - The variance of the distribution
+ * @returns A random number from the normal distribution
+ */
+function generateNormalRandom(mean: number, variance: number): number {
+  // Box-Muller transform
+  const u1 = Math.random();
+  const u2 = Math.random();
+  const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  
+  // Convert to our desired mean and variance
+  return mean + z0 * Math.sqrt(variance);
+}
+
 export async function runSearch(
   options: SearchOptions,
   overrides?: {
@@ -1149,7 +1189,8 @@ export async function runSearch(
   },
 ): Promise<SearchResponse> {
   const settings = settingsStore.getState();
-  const delay = overrides?.delayMs ?? settings.searchDelayMs;
+  const meanDelay = overrides?.delayMs ?? settings.searchDelayMs;
+  const variance = settings.searchDelayVarianceMs;
   const groupLimits = overrides?.groupLimits ?? settings.groupLimits;
 
   const { isMonetary } = parseMonetaryQuery(options.query);
@@ -1165,8 +1206,10 @@ export async function runSearch(
   const fullGroups = buildGroups(records, groupBy);
   const limitedGroups = applyGroupLimits(fullGroups, groupLimits);
 
-  // Reduce delay for better responsiveness, especially for short queries
-  const effectiveDelay = options.query.trim().length < 3 ? Math.min(delay, 50) : delay;
+  // Generate random delay using normal distribution
+  const randomDelay = generateNormalRandom(meanDelay, variance);
+  // Ensure delay is non-negative and reduce for short queries
+  const effectiveDelay = Math.max(0, options.query.trim().length < 3 ? Math.min(randomDelay, 50) : randomDelay);
   await wait(effectiveDelay);
 
   return {

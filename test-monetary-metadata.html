@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monetary Metadata Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-results {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .warning {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Monetary Search Metadata Test</h1>
+        <p>This test verifies that monetary searches (like "$12") no longer match non-monetary fields (like "12 units", "12 closets", etc.).</p>
+        
+        <button class="test-button" onclick="runTest()">Run Test</button>
+        
+        <div id="test-results" class="test-results" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        // Import the search service
+        import { runSearch } from './src/data/searchService.ts';
+        
+        // Make runSearch available globally
+        window.runSearch = runSearch;
+        
+        async function testMonetaryMetadata() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = 'Running test...\n';
+            
+            let output = 'Testing monetary search with field metadata...\n\n';
+            
+            try {
+                // Test 1: Search for "$12" - should NOT match "12 units", "12 closets", etc.
+                output += 'Test 1: Searching for "$12" (explicit monetary search)\n';
+                
+                const result1 = await runSearch({ query: '$12' });
+                output += `Found ${result1.totalResults} results\n`;
+                
+                // Check if any results contain "12 units" or similar non-monetary matches
+                let hasNonMonetaryMatches = false;
+                result1.records.forEach(record => {
+                    if (record.entityType === 'Bill' || record.entityType === 'ClientInvoice' || 
+                        record.entityType === 'PurchaseOrder' || record.entityType === 'Receipt' || 
+                        record.entityType === 'Payment') {
+                        record.lineItems.forEach(lineItem => {
+                            if (lineItem.lineItemTitle.includes('12 units') || 
+                                lineItem.lineItemTitle.includes('12 closets') ||
+                                lineItem.lineItemTitle.includes('12 bathrooms') ||
+                                lineItem.lineItemTitle.includes('12 fixtures')) {
+                                hasNonMonetaryMatches = true;
+                                output += `❌ Found non-monetary match: ${lineItem.lineItemTitle}\n`;
+                            }
+                        });
+                    }
+                });
+                
+                if (!hasNonMonetaryMatches) {
+                    output += '✅ No non-monetary matches found for "$12" search\n';
+                }
+                
+                output += '\n' + '='.repeat(50) + '\n\n';
+                
+                // Test 2: Search for "12" (non-explicit monetary search)
+                output += 'Test 2: Searching for "12" (non-explicit monetary search)\n';
+                const result2 = await runSearch({ query: '12' });
+                output += `Found ${result2.totalResults} results\n`;
+                
+                // Check if results are more focused on monetary fields
+                let monetaryMatches = 0;
+                let nonMonetaryMatches = 0;
+                
+                result2.records.forEach(record => {
+                    if (record.entityType === 'Bill' || record.entityType === 'ClientInvoice' || 
+                        record.entityType === 'PurchaseOrder' || record.entityType === 'Receipt' || 
+                        record.entityType === 'Payment') {
+                        record.lineItems.forEach(lineItem => {
+                            // Check if the match is in a monetary field
+                            if (lineItem.fieldMetadata) {
+                                if (lineItem.fieldMetadata.lineItemTitle === 'monetary' && 
+                                    lineItem.lineItemTitle.includes('12')) {
+                                    monetaryMatches++;
+                                    output += `✅ Monetary field match: ${lineItem.lineItemTitle}\n`;
+                                } else if (lineItem.fieldMetadata.lineItemTitle === 'non-monetary' && 
+                                           lineItem.lineItemTitle.includes('12')) {
+                                    nonMonetaryMatches++;
+                                    output += `❌ Non-monetary field match: ${lineItem.lineItemTitle}\n`;
+                                }
+                            }
+                        });
+                    }
+                });
+                
+                output += `\nMonetary field matches: ${monetaryMatches}\n`;
+                output += `Non-monetary field matches: ${nonMonetaryMatches}\n`;
+                
+                if (nonMonetaryMatches === 0) {
+                    output += '✅ No non-monetary field matches found for "12" search\n';
+                } else {
+                    output += '⚠️  Some non-monetary field matches still found\n';
+                }
+                
+                output += '\n' + '='.repeat(50) + '\n\n';
+                
+                // Test 3: Search for "$120" - should match actual $120 amounts
+                output += 'Test 3: Searching for "$120" (should match actual $120 amounts)\n';
+                const result3 = await runSearch({ query: '$120' });
+                output += `Found ${result3.totalResults} results\n`;
+                
+                let foundActual120 = false;
+                result3.records.forEach(record => {
+                    if (record.entityType === 'Bill' || record.entityType === 'ClientInvoice' || 
+                        record.entityType === 'PurchaseOrder' || record.entityType === 'Receipt' || 
+                        record.entityType === 'Payment') {
+                        // Check total value
+                        if (record.totalValue === 120) {
+                            foundActual120 = true;
+                            output += `✅ Found $120 total value match: ${record.title}\n`;
+                        }
+                        
+                        // Check line items
+                        record.lineItems.forEach(lineItem => {
+                            if (lineItem.lineItemTotal === 120 || lineItem.lineItemUnitPrice === 120) {
+                                foundActual120 = true;
+                                output += `✅ Found $120 line item match: ${lineItem.lineItemTitle} - $${lineItem.lineItemTotal}\n`;
+                            }
+                        });
+                    }
+                });
+                
+                if (foundActual120) {
+                    output += '✅ Found actual $120 monetary matches\n';
+                } else {
+                    output += 'ℹ️  No $120 amounts found in current corpus\n';
+                }
+                
+                // Summary
+                output += '\n' + '='.repeat(50) + '\n';
+                output += 'TEST SUMMARY:\n';
+                if (!hasNonMonetaryMatches && nonMonetaryMatches === 0) {
+                    output += '✅ SUCCESS: Monetary searches no longer match non-monetary fields!\n';
+                } else {
+                    output += '❌ ISSUE: Some non-monetary matches still found\n';
+                }
+                
+            } catch (error) {
+                output += `❌ Error running test: ${error.message}\n`;
+                console.error('Test error:', error);
+            }
+            
+            resultsDiv.innerHTML = output;
+        }
+        
+        // Make test function available globally
+        window.runTest = testMonetaryMetadata;
+    </script>
+</body>
+</html>

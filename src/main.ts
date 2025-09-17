@@ -7,6 +7,7 @@ import { createSettingsView } from './components/settingsView';
 import { createHomeSkeleton } from './components/homeSkeleton';
 import { appState, AppState } from './state/appState';
 import { runSearch } from './data/searchService';
+import { recentSearches } from './data/recentSearches';
 import { ScreenRoute } from './types';
 import { getEffectiveQueryLength, MIN_EFFECTIVE_QUERY_LENGTH } from './utils/query';
 
@@ -102,10 +103,52 @@ const header = createHeader({
     // Defer closing to outside-click + escape handlers.
   },
   onSearchKeyDown: (event) => {
+    console.log('🔍 Header onSearchKeyDown:', {
+      key: event.key,
+      target: event.target,
+      dialogOpen: appState.getState().dialogOpen
+    });
+
+    // Handle CMD/CTRL+Enter for "See all results" when search input is focused
+    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && appState.getState().dialogOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      navigate('results');
+      void performSearch(appState.getState().searchQuery, { openDialog: false });
+      return;
+    }
+
     if (event.key === 'Escape') {
+      console.log('🎯 Header: handling Escape');
       appState.setDialogOpen(false);
       header.searchInput.blur();
     }
+
+          // Handle arrow keys when dialog is open and we have results
+          if (appState.getState().dialogOpen && appState.getState().recentResponse &&
+              (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+            console.log('🎯 Header: handling arrow key, blurring input');
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Blur the input to remove focus
+            header.searchInput.blur();
+
+            // Focus the dialog so it can receive subsequent keyboard events
+            const dialog = document.querySelector('.search-dialog') as HTMLElement;
+            if (dialog) {
+              dialog.focus();
+            }
+
+            // Let the search dialog handle the navigation
+            // We'll dispatch a custom event to trigger navigation
+            const customEvent = new KeyboardEvent('keydown', {
+              key: event.key,
+              bubbles: true,
+              cancelable: true
+            });
+            document.dispatchEvent(customEvent);
+          }
   },
 });
 
@@ -122,6 +165,7 @@ searchDialog.setState({
   status: appState.getState().searchStatus,
   query: appState.getState().searchQuery,
   response: appState.getState().recentResponse,
+  selectedIndex: -1,
 });
 
 const resultsView = createResultsView({
@@ -247,6 +291,8 @@ async function performSearch(
 
     if (updateSubmitted) {
       appState.setLastSubmittedQuery(trimmed);
+      // Record the search in recent searches when it's a submitted query
+      recentSearches.addSearch(trimmed, response.totalResults);
     }
 
     if (openDialog && appState.getState().route === 'home') {
@@ -278,6 +324,12 @@ function focusSearchBar() {
 }
 
 function handleGlobalKeydown(event: KeyboardEvent) {
+  console.log('🌍 Global keydown:', {
+    key: event.key,
+    target: event.target,
+    dialogOpen: appState.getState().dialogOpen
+  });
+
   const target = event.target as HTMLElement | null;
   const isEditable =
     target &&
@@ -286,20 +338,29 @@ function handleGlobalKeydown(event: KeyboardEvent) {
       target.isContentEditable);
 
   if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditable) {
+    console.log('🎯 Global: handling / key');
     event.preventDefault();
     focusSearchBar();
     return;
   }
 
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+    console.log('🎯 Global: handling Cmd/Ctrl+K');
     event.preventDefault();
     focusSearchBar();
     return;
   }
 
   if (event.key === 'Escape' && appState.getState().dialogOpen) {
+    console.log('🎯 Global: handling Escape');
     appState.setDialogOpen(false);
     header.searchInput.blur();
+  }
+
+  // Handle arrow keys when dialog is open
+  if (appState.getState().dialogOpen && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+    console.log('🎯 Global: handling arrow key in dialog');
+    // Don't prevent default here, let the search dialog handle it
   }
 }
 
@@ -346,12 +407,15 @@ appState.subscribe((state) => {
     previousState.recentResponse !== state.recentResponse;
 
   if (dialogStateChanged) {
+    // Only reset selectedIndex if the query actually changed
+    const queryChanged = !previousState || previousState.searchQuery !== state.searchQuery;
     searchDialog.setState({
       visible: state.dialogOpen && state.route === 'home',
       status: state.searchStatus,
       query: state.searchQuery,
       response: state.recentResponse,
       isMonetarySearch: isMonetaryQuery(state.searchQuery),
+      selectedIndex: queryChanged ? -1 : (previousState?.selectedIndex ?? -1), // Preserve existing selection or default to -1
     });
   }
 
@@ -380,6 +444,22 @@ appState.subscribe((state) => {
 
 document.addEventListener('keydown', handleGlobalKeydown);
 document.addEventListener('mousedown', handleDocumentClick);
+
+// Handle custom search-query events from recent searches
+function handleSearchQueryEvent(event: CustomEvent) {
+  const query = event.detail?.query;
+  if (query && typeof query === 'string') {
+    // Set the search query and trigger a search
+    appState.setSearchQuery(query);
+    header.setMonetarySearchMode(isMonetaryQuery(query));
+    navigate('results');
+    void performSearch(query, { openDialog: false });
+  }
+}
+
+// Register event listener on both document and window
+document.addEventListener('search-query', handleSearchQueryEvent, true);
+window.addEventListener('search-query', handleSearchQueryEvent, true);
 
 // Initialize Lucide icons - simplified to prevent loops
 document.addEventListener('DOMContentLoaded', () => {

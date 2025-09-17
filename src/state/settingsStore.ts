@@ -3,12 +3,14 @@ import { createStore } from './store';
 
 export interface SettingsState {
   searchDelayMs: number;
+  searchDelayVarianceMs: number;
   groupLimits: Record<string, number>;
   lineItemsContextCount: number;
   showLineItemsByDefault: boolean;
   collapseIrrelevantLineItems: boolean;
   lineItemsCollapseThreshold: number;
   maxFacetValues: number;
+  recentSearchesDisplayLimit: number;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -18,11 +20,13 @@ function normalize(state: SettingsState): SettingsState {
   return {
     ...state,
     groupLimits: { ...state.groupLimits },
+    searchDelayVarianceMs: state.searchDelayVarianceMs ?? 10,
     lineItemsContextCount: state.lineItemsContextCount ?? 3,
     showLineItemsByDefault: state.showLineItemsByDefault ?? true,
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
     maxFacetValues: state.maxFacetValues ?? 5,
+    recentSearchesDisplayLimit: state.recentSearchesDisplayLimit ?? 5,
   };
 }
 

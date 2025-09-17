@@ -1,5 +1,6 @@
 {
   "searchDelayMs": 100,
+  "searchDelayVarianceMs": 10,
   "groupLimits": {
     "Document": 4,
     "ClientInvoice": 4,
@@ -14,5 +15,6 @@
   "showLineItemsByDefault": true,
   "collapseIrrelevantLineItems": true,
   "lineItemsCollapseThreshold": 5,
-  "maxFacetValues": 5
+  "maxFacetValues": 5,
+  "recentSearchesDisplayLimit": 5
 }

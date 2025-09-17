@@ -20,6 +20,16 @@ export interface LineItem {
   lineItemUnitPrice: number;
   lineItemTotal: number;
   lineItemType: LineItemType;
+  // Metadata to mark which fields are monetary for search purposes
+  fieldMetadata?: {
+    lineItemTitle: 'monetary' | 'non-monetary';
+    lineItemDescription: 'monetary' | 'non-monetary';
+    lineItemQuantity: 'monetary' | 'non-monetary';
+    lineItemQuantityUnitOfMeasure: 'monetary' | 'non-monetary';
+    lineItemUnitPrice: 'monetary' | 'non-monetary';
+    lineItemTotal: 'monetary' | 'non-monetary';
+    lineItemType: 'monetary' | 'non-monetary';
+  };
 }
 
 export interface SearchRecordBase {
@@ -47,6 +57,12 @@ export interface FinancialRecord extends SearchRecordBase {
   issuedDate: string;
   dueDate?: string;
   lineItems: LineItem[];
+  // Metadata to mark which fields are monetary for search purposes
+  fieldMetadata?: {
+    title: 'monetary' | 'non-monetary';
+    summary: 'monetary' | 'non-monetary';
+    totalValue: 'monetary' | 'non-monetary';
+  };
 }
 
 export type PersonType = 'Client' | 'Contact';

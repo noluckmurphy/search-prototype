@@ -30,7 +30,7 @@ export function createSettingsView(): SettingsViewHandles {
   const delayField = document.createElement('div');
   delayField.className = 'settings-field';
   delayField.innerHTML = `
-    <label for="search-delay">Simulated search delay (ms)</label>
+    <label for="search-delay">Simulated search delay mean (ms)</label>
   `;
 
   const delayInput = document.createElement('input');
@@ -41,6 +41,40 @@ export function createSettingsView(): SettingsViewHandles {
 
   delayField.append(delayInput);
   overallSection.append(delayField);
+
+  const varianceField = document.createElement('div');
+  varianceField.className = 'settings-field';
+  varianceField.innerHTML = `
+    <label for="search-delay-variance">Search delay variance (ms)</label>
+  `;
+
+  const varianceInput = document.createElement('input');
+  varianceInput.id = 'search-delay-variance';
+  varianceInput.type = 'number';
+  varianceInput.min = '0';
+  varianceInput.step = '1';
+
+  varianceField.append(varianceInput);
+  overallSection.append(varianceField);
+
+  const recentSearchesField = document.createElement('div');
+  recentSearchesField.className = 'settings-field';
+  recentSearchesField.innerHTML = `
+    <label for="recent-searches-limit">Recent searches to display</label>
+  `;
+
+  const recentSearchesSelect = document.createElement('select');
+  recentSearchesSelect.id = 'recent-searches-limit';
+  recentSearchesSelect.innerHTML = `
+    <option value="3">3 searches</option>
+    <option value="5">5 searches</option>
+    <option value="7">7 searches</option>
+    <option value="10">10 searches</option>
+    <option value="15">15 searches</option>
+  `;
+
+  recentSearchesField.append(recentSearchesSelect);
+  overallSection.append(recentSearchesField);
 
   // Full Results Page Settings Section
   const resultsSection = document.createElement('fieldset');
@@ -192,6 +226,8 @@ export function createSettingsView(): SettingsViewHandles {
   const render = () => {
     const state = settingsStore.getState();
     delayInput.value = String(state.searchDelayMs);
+    varianceInput.value = String(state.searchDelayVarianceMs);
+    recentSearchesSelect.value = String(state.recentSearchesDisplayLimit);
     lineItemsContextSelect.value = String(state.lineItemsContextCount);
     showLineItemsCheckbox.checked = state.showLineItemsByDefault;
     collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
@@ -206,6 +242,9 @@ export function createSettingsView(): SettingsViewHandles {
     const nextDelay = Number.parseInt(delayInput.value, 10);
     const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
 
+    const nextVariance = Number.parseInt(varianceInput.value, 10);
+    const resolvedVariance = Number.isFinite(nextVariance) && nextVariance >= 0 ? nextVariance : 10;
+
     const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
     const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
 
@@ -215,6 +254,9 @@ export function createSettingsView(): SettingsViewHandles {
     const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
     const resolvedMaxFacetValues = Number.isFinite(maxFacetValues) && maxFacetValues >= 0 ? maxFacetValues : 5;
 
+    const recentSearchesLimit = Number.parseInt(recentSearchesSelect.value, 10);
+    const resolvedRecentSearchesLimit = Number.isFinite(recentSearchesLimit) && recentSearchesLimit >= 0 ? recentSearchesLimit : 5;
+
     const groupLimits: Record<string, number> = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -223,11 +265,13 @@ export function createSettingsView(): SettingsViewHandles {
 
     settingsStore.update({
       searchDelayMs: resolvedDelay,
+      searchDelayVarianceMs: resolvedVariance,
       lineItemsContextCount: resolvedLineItemsContext,
       showLineItemsByDefault: showLineItemsCheckbox.checked,
       collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
       lineItemsCollapseThreshold: resolvedCollapseThreshold,
       maxFacetValues: resolvedMaxFacetValues,
+      recentSearchesDisplayLimit: resolvedRecentSearchesLimit,
       groupLimits,
     });
 

@@ -22,7 +22,7 @@ declare global {
 }
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
-import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
+import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid, highlightMonetaryValuesWithPartialMatches } from '../utils/highlight';
 import { settingsStore } from '../state/settingsStore';
 import { MIN_EFFECTIVE_QUERY_LENGTH, isQueryTooShort } from '../utils/query';
 
@@ -40,10 +40,10 @@ function hasMonetaryPotential(query: string): boolean {
 // Helper function to determine which highlighting function to use
 function getHighlightFunction(query: string, isMonetarySearch: boolean) {
   if (isMonetarySearch) {
-    return highlightMonetaryValues;
-  } else if (hasMonetaryPotential(query)) {
-    return highlightHybrid;
+    return highlightMonetaryValuesWithPartialMatches;
   } else {
+    // For non-monetary searches, always use regular text highlighting
+    // This prevents monetary highlighting classes from being applied to non-monetary searches
     return highlightText;
   }
 }
@@ -221,7 +221,8 @@ function renderFacets(
 
   if (status === 'idle') {
     container.classList.add('is-empty');
-    container.textContent = 'Facet breakdowns will appear once you run a search.';
+    // Show pro tips instead of simple helper text
+    container.innerHTML = renderFacetProTips('idle');
     return;
   }
 
@@ -239,14 +240,16 @@ function renderFacets(
 
   if (!response || !response.facets) {
     container.classList.add('is-empty');
-    container.textContent = 'No facet data for the current results.';
+    // Show pro tips instead of simple helper text
+    container.innerHTML = renderFacetProTips('empty');
     return;
   }
 
   const facetsEntries = Object.entries(response.facets) as [FacetKey, FacetValue[]][];
   if (facetsEntries.length === 0) {
     container.classList.add('is-empty');
-    container.textContent = 'No facet data for the current results.';
+    // Show pro tips instead of simple helper text
+    container.innerHTML = renderFacetProTips('no-results');
     return;
   }
 
@@ -295,7 +298,12 @@ function renderFacets(
 
       const text = document.createElement('span');
       text.className = 'facet-checkbox__text';
-      text.textContent = facet.value;
+      // Format entity type facet values for better display
+      if (key === 'entityType') {
+        text.textContent = formatEntityType(facet.value as any);
+      } else {
+        text.textContent = facet.value;
+      }
 
       const count = document.createElement('span');
       count.className = 'facet-checkbox__count';
@@ -364,10 +372,24 @@ function renderGroups(
   container.innerHTML = '';
 
   if (status === 'idle') {
-    const message = isQueryTooShort(query)
-      ? `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`
-      : 'Run a search to populate full results.';
-    container.innerHTML = `<p class="results-view__empty">${message}</p>`;
+    if (isQueryTooShort(query)) {
+      // Show pro tips for short queries - hide facets entirely
+      const message = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`;
+      container.innerHTML = renderProTipsState(message, 'idle');
+      // Hide the facets container for idle state
+      const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
+      if (facetsContainer) {
+        facetsContainer.style.display = 'none';
+      }
+    } else {
+      // Show empty state with pro tips - no heading message
+      container.innerHTML = renderProTipsState('', 'empty');
+      // Hide the facets container for empty state
+      const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
+      if (facetsContainer) {
+        facetsContainer.style.display = 'none';
+      }
+    }
     return;
   }
 
@@ -384,8 +406,20 @@ function renderGroups(
   }
 
   if (!response || !response.fullGroups.length) {
-    container.innerHTML = `<p class="results-view__empty">No results for "${query}". Adjust search terms or facets.</p>`;
+    // Show no results state with pro tips instead of simple message - hide facets entirely
+    container.innerHTML = renderProTipsState('No results found', 'no-results', query);
+    // Hide the facets container for no results state
+    const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
+    if (facetsContainer) {
+      facetsContainer.style.display = 'none';
+    }
     return;
+  }
+
+  // Show facets container again when we have results
+  const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
+  if (facetsContainer) {
+    facetsContainer.style.display = '';
   }
 
   // If results are grouped, render groups; otherwise render as flat list
@@ -432,6 +466,9 @@ function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, is
 
 function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement {
   const card = document.createElement('article');
+  
+  // Add document ID metadata for debugging
+  card.setAttribute('data-document-id', item.id);
   
   // Add Buildertrend-specific styling
   if (isBuildertrendRecord(item)) {
@@ -509,7 +546,7 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
     if (match && match.field !== 'title' && match.field !== 'summary' && !match.field.startsWith('lineItem')) {
       const context = document.createElement('div');
       context.className = 'search-context';
-      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 120, query);
+      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValuesWithPartialMatches(match.content, query) : getContextSnippet(match, 120, query);
       context.innerHTML = `<strong>Matched in ${getFieldLabel(match.field)}:</strong> ${highlightedSnippet}`;
       card.append(context);
     }
@@ -600,15 +637,47 @@ function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch
 
   // Check if any line item has actual highlighting matches
   return items.some((lineItem) => {
-    const searchableFields = [
-      lineItem.lineItemTitle,
-      lineItem.lineItemDescription,
-      lineItem.lineItemType,
-      lineItem.lineItemQuantity?.toString(),
-      lineItem.lineItemQuantityUnitOfMeasure,
-      formatCurrency(lineItem.lineItemUnitPrice),
-      formatCurrency(lineItem.lineItemTotal)
-    ];
+    let searchableFields: string[] = [];
+    
+    if (isMonetarySearch && lineItem.fieldMetadata) {
+      // For monetary searches, only check fields marked as 'monetary' in metadata
+      const monetaryFields: string[] = [];
+      
+      if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
+        monetaryFields.push(lineItem.lineItemTitle);
+      }
+      if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
+        monetaryFields.push(lineItem.lineItemDescription);
+      }
+      if (lineItem.fieldMetadata.lineItemType === 'monetary') {
+        monetaryFields.push(lineItem.lineItemType);
+      }
+      if (lineItem.fieldMetadata.lineItemQuantity === 'monetary') {
+        monetaryFields.push(lineItem.lineItemQuantity?.toString() || '');
+      }
+      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === 'monetary') {
+        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
+      }
+      if (lineItem.fieldMetadata.lineItemUnitPrice === 'monetary') {
+        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      }
+      if (lineItem.fieldMetadata.lineItemTotal === 'monetary') {
+        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
+      }
+      
+      searchableFields = monetaryFields.filter(field => field && field.trim() !== '');
+    } else {
+      // For non-monetary searches, check all fields (backward compatibility)
+      searchableFields = [
+        lineItem.lineItemTitle,
+        lineItem.lineItemDescription,
+        lineItem.lineItemType,
+        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantityUnitOfMeasure,
+        formatCurrency(lineItem.lineItemUnitPrice),
+        formatCurrency(lineItem.lineItemTotal)
+      ].filter(field => field && field.trim() !== '');
+    }
     
     return searchableFields.some((value) => {
       if (!value) return false;
@@ -629,15 +698,47 @@ function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMoneta
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
   
   items.forEach((lineItem: any, index: number) => {
-    const searchableFields = [
-      lineItem.lineItemTitle,
-      lineItem.lineItemDescription,
-      lineItem.lineItemType,
-      lineItem.lineItemQuantity?.toString(),
-      lineItem.lineItemQuantityUnitOfMeasure,
-      formatCurrency(lineItem.lineItemUnitPrice),
-      formatCurrency(lineItem.lineItemTotal)
-    ];
+    let searchableFields: string[] = [];
+    
+    if (isMonetarySearch && lineItem.fieldMetadata) {
+      // For monetary searches, only check fields marked as 'monetary' in metadata
+      const monetaryFields: string[] = [];
+      
+      if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
+        monetaryFields.push(lineItem.lineItemTitle);
+      }
+      if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
+        monetaryFields.push(lineItem.lineItemDescription);
+      }
+      if (lineItem.fieldMetadata.lineItemType === 'monetary') {
+        monetaryFields.push(lineItem.lineItemType);
+      }
+      if (lineItem.fieldMetadata.lineItemQuantity === 'monetary') {
+        monetaryFields.push(lineItem.lineItemQuantity?.toString() || '');
+      }
+      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === 'monetary') {
+        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
+      }
+      if (lineItem.fieldMetadata.lineItemUnitPrice === 'monetary') {
+        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      }
+      if (lineItem.fieldMetadata.lineItemTotal === 'monetary') {
+        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
+      }
+      
+      searchableFields = monetaryFields.filter(field => field && field.trim() !== '');
+    } else {
+      // For non-monetary searches, check all fields (backward compatibility)
+      searchableFields = [
+        lineItem.lineItemTitle,
+        lineItem.lineItemDescription,
+        lineItem.lineItemType,
+        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantityUnitOfMeasure,
+        formatCurrency(lineItem.lineItemUnitPrice),
+        formatCurrency(lineItem.lineItemTotal)
+      ].filter(field => field && field.trim() !== '');
+    }
     
     const hasMatch = searchableFields.some((value) => {
       if (!value) return false;
@@ -1033,4 +1134,248 @@ function getFieldLabel(field: string): string {
   }
 
   return labels[field] || field;
+}
+
+function renderProTipsState(message: string, state: 'idle' | 'empty' | 'no-results', query?: string): string {
+  const proTips = getProTips(state, query);
+  
+  return `
+    <div class="pro-tips-state">
+      ${message ? `
+        <div class="pro-tips-state__header">
+          <h2 class="pro-tips-state__title">${message}</h2>
+        </div>
+      ` : ''}
+      <div class="pro-tips-state__content">
+        <div class="pro-tips">
+          <h3 class="pro-tips__title">Pro Tips & Tricks</h3>
+          <div class="pro-tips__grid">
+            ${proTips.map(tip => `
+              <div class="pro-tip">
+                <div class="pro-tip__content">
+                  <h4 class="pro-tip__title">
+                    <span class="pro-tip__icon">${tip.icon}</span>
+                    ${tip.title}
+                  </h4>
+                  <p class="pro-tip__description">${tip.description}</p>
+                  <div class="pro-tip__examples">
+                    ${tip.examples.map(example => `
+                      <code class="pro-tip__example">${example}</code>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Array<{
+  icon: string;
+  title: string;
+  description: string;
+  examples: string[];
+}> {
+  const tips: Array<{
+    icon: string;
+    title: string;
+    description: string;
+    examples: string[];
+  }> = [];
+
+  // Always include basic search tips
+  tips.push({
+    icon: '🔍',
+    title: 'Basic Text Search',
+    description: 'Search for any text in titles, summaries, projects, clients, and more.',
+    examples: ['kitchen renovation', 'John Smith', 'Project Alpha']
+  });
+
+  // Add monetary search tips
+  tips.push({
+    icon: '💰',
+    title: 'Monetary Searches',
+    description: 'Find invoices, bills, and receipts by exact amounts or ranges.',
+    examples: ['$1234.56', '$500-$1000', '1234.56', '1000 to 2000']
+  });
+
+  // Add range search tips
+  tips.push({
+    icon: '📊',
+    title: 'Range Queries',
+    description: 'Search for amounts within specific ranges using various formats.',
+    examples: ['$500-$1000', '1000 to 2000', '$50k-$100k']
+  });
+
+  // Add entity type tips
+  tips.push({
+    icon: '📋',
+    title: 'Entity Types',
+    description: 'Search for specific types of records and documents.',
+    examples: ['invoices', 'contracts', 'people', 'organizations']
+  });
+
+  // Add project/client tips
+  tips.push({
+    icon: '🏗️',
+    title: 'Project & Client Search',
+    description: 'Find records related to specific projects or clients.',
+    examples: ['Project Alpha', 'Smith Construction', 'residential']
+  });
+
+  // Add date-based tips
+  tips.push({
+    icon: '📅',
+    title: 'Date-Based Search',
+    description: 'Search for records by date ranges, recent activity, or time periods.',
+    examples: ['recent', 'last month', '2024', 'Q1 2024']
+  });
+
+  // Add Buildertrend-specific tips
+  tips.push({
+    icon: '⚡',
+    title: 'Buildertrend Navigation',
+    description: 'Use trigger queries to quickly navigate to specific Buildertrend sections.',
+    examples: ['schedule', 'estimates', 'change orders', 'punch list']
+  });
+
+  // Add line item tips
+  tips.push({
+    icon: '📝',
+    title: 'Line Item Details',
+    description: 'Search within detailed line items of invoices and purchase orders.',
+    examples: ['lumber', 'labor', 'materials', 'equipment']
+  });
+
+  // Add status-based tips
+  tips.push({
+    icon: '📊',
+    title: 'Status Filters',
+    description: 'Find records by their current status or workflow stage.',
+    examples: ['pending', 'approved', 'paid', 'overdue']
+  });
+
+  // Add advanced search tips
+  tips.push({
+    icon: '🎯',
+    title: 'Advanced Techniques',
+    description: 'Combine multiple search terms and use facets to refine results.',
+    examples: ['kitchen AND renovation', 'invoice AND pending', 'Smith OR Johnson']
+  });
+
+  // Customize tips based on state
+  if (state === 'no-results' && query) {
+    // Add troubleshooting tips for no results
+    tips.unshift({
+      icon: '🔧',
+      title: 'No Results? Try These',
+      description: 'Adjust your search strategy when no results are found.',
+      examples: [
+        'Use fewer keywords',
+        'Check spelling',
+        'Try broader terms',
+        'Use different formats'
+      ]
+    });
+  }
+
+  if (state === 'idle') {
+    // For idle state, emphasize getting started
+    tips.unshift({
+      icon: '🚀',
+      title: 'Get Started',
+      description: 'Begin your search with any of these popular search types.',
+      examples: ['$5000', 'kitchen', 'Smith Construction', 'recent invoices']
+    });
+  }
+
+  return tips;
+}
+
+function renderFacetProTips(state: 'idle' | 'empty' | 'no-results'): string {
+  const facetTips = getFacetProTips(state);
+  
+  return `
+    <div class="facet-pro-tips">
+      <h3 class="facet-pro-tips__title">Filter & Refine</h3>
+      <div class="facet-pro-tips__list">
+        ${facetTips.map(tip => `
+          <div class="facet-pro-tip">
+            <div class="facet-pro-tip__icon">${tip.icon}</div>
+            <div class="facet-pro-tip__content">
+              <h4 class="facet-pro-tip__title">${tip.title}</h4>
+              <p class="facet-pro-tip__description">${tip.description}</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function getFacetProTips(state: 'idle' | 'empty' | 'no-results'): Array<{
+  icon: string;
+  title: string;
+  description: string;
+}> {
+  const tips: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }> = [];
+
+  if (state === 'idle') {
+    tips.push({
+      icon: '🔍',
+      title: 'Search First',
+      description: 'Run a search to see filter options and refine your results.'
+    });
+    
+    tips.push({
+      icon: '⚡',
+      title: 'Quick Filters',
+      description: 'Use facets to narrow down results by type, project, status, and more.'
+    });
+  } else {
+    tips.push({
+      icon: '📊',
+      title: 'Type Filters',
+      description: 'Filter by Document, Invoice, Person, Organization, or Buildertrend records.'
+    });
+    
+    tips.push({
+      icon: '🏗️',
+      title: 'Project & Client',
+      description: 'Narrow results to specific projects or clients.'
+    });
+    
+    tips.push({
+      icon: '💰',
+      title: 'Amount Ranges',
+      description: 'Filter financial records by total value ranges.'
+    });
+    
+    tips.push({
+      icon: '📅',
+      title: 'Date Filters',
+      description: 'Find records by issue date ranges (last week, month, year).'
+    });
+    
+    tips.push({
+      icon: '📋',
+      title: 'Status Filters',
+      description: 'Filter by record status like pending, approved, or paid.'
+    });
+    
+    tips.push({
+      icon: '🎯',
+      title: 'Advanced Grouping',
+      description: 'Group results by type, project, status, or client for better organization.'
+    });
+  }
+
+  return tips;
 }

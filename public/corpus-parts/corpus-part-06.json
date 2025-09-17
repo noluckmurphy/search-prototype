@@ -8,7 +8,11 @@
     "client": "Evergreen Builders Network",
     "status": "Preferred",
     "updatedAt": "2024-02-12T15:20:41.201Z",
-    "tags": ["Electrical", "Subcontractor", "Preferred"],
+    "tags": [
+      "Electrical",
+      "Subcontractor",
+      "Preferred"
+    ],
     "metadata": {
       "licenseStatus": "OR-CCB-812345",
       "crewSize": 42,
@@ -22,7 +26,66 @@
     "primaryContact": "Sofia Ramirez",
     "phone": "(503) 555-0134",
     "email": "estimating@cascadeelectrical.coop",
-    "website": "https://cascadeelectrical.coop"
+    "website": "https://cascadeelectrical.coop",
+    "lineItems": [
+      {
+        "lineItemId": "organization-001-item-1",
+        "lineItemTitle": "Carpet removal and disposal - 11 sq ft",
+        "lineItemDescription": "Subcontractor for carpet removal and disposal - 11 sq ft on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 150,
+        "lineItemTotal": 1650,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-001-item-2",
+        "lineItemTitle": "Bathroom tile work - 25 sq ft",
+        "lineItemDescription": "Other for bathroom tile work - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 6,
+        "lineItemTotal": 150,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-001-item-3",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Labor for cabinets work on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 98,
+        "lineItemTotal": 1176,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-002",
@@ -33,7 +96,11 @@
     "client": "Summit Commercial Group",
     "status": "Preferred",
     "updatedAt": "2024-03-22T19:04:05.481Z",
-    "tags": ["Mechanical", "HVAC", "Subcontractor"],
+    "tags": [
+      "Mechanical",
+      "HVAC",
+      "Subcontractor"
+    ],
     "metadata": {
       "licenseStatus": "OR-CCB-765443",
       "crewSize": 36,
@@ -47,7 +114,123 @@
     "primaryContact": "Noah Patel",
     "phone": "(971) 555-0188",
     "email": "team@summithvac.pro",
-    "website": "https://summithvac.pro"
+    "website": "https://summithvac.pro",
+    "lineItems": [
+      {
+        "lineItemId": "organization-002-item-1",
+        "lineItemTitle": "Bathroom waterproofing - 23 sq ft",
+        "lineItemDescription": "Material for bathroom waterproofing - 23 sq ft on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 104,
+        "lineItemTotal": 2392,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-002-item-2",
+        "lineItemTitle": "Carpet removal and disposal - 19 sq ft",
+        "lineItemDescription": "Material for carpet removal and disposal - 19 sq ft on Building core areas",
+        "lineItemQuantity": 19,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 38,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-002-item-3",
+        "lineItemTitle": "Concrete delivery and placement - 3 cubic yards",
+        "lineItemDescription": "Equipment for concrete delivery and placement - 3 cubic yards on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 3,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-002-item-4",
+        "lineItemTitle": "Concrete sealing and waterproofing - 21 sq ft",
+        "lineItemDescription": "Equipment for concrete sealing and waterproofing - 21 sq ft on Building core areas",
+        "lineItemQuantity": 21,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 21,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-002-item-5",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Labor for cabinets work on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 4,
+        "lineItemTotal": 36,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-002-item-6",
+        "lineItemTitle": "Carpet delivery and handling - 16 sq ft",
+        "lineItemDescription": "Other for carpet delivery and handling - 16 sq ft on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 64,
+        "lineItemTotal": 1024,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-003",
@@ -58,7 +241,11 @@
     "client": "Evergreen Supply Collective",
     "status": "Preferred",
     "updatedAt": "2024-01-28T11:12:05.612Z",
-    "tags": ["Millwork", "Vendor", "Finish"],
+    "tags": [
+      "Millwork",
+      "Vendor",
+      "Finish"
+    ],
     "metadata": {
       "leadTimeWeeks": 6,
       "avgProjectValue": 420000,
@@ -71,7 +258,66 @@
     "primaryContact": "Harper Singh",
     "phone": "(503) 555-0170",
     "email": "projects@evergreenmillworks.com",
-    "website": "https://evergreenmillworks.com"
+    "website": "https://evergreenmillworks.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-003-item-1",
+        "lineItemTitle": "Concrete sealing and waterproofing - 6 sq ft",
+        "lineItemDescription": "Labor for concrete sealing and waterproofing - 6 sq ft on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 186,
+        "lineItemTotal": 1116,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-003-item-2",
+        "lineItemTitle": "Demo and removal - 23 hours",
+        "lineItemDescription": "Other for demo and removal - 23 hours on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 842,
+        "lineItemTotal": 19366,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-003-item-3",
+        "lineItemTitle": "Custom cabinet work - 17 units",
+        "lineItemDescription": "Other for custom cabinet work - 17 units on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 56,
+        "lineItemTotal": 952,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-004",
@@ -82,7 +328,11 @@
     "client": "UrbanCore GC Alliance",
     "status": "Active",
     "updatedAt": "2024-04-05T08:45:39.993Z",
-    "tags": ["Concrete", "Subcontractor", "Structural"],
+    "tags": [
+      "Concrete",
+      "Subcontractor",
+      "Structural"
+    ],
     "metadata": {
       "licenseStatus": "OR-CCB-704211",
       "crewSize": 58,
@@ -96,7 +346,104 @@
     "primaryContact": "Damian Holt",
     "phone": "(503) 555-0110",
     "email": "precon@precisionconcretepartners.com",
-    "website": "https://precisionconcretepartners.com"
+    "website": "https://precisionconcretepartners.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-004-item-1",
+        "lineItemTitle": "Exterior demolition - 12 sq ft",
+        "lineItemDescription": "Material for exterior demolition - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 108,
+        "lineItemTotal": 1296,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-004-item-2",
+        "lineItemTitle": "Bathroom waterproofing - 25 sq ft",
+        "lineItemDescription": "Subcontractor for bathroom waterproofing - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 460,
+        "lineItemTotal": 11500,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-004-item-3",
+        "lineItemTitle": "Deck staining and sealing - 3 sq ft",
+        "lineItemDescription": "Labor for deck staining and sealing - 3 sq ft on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 1274,
+        "lineItemTotal": 3822,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-004-item-4",
+        "lineItemTitle": "Cabinet doors and drawers - 13 pieces",
+        "lineItemDescription": "Equipment for cabinet doors and drawers - 13 pieces on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 13,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-004-item-5",
+        "lineItemTitle": "Deck railing installation - 15 linear feet",
+        "lineItemDescription": "Labor for deck railing installation - 15 linear feet on Building core areas",
+        "lineItemQuantity": 15,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 132,
+        "lineItemTotal": 1980,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-005",
@@ -107,7 +454,10 @@
     "client": "Coastal Development Collaborative",
     "status": "Qualified",
     "updatedAt": "2024-01-10T22:18:32.355Z",
-    "tags": ["Glazing", "Subcontractor"],
+    "tags": [
+      "Glazing",
+      "Subcontractor"
+    ],
     "metadata": {
       "licenseStatus": "OR-CCB-889451",
       "avgProjectValue": 510000,
@@ -120,7 +470,28 @@
     "primaryContact": "Maya Chen",
     "phone": "(541) 555-0144",
     "email": "estimate@coastalglassglazing.com",
-    "website": "https://coastalglassglazing.com"
+    "website": "https://coastalglassglazing.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-005-item-1",
+        "lineItemTitle": "Demolition work - 4 sq ft",
+        "lineItemDescription": "Equipment for demolition work - 4 sq ft on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 78,
+        "lineItemTotal": 312,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-006",
@@ -131,7 +502,11 @@
     "client": "High Ridge Collective",
     "status": "Active",
     "updatedAt": "2024-02-29T14:07:11.740Z",
-    "tags": ["Landscape", "Subcontractor", "Sustainability"],
+    "tags": [
+      "Landscape",
+      "Subcontractor",
+      "Sustainability"
+    ],
     "metadata": {
       "licenseStatus": "OR-LBR-22341",
       "crewSize": 24,
@@ -144,7 +519,161 @@
     "primaryContact": "Gavin Brooks",
     "phone": "(971) 555-0155",
     "email": "hello@highridgelandscapes.com",
-    "website": "https://highridgelandscapes.com"
+    "website": "https://highridgelandscapes.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-006-item-1",
+        "lineItemTitle": "Deck construction - 17 sq ft",
+        "lineItemDescription": "Material for deck construction - 17 sq ft on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 17,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-2",
+        "lineItemTitle": "Concrete slab installation - 2 sq ft",
+        "lineItemDescription": "Material for concrete slab installation - 2 sq ft on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 111,
+        "lineItemTotal": 222,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-3",
+        "lineItemTitle": "Cabinet refinishing - 23 units",
+        "lineItemDescription": "Other for cabinet refinishing - 23 units on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 55,
+        "lineItemTotal": 1265,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-4",
+        "lineItemTitle": "Custom cabinet work - 17 units",
+        "lineItemDescription": "Subcontractor for custom cabinet work - 17 units on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 73,
+        "lineItemTotal": 1241,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-5",
+        "lineItemTitle": "Kitchen cabinets installation - 23 linear feet",
+        "lineItemDescription": "Other for kitchen cabinets installation - 23 linear feet on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 71,
+        "lineItemTotal": 1633,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-6",
+        "lineItemTitle": "Demo and removal - 9 hours",
+        "lineItemDescription": "Equipment for demo and removal - 9 hours on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 275,
+        "lineItemTotal": 2475,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-7",
+        "lineItemTitle": "Deck repair and maintenance - 16 sq ft",
+        "lineItemDescription": "Subcontractor for deck repair and maintenance - 16 sq ft on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 10,
+        "lineItemTotal": 160,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-006-item-8",
+        "lineItemTitle": "Concrete repair and patching - 4 sq ft",
+        "lineItemDescription": "Other for concrete repair and patching - 4 sq ft on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 8,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-007",
@@ -155,7 +684,11 @@
     "client": "Metro Purchasing Cooperative",
     "status": "Preferred",
     "updatedAt": "2023-12-18T10:55:09.128Z",
-    "tags": ["Flooring", "Vendor", "Materials"],
+    "tags": [
+      "Flooring",
+      "Vendor",
+      "Materials"
+    ],
     "metadata": {
       "warehouseSqFt": 52000,
       "avgProjectValue": 330000,
@@ -168,7 +701,104 @@
     "primaryContact": "Lena Kowalski",
     "phone": "(503) 555-0198",
     "email": "orders@metroflooringsupply.com",
-    "website": "https://metroflooringsupply.com"
+    "website": "https://metroflooringsupply.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-007-item-1",
+        "lineItemTitle": "Concrete slab installation - 15 sq ft",
+        "lineItemDescription": "Equipment for concrete slab installation - 15 sq ft on Building core areas",
+        "lineItemQuantity": 15,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 596,
+        "lineItemTotal": 8940,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-007-item-2",
+        "lineItemTitle": "Cabinet countertop installation - 3 linear feet",
+        "lineItemDescription": "Subcontractor for cabinet countertop installation - 3 linear feet on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 72,
+        "lineItemTotal": 216,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-007-item-3",
+        "lineItemTitle": "Concrete slab installation - 14 sq ft",
+        "lineItemDescription": "Material for concrete slab installation - 14 sq ft on Building core areas",
+        "lineItemQuantity": 14,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 112,
+        "lineItemTotal": 1568,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-007-item-4",
+        "lineItemTitle": "Concrete delivery and placement - 20 cubic yards",
+        "lineItemDescription": "Material for concrete delivery and placement - 20 cubic yards on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 41,
+        "lineItemTotal": 820,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-007-item-5",
+        "lineItemTitle": "Demolition cleanup - 21 hours",
+        "lineItemDescription": "Subcontractor for demolition cleanup - 21 hours on Building core areas",
+        "lineItemQuantity": 21,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 38,
+        "lineItemTotal": 798,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "organization-008",
@@ -179,7 +809,10 @@
     "client": "Blue Horizon Group",
     "status": "Preferred",
     "updatedAt": "2024-03-05T17:33:55.909Z",
-    "tags": ["Roofing", "Subcontractor"],
+    "tags": [
+      "Roofing",
+      "Subcontractor"
+    ],
     "metadata": {
       "licenseStatus": "OR-CCB-667890",
       "crewSize": 31,
@@ -192,7 +825,85 @@
     "primaryContact": "Camila Duarte",
     "phone": "(971) 555-0162",
     "email": "estimating@bluehorizonroof.com",
-    "website": "https://bluehorizonroof.com"
+    "website": "https://bluehorizonroof.com",
+    "lineItems": [
+      {
+        "lineItemId": "organization-008-item-1",
+        "lineItemTitle": "Deck framing and structure - 2 sq ft",
+        "lineItemDescription": "Equipment for deck framing and structure - 2 sq ft on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 326,
+        "lineItemTotal": 652,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-008-item-2",
+        "lineItemTitle": "Deck framing and structure - 13 sq ft",
+        "lineItemDescription": "Other for deck framing and structure - 13 sq ft on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 26,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-008-item-3",
+        "lineItemTitle": "Concrete slab installation - 13 sq ft",
+        "lineItemDescription": "Other for concrete slab installation - 13 sq ft on Building core areas",
+        "lineItemQuantity": 13,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 11,
+        "lineItemTotal": 143,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "organization-008-item-4",
+        "lineItemTitle": "Deck repair and maintenance - 22 sq ft",
+        "lineItemDescription": "Other for deck repair and maintenance - 22 sq ft on Building core areas",
+        "lineItemQuantity": 22,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 825,
+        "lineItemTotal": 18150,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-001",
@@ -203,7 +914,11 @@
     "client": "Avery & Michael Chen",
     "status": "Active",
     "updatedAt": "2024-03-18T09:14:21.777Z",
-    "tags": ["Client", "Residential", "Premium"],
+    "tags": [
+      "Client",
+      "Residential",
+      "Premium"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Email",
@@ -216,7 +931,123 @@
     "email": "avery.chen@example.com",
     "phone": "(503) 555-0104",
     "location": "Portland, OR",
-    "tradeFocus": "Interior Finishes"
+    "tradeFocus": "Interior Finishes",
+    "lineItems": [
+      {
+        "lineItemId": "person-001-item-1",
+        "lineItemTitle": "Demolition work - 25 sq ft",
+        "lineItemDescription": "Subcontractor for demolition work - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 62,
+        "lineItemTotal": 1550,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-001-item-2",
+        "lineItemTitle": "Concrete slab installation - 21 sq ft",
+        "lineItemDescription": "Labor for concrete slab installation - 21 sq ft on Building core areas",
+        "lineItemQuantity": 21,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 21,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-001-item-3",
+        "lineItemTitle": "Exterior demolition - 3 sq ft",
+        "lineItemDescription": "Subcontractor for exterior demolition - 3 sq ft on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 1,
+        "lineItemTotal": 3,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-001-item-4",
+        "lineItemTitle": "Cabinet countertop installation - 20 linear feet",
+        "lineItemDescription": "Labor for cabinet countertop installation - 20 linear feet on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 288,
+        "lineItemTotal": 5760,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-001-item-5",
+        "lineItemTitle": "Demolition work - 2 sq ft",
+        "lineItemDescription": "Labor for demolition work - 2 sq ft on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 15,
+        "lineItemTotal": 30,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-001-item-6",
+        "lineItemTitle": "Deck boards installation - 19 sq ft",
+        "lineItemDescription": "Labor for deck boards installation - 19 sq ft on Building core areas",
+        "lineItemQuantity": 19,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 72,
+        "lineItemTotal": 1368,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-002",
@@ -227,7 +1058,11 @@
     "client": "Martinez Residential Group",
     "status": "Active",
     "updatedAt": "2024-02-06T12:08:47.115Z",
-    "tags": ["Client", "Developer", "Warranty"],
+    "tags": [
+      "Client",
+      "Developer",
+      "Warranty"
+    ],
     "metadata": {
       "relationshipDepth": "Medium",
       "preferredContactMethod": "SMS",
@@ -240,7 +1075,104 @@
     "email": "luis.martinez@example.com",
     "phone": "(971) 555-0120",
     "location": "Lake Oswego, OR",
-    "tradeFocus": "Owner Experience"
+    "tradeFocus": "Owner Experience",
+    "lineItems": [
+      {
+        "lineItemId": "person-002-item-1",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Labor for cabinets work on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 59,
+        "lineItemTotal": 531,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-002-item-2",
+        "lineItemTitle": "Interior demolition - 18 sq ft",
+        "lineItemDescription": "Subcontractor for interior demolition - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "hours",
+        "lineItemUnitPrice": 70,
+        "lineItemTotal": 1260,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-002-item-3",
+        "lineItemTitle": "Bathroom ventilation installation - 12 units",
+        "lineItemDescription": "Labor for bathroom ventilation installation - 12 units on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 24,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-002-item-4",
+        "lineItemTitle": "Deck repair and maintenance - 6 sq ft",
+        "lineItemDescription": "Material for deck repair and maintenance - 6 sq ft on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 446,
+        "lineItemTotal": 2676,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-002-item-5",
+        "lineItemTitle": "Concrete repair and patching - 18 sq ft",
+        "lineItemDescription": "Equipment for concrete repair and patching - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 16,
+        "lineItemTotal": 288,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-003",
@@ -251,7 +1183,11 @@
     "client": "Kapoor Property Group",
     "status": "In Planning",
     "updatedAt": "2024-01-17T08:42:51.551Z",
-    "tags": ["Client", "Commercial", "Retail"],
+    "tags": [
+      "Client",
+      "Commercial",
+      "Retail"
+    ],
     "metadata": {
       "relationshipDepth": "Emerging",
       "preferredContactMethod": "Video",
@@ -264,7 +1200,104 @@
     "email": "priya.kapoor@example.com",
     "phone": "(503) 555-0182",
     "location": "Portland, OR",
-    "tradeFocus": "Retail Delivery"
+    "tradeFocus": "Retail Delivery",
+    "lineItems": [
+      {
+        "lineItemId": "person-003-item-1",
+        "lineItemTitle": "Bathroom electrical work - 24 bathrooms",
+        "lineItemDescription": "Equipment for bathroom electrical work - 24 bathrooms on Building core areas",
+        "lineItemQuantity": 24,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 127,
+        "lineItemTotal": 3048,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-003-item-2",
+        "lineItemTitle": "Carpet installation - 12 sq ft",
+        "lineItemDescription": "Material for carpet installation - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 57,
+        "lineItemTotal": 684,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-003-item-3",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Other for cabinets work on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 495,
+        "lineItemTotal": 5940,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-003-item-4",
+        "lineItemTitle": "Cabinet refinishing - 18 units",
+        "lineItemDescription": "Equipment for cabinet refinishing - 18 units on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 163,
+        "lineItemTotal": 2934,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-003-item-5",
+        "lineItemTitle": "Carpet padding installation - 25 sq ft",
+        "lineItemDescription": "Material for carpet padding installation - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 14,
+        "lineItemTotal": 350,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-004",
@@ -275,7 +1308,11 @@
     "client": "Ellis Development Partners",
     "status": "Active",
     "updatedAt": "2024-04-01T18:22:14.660Z",
-    "tags": ["Client", "Punch List", "Closeout"],
+    "tags": [
+      "Client",
+      "Punch List",
+      "Closeout"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Phone",
@@ -288,7 +1325,66 @@
     "email": "jordan.ellis@example.com",
     "phone": "(503) 555-0176",
     "location": "Hillsboro, OR",
-    "tradeFocus": "Quality Control"
+    "tradeFocus": "Quality Control",
+    "lineItems": [
+      {
+        "lineItemId": "person-004-item-1",
+        "lineItemTitle": "Concrete sealing and waterproofing - 8 sq ft",
+        "lineItemDescription": "Equipment for concrete sealing and waterproofing - 8 sq ft on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 246,
+        "lineItemTotal": 1968,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-004-item-2",
+        "lineItemTitle": "Carpet repair and patching - 5 sq ft",
+        "lineItemDescription": "Equipment for carpet repair and patching - 5 sq ft on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 253,
+        "lineItemTotal": 1265,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-004-item-3",
+        "lineItemTitle": "Bathroom plumbing rough-in - 23 bathrooms",
+        "lineItemDescription": "Other for bathroom plumbing rough-in - 23 bathrooms on Building core areas",
+        "lineItemQuantity": 23,
+        "lineItemQuantityUnitOfMeasure": "dollars",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 46,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-005",
@@ -299,7 +1395,11 @@
     "client": "Nakamura Family",
     "status": "Active",
     "updatedAt": "2024-03-09T21:33:27.422Z",
-    "tags": ["Client", "Sustainability", "Roof Deck"],
+    "tags": [
+      "Client",
+      "Sustainability",
+      "Roof Deck"
+    ],
     "metadata": {
       "relationshipDepth": "Medium",
       "preferredContactMethod": "Email",
@@ -312,7 +1412,66 @@
     "email": "mei.nakamura@example.com",
     "phone": "(971) 555-0108",
     "location": "Portland, OR",
-    "tradeFocus": "Green Building"
+    "tradeFocus": "Green Building",
+    "lineItems": [
+      {
+        "lineItemId": "person-005-item-1",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Material for cabinets work on Building core areas",
+        "lineItemQuantity": 10,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 2058,
+        "lineItemTotal": 20580,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-005-item-2",
+        "lineItemTitle": "Concrete foundation pour - 14 cubic yards",
+        "lineItemDescription": "Other for concrete foundation pour - 14 cubic yards on Building core areas",
+        "lineItemQuantity": 14,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 169,
+        "lineItemTotal": 2366,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-005-item-3",
+        "lineItemTitle": "Interior demolition - 10 sq ft",
+        "lineItemDescription": "Other for interior demolition - 10 sq ft on Building core areas",
+        "lineItemQuantity": 10,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 219,
+        "lineItemTotal": 2190,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-006",
@@ -323,7 +1482,11 @@
     "client": "Cascade Electrical Cooperative",
     "status": "Active",
     "updatedAt": "2024-02-27T16:40:44.551Z",
-    "tags": ["Contact", "Electrical", "Procurement"],
+    "tags": [
+      "Contact",
+      "Electrical",
+      "Procurement"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Email",
@@ -336,7 +1499,123 @@
     "email": "sramirez@cascadeelectrical.coop",
     "phone": "(503) 555-0134",
     "location": "Beaverton, OR",
-    "tradeFocus": "Electrical Systems"
+    "tradeFocus": "Electrical Systems",
+    "lineItems": [
+      {
+        "lineItemId": "person-006-item-1",
+        "lineItemTitle": "Carpet cleaning and maintenance - 4 sq ft",
+        "lineItemDescription": "Equipment for carpet cleaning and maintenance - 4 sq ft on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 174,
+        "lineItemTotal": 696,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-006-item-2",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Equipment for cabinets work on Building core areas",
+        "lineItemQuantity": 3,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 166,
+        "lineItemTotal": 498,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-006-item-3",
+        "lineItemTitle": "Concrete slab installation - 1 sq ft",
+        "lineItemDescription": "Other for concrete slab installation - 1 sq ft on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 359,
+        "lineItemTotal": 359,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-006-item-4",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Subcontractor for cabinets work on Building core areas",
+        "lineItemQuantity": 2,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 177,
+        "lineItemTotal": 354,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-006-item-5",
+        "lineItemTitle": "Interior demolition - 25 sq ft",
+        "lineItemDescription": "Other for interior demolition - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 122,
+        "lineItemTotal": 3050,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-006-item-6",
+        "lineItemTitle": "Concrete finishing work - 16 sq ft",
+        "lineItemDescription": "Material for concrete finishing work - 16 sq ft on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "closets",
+        "lineItemUnitPrice": 615,
+        "lineItemTotal": 9840,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-007",
@@ -347,7 +1626,11 @@
     "client": "Summit HVAC Services",
     "status": "Active",
     "updatedAt": "2024-03-14T10:18:09.338Z",
-    "tags": ["Contact", "Mechanical", "Design-Assist"],
+    "tags": [
+      "Contact",
+      "Mechanical",
+      "Design-Assist"
+    ],
     "metadata": {
       "relationshipDepth": "Medium",
       "preferredContactMethod": "Video",
@@ -360,7 +1643,104 @@
     "email": "npatel@summithvac.pro",
     "phone": "(971) 555-0188",
     "location": "Portland, OR",
-    "tradeFocus": "HVAC & Controls"
+    "tradeFocus": "HVAC & Controls",
+    "lineItems": [
+      {
+        "lineItemId": "person-007-item-1",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Equipment for cabinets work on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "sq ft",
+        "lineItemUnitPrice": 15,
+        "lineItemTotal": 180,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-007-item-2",
+        "lineItemTitle": "Concrete foundation pour - 8 cubic yards",
+        "lineItemDescription": "Other for concrete foundation pour - 8 cubic yards on Building core areas",
+        "lineItemQuantity": 8,
+        "lineItemQuantityUnitOfMeasure": "permits",
+        "lineItemUnitPrice": 175,
+        "lineItemTotal": 1400,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-007-item-3",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Subcontractor for cabinets work on Building core areas",
+        "lineItemQuantity": 1,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 2,
+        "lineItemTotal": 2,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-007-item-4",
+        "lineItemTitle": "cabinets work",
+        "lineItemDescription": "Equipment for cabinets work on Building core areas",
+        "lineItemQuantity": 6,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 176,
+        "lineItemTotal": 1056,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-007-item-5",
+        "lineItemTitle": "Bathroom tile work - 9 sq ft",
+        "lineItemDescription": "Subcontractor for bathroom tile work - 9 sq ft on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 353,
+        "lineItemTotal": 3177,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-008",
@@ -371,7 +1751,11 @@
     "client": "Evergreen Millworks",
     "status": "Active",
     "updatedAt": "2024-01-31T09:02:57.904Z",
-    "tags": ["Contact", "Millwork", "Vendor"],
+    "tags": [
+      "Contact",
+      "Millwork",
+      "Vendor"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Email",
@@ -384,7 +1768,123 @@
     "email": "hsingh@evergreenmillworks.com",
     "phone": "(503) 555-0170",
     "location": "Portland, OR",
-    "tradeFocus": "Custom Millwork"
+    "tradeFocus": "Custom Millwork",
+    "lineItems": [
+      {
+        "lineItemId": "person-008-item-1",
+        "lineItemTitle": "Bathroom fixtures installation - 17 units",
+        "lineItemDescription": "Equipment for bathroom fixtures installation - 17 units on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 1235,
+        "lineItemTotal": 20995,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-008-item-2",
+        "lineItemTitle": "Kitchen cabinets installation - 4 linear feet",
+        "lineItemDescription": "Equipment for kitchen cabinets installation - 4 linear feet on Building core areas",
+        "lineItemQuantity": 4,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 289,
+        "lineItemTotal": 1156,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-008-item-3",
+        "lineItemTitle": "Bathroom renovation - 25 bathrooms",
+        "lineItemDescription": "Other for bathroom renovation - 25 bathrooms on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 299,
+        "lineItemTotal": 7475,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-008-item-4",
+        "lineItemTitle": "Deck construction - 18 sq ft",
+        "lineItemDescription": "Equipment for deck construction - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 82,
+        "lineItemTotal": 1476,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-008-item-5",
+        "lineItemTitle": "Concrete repair and patching - 24 sq ft",
+        "lineItemDescription": "Subcontractor for concrete repair and patching - 24 sq ft on Building core areas",
+        "lineItemQuantity": 24,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 5634,
+        "lineItemTotal": 135216,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-008-item-6",
+        "lineItemTitle": "Exterior demolition - 15 sq ft",
+        "lineItemDescription": "Labor for exterior demolition - 15 sq ft on Building core areas",
+        "lineItemQuantity": 15,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 5374,
+        "lineItemTotal": 80610,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-009",
@@ -395,7 +1895,11 @@
     "client": "Precision Concrete Partners",
     "status": "Active",
     "updatedAt": "2024-04-02T07:44:29.780Z",
-    "tags": ["Contact", "Concrete", "Field"],
+    "tags": [
+      "Contact",
+      "Concrete",
+      "Field"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Phone",
@@ -408,7 +1912,47 @@
     "email": "dholt@precisionconcretepartners.com",
     "phone": "(503) 555-0110",
     "location": "Vancouver, WA",
-    "tradeFocus": "Structural Concrete"
+    "tradeFocus": "Structural Concrete",
+    "lineItems": [
+      {
+        "lineItemId": "person-009-item-1",
+        "lineItemTitle": "Demolition work - 18 sq ft",
+        "lineItemDescription": "Labor for demolition work - 18 sq ft on Building core areas",
+        "lineItemQuantity": 18,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 1686,
+        "lineItemTotal": 30348,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-009-item-2",
+        "lineItemTitle": "Demolition debris disposal - 9 cubic yards",
+        "lineItemDescription": "Subcontractor for demolition debris disposal - 9 cubic yards on Building core areas",
+        "lineItemQuantity": 9,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 302,
+        "lineItemTotal": 2718,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-010",
@@ -419,7 +1963,11 @@
     "client": "Metro Flooring Supply",
     "status": "Active",
     "updatedAt": "2023-12-20T13:48:44.412Z",
-    "tags": ["Contact", "Flooring", "Vendor"],
+    "tags": [
+      "Contact",
+      "Flooring",
+      "Vendor"
+    ],
     "metadata": {
       "relationshipDepth": "Medium",
       "preferredContactMethod": "Email",
@@ -432,7 +1980,47 @@
     "email": "lkowalski@metroflooringsupply.com",
     "phone": "(503) 555-0198",
     "location": "Portland, OR",
-    "tradeFocus": "Flooring Materials"
+    "tradeFocus": "Flooring Materials",
+    "lineItems": [
+      {
+        "lineItemId": "person-010-item-1",
+        "lineItemTitle": "Deck staining and sealing - 25 sq ft",
+        "lineItemDescription": "Subcontractor for deck staining and sealing - 25 sq ft on Building core areas",
+        "lineItemQuantity": 25,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 177,
+        "lineItemTotal": 4425,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-010-item-2",
+        "lineItemTitle": "Cabinet countertop installation - 5 linear feet",
+        "lineItemDescription": "Equipment for cabinet countertop installation - 5 linear feet on Building core areas",
+        "lineItemQuantity": 5,
+        "lineItemQuantityUnitOfMeasure": "loads",
+        "lineItemUnitPrice": 102,
+        "lineItemTotal": 510,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-011",
@@ -443,7 +2031,11 @@
     "client": "Blue Horizon Roofing",
     "status": "Active",
     "updatedAt": "2024-03-07T23:16:09.684Z",
-    "tags": ["Contact", "Roofing", "Preconstruction"],
+    "tags": [
+      "Contact",
+      "Roofing",
+      "Preconstruction"
+    ],
     "metadata": {
       "relationshipDepth": "Medium",
       "preferredContactMethod": "Email",
@@ -456,7 +2048,161 @@
     "email": "cduarte@bluehorizonroof.com",
     "phone": "(971) 555-0162",
     "location": "Salem, OR",
-    "tradeFocus": "Roofing & Waterproofing"
+    "tradeFocus": "Roofing & Waterproofing",
+    "lineItems": [
+      {
+        "lineItemId": "person-011-item-1",
+        "lineItemTitle": "Demolition cleanup - 17 hours",
+        "lineItemDescription": "Equipment for demolition cleanup - 17 hours on Building core areas",
+        "lineItemQuantity": 17,
+        "lineItemQuantityUnitOfMeasure": "linear feet",
+        "lineItemUnitPrice": 13,
+        "lineItemTotal": 221,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-2",
+        "lineItemTitle": "Demolition debris disposal - 19 cubic yards",
+        "lineItemDescription": "Other for demolition debris disposal - 19 cubic yards on Building core areas",
+        "lineItemQuantity": 19,
+        "lineItemQuantityUnitOfMeasure": "fixtures",
+        "lineItemUnitPrice": 505,
+        "lineItemTotal": 9595,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-3",
+        "lineItemTitle": "Deck staining and sealing - 11 sq ft",
+        "lineItemDescription": "Other for deck staining and sealing - 11 sq ft on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 369,
+        "lineItemTotal": 4059,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-4",
+        "lineItemTitle": "Concrete repair and patching - 21 sq ft",
+        "lineItemDescription": "Subcontractor for concrete repair and patching - 21 sq ft on Building core areas",
+        "lineItemQuantity": 21,
+        "lineItemQuantityUnitOfMeasure": "units",
+        "lineItemUnitPrice": 317,
+        "lineItemTotal": 6657,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-5",
+        "lineItemTitle": "Demolition debris disposal - 20 cubic yards",
+        "lineItemDescription": "Subcontractor for demolition debris disposal - 20 cubic yards on Building core areas",
+        "lineItemQuantity": 20,
+        "lineItemQuantityUnitOfMeasure": "cubic yards",
+        "lineItemUnitPrice": 72,
+        "lineItemTotal": 1440,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-6",
+        "lineItemTitle": "Custom cabinet work - 24 units",
+        "lineItemDescription": "Equipment for custom cabinet work - 24 units on Building core areas",
+        "lineItemQuantity": 24,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 118,
+        "lineItemTotal": 2832,
+        "lineItemType": "Equipment",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-7",
+        "lineItemTitle": "Cabinet countertop installation - 12 linear feet",
+        "lineItemDescription": "Labor for cabinet countertop installation - 12 linear feet on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "bathrooms",
+        "lineItemUnitPrice": 2782,
+        "lineItemTotal": 33384,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-011-item-8",
+        "lineItemTitle": "Deck railing installation - 16 linear feet",
+        "lineItemDescription": "Labor for deck railing installation - 16 linear feet on Building core areas",
+        "lineItemQuantity": 16,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 96,
+        "lineItemTotal": 1536,
+        "lineItemType": "Labor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   },
   {
     "id": "person-012",
@@ -467,7 +2213,11 @@
     "client": "High Ridge Landscapes",
     "status": "Active",
     "updatedAt": "2024-02-29T14:12:41.003Z",
-    "tags": ["Contact", "Landscape", "Scheduling"],
+    "tags": [
+      "Contact",
+      "Landscape",
+      "Scheduling"
+    ],
     "metadata": {
       "relationshipDepth": "High",
       "preferredContactMethod": "Phone",
@@ -480,6 +2230,65 @@
     "email": "gbrooks@highridgelandscapes.com",
     "phone": "(971) 555-0155",
     "location": "Portland, OR",
-    "tradeFocus": "Landscape & Sitework"
+    "tradeFocus": "Landscape & Sitework",
+    "lineItems": [
+      {
+        "lineItemId": "person-012-item-1",
+        "lineItemTitle": "Demolition work - 11 sq ft",
+        "lineItemDescription": "Other for demolition work - 11 sq ft on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "inspections",
+        "lineItemUnitPrice": 233,
+        "lineItemTotal": 2563,
+        "lineItemType": "Other",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-012-item-2",
+        "lineItemTitle": "Demolition work - 12 sq ft",
+        "lineItemDescription": "Subcontractor for demolition work - 12 sq ft on Building core areas",
+        "lineItemQuantity": 12,
+        "lineItemQuantityUnitOfMeasure": "pieces",
+        "lineItemUnitPrice": 122,
+        "lineItemTotal": 1464,
+        "lineItemType": "Subcontractor",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      },
+      {
+        "lineItemId": "person-012-item-3",
+        "lineItemTitle": "Demo and removal - 11 hours",
+        "lineItemDescription": "Material for demo and removal - 11 hours on Building core areas",
+        "lineItemQuantity": 11,
+        "lineItemQuantityUnitOfMeasure": "ls",
+        "lineItemUnitPrice": 2155,
+        "lineItemTotal": 23705,
+        "lineItemType": "Material",
+        "fieldMetadata": {
+          "lineItemTitle": "non-monetary",
+          "lineItemDescription": "non-monetary",
+          "lineItemQuantity": "non-monetary",
+          "lineItemQuantityUnitOfMeasure": "non-monetary",
+          "lineItemUnitPrice": "monetary",
+          "lineItemTotal": "monetary",
+          "lineItemType": "non-monetary"
+        }
+      }
+    ]
   }
 ]

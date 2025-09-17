@@ -343,7 +343,16 @@ function generateLineItem(lineItemId, term, entityType = null) {
       lineItemQuantityUnitOfMeasure: unitType,
       lineItemUnitPrice: unitPrice,
       lineItemTotal: total,
-      lineItemType: lineItemType
+      lineItemType: lineItemType,
+      fieldMetadata: {
+        lineItemTitle: 'non-monetary',
+        lineItemDescription: 'non-monetary',
+        lineItemQuantity: 'non-monetary',
+        lineItemQuantityUnitOfMeasure: 'non-monetary',
+        lineItemUnitPrice: 'monetary',
+        lineItemTotal: 'monetary',
+        lineItemType: 'non-monetary'
+      }
     };
   } else {
     // Fallback for terms without specific templates
@@ -361,7 +370,16 @@ function generateLineItem(lineItemId, term, entityType = null) {
       lineItemQuantityUnitOfMeasure: unitType,
       lineItemUnitPrice: unitPrice,
       lineItemTotal: total,
-      lineItemType: lineItemType
+      lineItemType: lineItemType,
+      fieldMetadata: {
+        lineItemTitle: 'non-monetary',
+        lineItemDescription: 'non-monetary',
+        lineItemQuantity: 'non-monetary',
+        lineItemQuantityUnitOfMeasure: 'non-monetary',
+        lineItemUnitPrice: 'monetary',
+        lineItemTotal: 'monetary',
+        lineItemType: 'non-monetary'
+      }
     };
   }
 }
@@ -414,6 +432,17 @@ function updateDocumentWithLineItems(document) {
     if (document.totalValue !== undefined) {
       document.totalValue = document.lineItems.reduce((sum, item) => sum + item.lineItemTotal, 0);
     }
+  }
+  
+  // Add field metadata for financial records
+  if (document.entityType === 'Bill' || document.entityType === 'ClientInvoice' || 
+      document.entityType === 'PurchaseOrder' || document.entityType === 'Receipt' || 
+      document.entityType === 'Payment') {
+    document.fieldMetadata = {
+      title: 'non-monetary',
+      summary: 'non-monetary',
+      totalValue: 'monetary'
+    };
   }
   
   return document;

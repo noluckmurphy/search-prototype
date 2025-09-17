@@ -15,5 +15,8 @@
   "devDependencies": {
     "esbuild": "^0.25.9",
     "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "dinero.js": "^1.9.1"
   }
 }

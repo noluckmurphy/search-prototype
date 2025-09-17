@@ -387,7 +387,7 @@ export function highlightMonetaryValues(text: string, query: string): string {
 }
 
 /**
- * Extracts monetary tokens from a query (reused from searchService.ts logic)
+ * Extracts monetary tokens from a query using the improved monetary parsing
  */
 function extractMonetaryTokens(query: string): { amounts: number[]; textTokens: string[]; range: { min: number; max: number } | null } {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -413,15 +413,31 @@ function extractMonetaryTokens(query: string): { amounts: number[]; textTokens: 
 }
 
 /**
- * Parses currency string to extract numeric value
+ * Parses currency string to extract numeric value using improved parsing logic
  */
 function parseCurrencyString(amountStr: string): number | null {
-  // Remove currency symbols, commas, and whitespace
-  const cleaned = amountStr.replace(/[$,\s]/g, '');
+  // Remove currency symbols and whitespace, but handle commas carefully
+  let cleaned = amountStr.replace(/[$\s]/g, '');
+  
+  // Handle empty or invalid strings
+  if (!cleaned || cleaned === '') {
+    return null;
+  }
   
   // Handle range queries (e.g., "100-200", "100 to 200")
   if (cleaned.includes('-') || cleaned.toLowerCase().includes(' to ')) {
     return null; // Will be handled separately
+  }
+  
+  // Handle comma as decimal separator (European format like "55,13")
+  // If there's exactly one comma and it's followed by 1-2 digits at the end, treat it as decimal
+  const commaAsDecimalMatch = cleaned.match(/^(\d+),(\d{1,2})$/);
+  if (commaAsDecimalMatch) {
+    const [, integerPart, decimalPart] = commaAsDecimalMatch;
+    cleaned = `${integerPart}.${decimalPart.padEnd(2, '0')}`;
+  } else {
+    // Remove commas as thousands separators (like "1,234.56")
+    cleaned = cleaned.replace(/,/g, '');
   }
   
   const parsed = parseFloat(cleaned);
@@ -463,25 +479,170 @@ function escapeRegex(text: string): string {
 
 /**
  * Checks if a query amount is a partial match of a data value
- * This handles cases like searching for "$127" and matching "$1,275"
+ * This handles cases like searching for "$55,13" and matching "$551.32"
  */
 function isPartialMonetaryMatch(queryAmount: number, dataValue: number): boolean {
   // Convert both to strings for comparison
   const queryStr = queryAmount.toString();
   const dataStr = dataValue.toString();
   
-  // Check if the query amount appears at the start of the data value
-  // This handles cases like 127 matching 1275, but not 127 matching 3127
-  if (dataStr.startsWith(queryStr)) {
+  // Check for exact match first
+  if (queryStr === dataStr) {
     return true;
   }
   
-  // Also check if the query amount appears at the start when we remove trailing zeros
-  // This handles cases like 127 matching 1270
+  // Check if the query amount appears at the start of the data value
+  // This handles cases like 55.13 matching 55.13, 55.130, 55.1300, etc.
+  if (dataStr.startsWith(queryStr)) {
+    // Only allow prefix matching if the next character is a decimal point or zero
+    if (dataStr.length > queryStr.length) {
+      const nextChar = dataStr[queryStr.length];
+      return nextChar === '.' || nextChar === '0';
+    }
+    return true; // Same length, already handled by exact match above
+  }
+  
+  // Check if the query amount appears at the start when we remove trailing zeros
+  // This handles cases like 55.13 matching 55.130, 55.1300, etc.
   const dataWithoutTrailingZeros = dataStr.replace(/0+$/, '');
   if (dataWithoutTrailingZeros.startsWith(queryStr)) {
     return true;
   }
   
+  // Check for more sophisticated partial matches
+  // Handle cases where the query is a prefix of the data value
+  // For example: "55" should match "551.32" (but not "155.32")
+  if (queryStr.length >= 2 && dataStr.length > queryStr.length) {
+    // Check if the query appears at the start of the data value
+    if (dataStr.startsWith(queryStr)) {
+      // Additional validation: ensure the next character makes sense
+      const nextChar = dataStr[queryStr.length];
+      // Allow if next char is a digit (like 55 matching 551)
+      if (/^\d$/.test(nextChar)) {
+        return true;
+      }
+    }
+  }
+  
+  // Special case: handle European decimal format queries
+  // If query is like "55,13" (55.13) and data is "551.32", check if "55" matches "551"
+  if (queryStr.includes('.')) {
+    const queryIntegerPart = queryStr.split('.')[0];
+    const dataIntegerPart = dataStr.split('.')[0];
+    
+    if (dataIntegerPart.startsWith(queryIntegerPart) && queryIntegerPart.length >= 2) {
+      return true;
+    }
+  }
+  
   return false;
+}
+
+/**
+ * Enhanced monetary highlighting that shows different colors for exact vs partial matches
+ * This provides better UX by visually distinguishing match types
+ */
+export function highlightMonetaryValuesWithPartialMatches(text: string, query: string): string {
+  if (!query.trim()) {
+    return escapeHtml(text);
+  }
+
+  const { amounts, textTokens, range } = extractMonetaryTokens(query);
+  
+  if (amounts.length === 0 && textTokens.length === 0 && !range) {
+    return escapeHtml(text);
+  }
+
+  let highlightedText = escapeHtml(text);
+  
+  // For explicit monetary searches (queries starting with $), be more restrictive
+  const isExplicitMonetary = query.trim().startsWith('$');
+  
+  // Highlight numeric values that match the query amounts
+  if (amounts.length > 0) {
+    // First pass: highlight exact matches with green
+    for (const amount of amounts) {
+      const amountStr = amount.toString();
+      const amountWithCommas = amount.toLocaleString();
+      
+      if (isExplicitMonetary) {
+        const monetaryPattern = new RegExp(
+          `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+          'g'
+        );
+        highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight-exact">$1</mark>');
+      } else {
+        const pattern = new RegExp(
+          `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+          'g'
+        );
+        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-exact">$1</mark>');
+      }
+    }
+    
+    // Second pass: highlight partial matches with yellow
+    // For explicit monetary searches, only do partial matching if no exact matches were found
+    const hasExactMatches = highlightedText.includes('monetary-highlight-exact');
+    const shouldDoPartialMatching = !isExplicitMonetary || !hasExactMatches;
+    
+    if (shouldDoPartialMatching) {
+      const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+      highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+        // Skip if already highlighted
+        if (match.includes('<mark')) {
+          return match;
+        }
+        
+        // Extract the numeric value from the match
+        const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+        
+        // Check if any query amount is a partial match of this value
+        for (const queryAmount of amounts) {
+          if (isPartialMonetaryMatch(queryAmount, numericValue)) {
+            return `<mark class="monetary-highlight-partial">${match}</mark>`;
+          }
+        }
+        
+        return match;
+      });
+    }
+  }
+  
+  // Handle range highlighting
+  if (range) {
+    const rangePatterns = [
+      new RegExp(`\\b${escapeRegex(range.min.toString())}\\s*-\\s*${escapeRegex(range.max.toString())}\\b`, 'g'),
+      new RegExp(`\\b${escapeRegex(range.min.toString())}\\s+to\\s+${escapeRegex(range.max.toString())}\\b`, 'gi'),
+      new RegExp(`\\b${escapeRegex(range.min.toString())}\\b`, 'g'),
+      new RegExp(`\\b${escapeRegex(range.max.toString())}\\b`, 'g'),
+    ];
+    
+    for (const pattern of rangePatterns) {
+      highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-range">$&</mark>');
+    }
+    
+    // Additionally, highlight any monetary values in the text that fall within the range
+    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
+      const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+      
+      if (!isNaN(numericValue) && numericValue >= range.min && numericValue <= range.max) {
+        if (!match.includes('<mark')) {
+          return `<mark class="monetary-highlight-range">${match}</mark>`;
+        }
+      }
+      
+      return match;
+    });
+  }
+  
+  // Also highlight any text tokens that match
+  if (textTokens.length > 0) {
+    for (const token of textTokens) {
+      const regex = new RegExp(`(${escapeRegex(token)})`, 'gi');
+      highlightedText = highlightedText.replace(regex, '<mark class="monetary-highlight-text">$1</mark>');
+    }
+  }
+  
+  return highlightedText;
 }
