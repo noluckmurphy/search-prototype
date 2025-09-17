@@ -2,8 +2,8 @@
   {
     "id": "payment-007",
     "entityType": "Payment",
-    "title": "Precision Plumbing payment",
-    "summary": "Payment recorded to Precision Plumbing via Wire Transfer.",
+    "title": "Precision Plumbing payment (Cost Codes)",
+    "summary": "Payment recorded to Precision Plumbing via Wire Transfer. Cost codes tracked for accounting.",
     "project": "Sunset Heights",
     "client": "Jennifer & Michael Thompson",
     "status": "Cleared",
@@ -40,7 +40,7 @@
   {
     "id": "payment-008",
     "entityType": "Payment",
-    "title": "Granite State Supply payment",
+    "title": "Granite State Supply payment (Template-Based)",
     "summary": "Payment recorded to Granite State Supply via Wire Transfer.",
     "project": "Pinecrest Estate",
     "client": "Lisa & Robert Johnson",
@@ -109,7 +109,7 @@
     "id": "payment-009",
     "entityType": "Payment",
     "title": "Precision Plumbing payment",
-    "summary": "Payment recorded to Precision Plumbing via Check.",
+    "summary": "Payment recorded to Precision Plumbing via Check. Templates used for payment processing.",
     "project": "Sunset Heights",
     "client": "Jennifer & Michael Thompson",
     "status": "Processing",

@@ -6,7 +6,8 @@ export type SearchEntityType =
   | 'Receipt'
   | 'Payment'
   | 'Person'
-  | 'Organization';
+  | 'Organization'
+  | 'Buildertrend';
 
 export type LineItemType = 'Labor' | 'Material' | 'Subcontractor' | 'Other';
 
@@ -74,11 +75,21 @@ export interface OrganizationRecord extends SearchRecordBase {
   website?: string;
 }
 
+export interface BuildertrendRecord extends SearchRecordBase {
+  entityType: 'Buildertrend';
+  path: string;
+  description: string;
+  icon: string;
+  url: string;
+  triggerQueries: string[];
+}
+
 export type SearchRecord =
   | DocumentRecord
   | FinancialRecord
   | PersonRecord
-  | OrganizationRecord;
+  | OrganizationRecord
+  | BuildertrendRecord;
 
 export function isFinancialRecord(record: SearchRecord): record is FinancialRecord {
   return (
@@ -96,6 +107,10 @@ export function isPersonRecord(record: SearchRecord): record is PersonRecord {
 
 export function isOrganizationRecord(record: SearchRecord): record is OrganizationRecord {
   return record.entityType === 'Organization';
+}
+
+export function isBuildertrendRecord(record: SearchRecord): record is BuildertrendRecord {
+  return record.entityType === 'Buildertrend';
 }
 
 export interface SearchGroup {

@@ -1,14 +1,25 @@
 import {
+  BuildertrendRecord,
   FacetKey,
   FacetSelectionState,
   FacetValue,
   SearchGroup,
   SearchRecord,
   SearchResponse,
+  isBuildertrendRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
 } from '../types';
+
+// Declare Lucide global
+declare global {
+  interface Window {
+    lucide?: {
+      createIcons: () => void;
+    };
+  }
+}
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
@@ -241,6 +252,9 @@ function renderFacets(
 
   container.classList.remove('is-empty');
 
+  const settings = settingsStore.getState();
+  const maxFacetValues = settings.maxFacetValues;
+
   facetsEntries.forEach(([key, values]) => {
     const block = document.createElement('section');
     block.className = 'results-view__facet-block';
@@ -252,9 +266,20 @@ function renderFacets(
     const list = document.createElement('ul');
     list.className = 'results-view__facet-list';
 
-    values.forEach((facet) => {
+    // Determine how many values to show initially
+    const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
+    const initialCount = shouldLimit ? maxFacetValues : values.length;
+    const hiddenCount = values.length - initialCount;
+
+    // Create facet items
+    values.forEach((facet, index) => {
       const listItem = document.createElement('li');
       listItem.className = 'results-view__facet-item';
+      
+      // Hide items beyond the initial count
+      if (shouldLimit && index >= initialCount) {
+        listItem.classList.add('facet-item--hidden');
+      }
 
       const label = document.createElement('label');
       label.className = 'facet-checkbox';
@@ -286,6 +311,44 @@ function renderFacets(
     });
 
     block.append(list);
+
+    // Add show more/less toggle if needed
+    if (shouldLimit && hiddenCount > 0) {
+      const toggleContainer = document.createElement('div');
+      toggleContainer.className = 'facet-toggle-container';
+
+      const toggleButton = document.createElement('button');
+      toggleButton.type = 'button';
+      toggleButton.className = 'facet-toggle-button';
+      toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? '' : '...'}`;
+      toggleButton.dataset.facetKey = key;
+
+      toggleContainer.append(toggleButton);
+      block.append(toggleContainer);
+
+      // Add toggle functionality
+      toggleButton.addEventListener('click', () => {
+        const isExpanded = toggleButton.classList.contains('is-expanded');
+        const allItems = list.querySelectorAll('.results-view__facet-item');
+        
+        if (isExpanded) {
+          // Collapse: hide items beyond initial count
+          allItems.forEach((item, index) => {
+            if (index >= initialCount) {
+              item.classList.add('facet-item--hidden');
+            }
+          });
+          toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? '' : '...'}`;
+          toggleButton.classList.remove('is-expanded');
+        } else {
+          // Expand: show all items
+          allItems.forEach(item => item.classList.remove('facet-item--hidden'));
+          toggleButton.textContent = 'Show less';
+          toggleButton.classList.add('is-expanded');
+        }
+      });
+    }
+
     container.append(block);
   });
 }
@@ -369,7 +432,31 @@ function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, is
 
 function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement {
   const card = document.createElement('article');
-  card.className = 'result-card';
+  
+  // Add Buildertrend-specific styling
+  if (isBuildertrendRecord(item)) {
+    card.className = 'result-card result-card--buildertrend';
+    card.setAttribute('data-url', item.url);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Navigate to ${item.title}`);
+    
+    // Add click handler for navigation
+    card.addEventListener('click', () => {
+      // TODO: Implement navigation logic
+      console.log('Navigate to:', item.url);
+    });
+    
+    // Add keyboard support
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        console.log('Navigate to:', item.url);
+      }
+    });
+  } else {
+    card.className = 'result-card';
+  }
 
   const header = document.createElement('div');
   header.className = 'result-card__header';
@@ -379,11 +466,32 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
   const title = document.createElement('h3');
   title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
 
+  // Add icon for Buildertrend records
+  if (isBuildertrendRecord(item)) {
+    const icon = document.createElement('i');
+    icon.className = 'result-card__icon';
+    icon.setAttribute('data-lucide', item.icon);
+    header.append(icon, title);
+    
+    // Update icons after DOM is ready
+    requestAnimationFrame(() => {
+      if (window.lucide) {
+        try {
+          window.lucide.createIcons();
+        } catch (error) {
+          console.warn('Error updating icons:', error);
+        }
+      }
+    });
+  } else {
+    header.append(title);
+  }
+
   const badge = document.createElement('span');
   badge.className = 'result-card__badge';
   badge.textContent = formatEntityType(item.entityType);
 
-  header.append(title, badge);
+  header.append(badge);
 
   const summary = document.createElement('p');
   summary.className = 'result-card__summary';
@@ -431,6 +539,12 @@ function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: b
     entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
     metas.push(entry);
   };
+
+  if (isBuildertrendRecord(item)) {
+    pushMeta('Navigate To', item.path);
+    pushMeta('Description', item.description);
+    return metas;
+  }
 
   pushMeta('Project', item.project);
   pushMeta('Status', item.status);
@@ -635,7 +749,7 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   wrapper.className = 'result-card__line-items';
 
   const heading = document.createElement('h4');
-  heading.textContent = 'Line items';
+  heading.textContent = `Line item${items.length === 1 ? '' : 's'}`;
   wrapper.append(heading);
 
   // Helper function to render a line item row
@@ -660,7 +774,7 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   if (!shouldShowLineItems) {
     const toggleLink = document.createElement('button');
     toggleLink.className = 'line-items-toggle';
-    toggleLink.textContent = `Show line items (${items.length})`;
+    toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
     toggleLink.type = 'button';
     
     const table = document.createElement('table');
@@ -704,10 +818,10 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     toggleLink.addEventListener('click', () => {
       if (table.style.display === 'none') {
         table.style.display = 'table';
-        toggleLink.textContent = 'Hide line items';
+        toggleLink.textContent = `Hide line item${items.length === 1 ? '' : 's'}`;
       } else {
         table.style.display = 'none';
-        toggleLink.textContent = `Show line items (${items.length})`;
+        toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
       }
     });
     
@@ -799,7 +913,7 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
       collapsedRow.innerHTML = `
         <td colspan="5" class="line-item__collapsed-content">
           <span class="line-item__collapsed-text">...</span>
-          <span class="line-item__collapsed-count">${itemCount} items</span>
+          <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? '' : 's'}</span>
         </td>
       `;
       tbody.append(collapsedRow);

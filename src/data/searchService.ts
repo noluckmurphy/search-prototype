@@ -1,4 +1,5 @@
 import {
+  BuildertrendRecord,
   DocumentRecord,
   FacetKey,
   FacetSelectionState,
@@ -11,6 +12,7 @@ import {
   SearchOptions,
   SearchRecord,
   SearchResponse,
+  isBuildertrendRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
@@ -18,6 +20,7 @@ import {
 import { settingsStore } from '../state/settingsStore';
 
 const GROUP_ORDER: SearchEntityType[] = [
+  'Buildertrend',
   'Document',
   'Person',
   'Organization',
@@ -52,11 +55,20 @@ async function loadCorpus(): Promise<SearchRecord[]> {
   }
 
   try {
+    const allRecords: any[] = [];
+    
+    // Load Buildertrend corpus first (for priority ordering)
+    try {
+      const buildertrendResponse = await fetch('./buildertrend-corpus.json');
+      const buildertrendData = await buildertrendResponse.json();
+      allRecords.push(...buildertrendData);
+    } catch (error) {
+      console.warn('Could not load Buildertrend corpus:', error);
+    }
+    
     // Load the index file to get metadata about the split files
     const indexResponse = await fetch('./corpus-parts/index.json');
     const indexData = await indexResponse.json();
-    
-    const allRecords: any[] = [];
     
     // Load each corpus part file
     for (const fileInfo of indexData.files) {
@@ -93,6 +105,16 @@ function normalizeRecord(record: any): SearchRecord {
   };
 
   switch (record.entityType as SearchEntityType) {
+    case 'Buildertrend':
+      return {
+        ...baseRecord,
+        entityType: 'Buildertrend',
+        path: record.path,
+        description: record.description,
+        icon: record.icon,
+        url: record.url,
+        triggerQueries: record.triggerQueries,
+      } as BuildertrendRecord;
     case 'Document':
       return {
         ...baseRecord,
@@ -147,7 +169,15 @@ function buildHaystack(record: SearchRecord): string {
     ...Object.values(record.metadata ?? {}).map((value) => (value == null ? '' : String(value))),
   ];
 
-  if (isFinancialRecord(record)) {
+  if (isBuildertrendRecord(record)) {
+    base.push(
+      record.path,
+      record.description,
+      record.icon,
+      record.url,
+      ...record.triggerQueries,
+    );
+  } else if (isFinancialRecord(record)) {
     record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
     });
@@ -314,11 +344,22 @@ function matchesMonetaryString(queryStr: string, dataValue: number): boolean {
       return false;
     }
   } else if (querySignificantDigits >= 3) {
-    // 3 digits (like "800") - restrictive, must start with same 3 digits
-    if (normalizedData.length >= 3) {
-      return normalizedData.startsWith(normalizedQuery);
+    // 3 digits (like "123") - be more restrictive for explicit monetary queries
+    // Only match if:
+    // 1. Exact match (already handled above)
+    // 2. Data value is longer and starts with the query AND has zeros after (e.g., 123 matches 1230, 12300, but NOT 1233, 1234)
+    // 3. Do NOT match shorter values - user provided 3 digits, so be restrictive
+    if (normalizedData.length > querySignificantDigits) {
+      // Data is longer - only match if it starts with query AND the next digit is 0
+      // This prevents 123 from matching 1233, 1234, etc.
+      if (normalizedData.startsWith(normalizedQuery)) {
+        const nextDigit = normalizedData[querySignificantDigits];
+        return nextDigit === '0';
+      }
+      return false;
     } else {
-      return normalizedQuery.startsWith(normalizedData);
+      // Same length or shorter - only exact match (already handled above)
+      return false;
     }
   } else if (querySignificantDigits >= 2) {
     // 2 digits (like "80") - moderate restriction, must start with same 2 digits
@@ -519,6 +560,11 @@ function matchesSelections(record: SearchRecord, selections?: FacetSelectionStat
   for (const key of Object.keys(selections) as FacetKey[]) {
     const values = selections[key];
     if (!values || values.size === 0) {
+      continue;
+    }
+
+    // Skip groupBy facet - it's used for organization, not filtering
+    if (key === 'groupBy') {
       continue;
     }
 
@@ -895,8 +941,32 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   
   const corpus = await loadCorpus();
-  const filtered = corpus.filter((record) => {
+  
+  // First, check for Buildertrend matches (exact trigger query matches)
+  const buildertrendMatches: SearchRecord[] = [];
+  const otherMatches: SearchRecord[] = [];
+  
+  console.log('Starting search for:', searchQuery, 'with corpus size:', corpus.length);
+  
+  corpus.forEach((record, index) => {
     let matchesQueryResult: boolean;
+    
+    // Check for Buildertrend trigger query matches first
+    if (isBuildertrendRecord(record)) {
+      console.log(`Checking Buildertrend record ${index}:`, record.title, 'triggerQueries:', record.triggerQueries);
+      matchesQueryResult = record.triggerQueries.some(triggerQuery => {
+        const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
+        if (match) {
+          console.log('Found exact match:', triggerQuery, '===', searchQuery);
+        }
+        return match;
+      });
+      if (matchesQueryResult) {
+        console.log('Buildertrend match found:', record.title, 'for query:', searchQuery);
+        buildertrendMatches.push(record);
+      }
+      return; // Always skip regular matching for Buildertrend records
+    }
     
     if (isMonetary) {
       // Explicit monetary search (query starts with $)
@@ -909,11 +979,22 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
       matchesQueryResult = matchesQuery(record, searchQuery);
     }
     
-    return matchesQueryResult && matchesSelections(record, selections);
+    if (matchesQueryResult && matchesSelections(record, selections)) {
+      otherMatches.push(record);
+    }
   });
   
-  // Use relevance-based sorting for non-empty queries, recency for empty queries
-  return searchQuery.trim() ? sortByRelevance(filtered, searchQuery, isMonetary) : sortByRecency(filtered);
+  // Sort other matches by relevance/recency
+  const sortedOtherMatches = searchQuery.trim() ? sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
+  
+  console.log('Search results for "' + searchQuery + '":', {
+    buildertrendMatches: buildertrendMatches.length,
+    otherMatches: sortedOtherMatches.length,
+    total: buildertrendMatches.length + sortedOtherMatches.length
+  });
+  
+  // Return Buildertrend matches first, then other matches
+  return [...buildertrendMatches, ...sortedOtherMatches];
 }
 
 function determineGroupEntityType(records: SearchRecord[]): SearchEntityType {
@@ -990,13 +1071,13 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
         groupKey = record.entityType;
         break;
       case 'Project':
-        groupKey = record.project;
+        groupKey = record.project || 'No Project';
         break;
       case 'Status':
-        groupKey = record.status;
+        groupKey = record.status || 'No Status';
         break;
       case 'Client':
-        groupKey = record.client;
+        groupKey = record.client || 'No Client';
         break;
       default:
         groupKey = record.entityType;
@@ -1010,6 +1091,13 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
 
   // Sort groups by key name for consistent ordering
   const sortedEntries = Array.from(map.entries()).sort((a, b) => {
+    // Handle "No X" groups by putting them at the end
+    const aIsEmpty = a[0].startsWith('No ');
+    const bIsEmpty = b[0].startsWith('No ');
+    
+    if (aIsEmpty && !bIsEmpty) return 1;
+    if (!aIsEmpty && bIsEmpty) return -1;
+    
     if (groupBy === 'Type') {
       const orderA = GROUP_ORDER.indexOf(a[0] as SearchEntityType);
       const orderB = GROUP_ORDER.indexOf(b[0] as SearchEntityType);

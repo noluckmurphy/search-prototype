@@ -1,0 +1,57 @@
+[
+  {
+    "id": "bt-templates",
+    "entityType": "Buildertrend",
+    "title": "Templates",
+    "summary": "Job Info → Templates",
+    "path": "Job Info → Templates",
+    "description": "Access and manage your project templates",
+    "icon": "layout-template",
+    "url": "/app/Templates/MyTemplates",
+    "triggerQueries": ["templates", "template", "Templates", "Template", "TEMPLATES", "TEMPLATE"],
+    "project": "System",
+    "client": "Buildertrend",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "tags": ["templates", "job-info", "buildertrend"],
+    "metadata": {}
+  },
+  {
+    "id": "bt-cost-codes",
+    "entityType": "Buildertrend",
+    "title": "Cost Codes",
+    "summary": "Settings → Cost Codes",
+    "path": "Settings → Cost Codes",
+    "description": "Manage cost codes for project tracking and billing",
+    "icon": "hash",
+    "url": "/app/Settings/CostCodes",
+    "triggerQueries": [
+      "cost code", "cost codes", "costcode", "costcodes", "cost-code", "cost-codes",
+      "Cost Code", "Cost Codes", "CostCode", "CostCodes", "Cost-Code", "Cost-Codes",
+      "COST CODE", "COST CODES", "COSTCODE", "COSTCODES", "COST-CODE", "COST-CODES"
+    ],
+    "project": "System",
+    "client": "Buildertrend",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "tags": ["cost-codes", "settings", "buildertrend"],
+    "metadata": {}
+  },
+  {
+    "id": "bt-subs-vendors",
+    "entityType": "Buildertrend",
+    "title": "Subs & Vendors Directory",
+    "summary": "Manage Users → Subs/Vendors",
+    "path": "Manage Users → Subs/Vendors",
+    "description": "Directory of subcontractors and vendors",
+    "icon": "users",
+    "url": "/app/Sub",
+    "triggerQueries": [
+      "sub", "subs", "vendor", "vendors", "Sub", "Subs", "Vendor", "Vendors",
+      "SUB", "SUBS", "VENDOR", "VENDORS"
+    ],
+    "project": "System",
+    "client": "Buildertrend",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "tags": ["subs", "vendors", "directory", "manage-users", "buildertrend"],
+    "metadata": {}
+  }
+]

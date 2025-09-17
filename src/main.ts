@@ -4,10 +4,20 @@ import { createHeader } from './components/header';
 import { createSearchDialog } from './components/searchDialog';
 import { createResultsView } from './components/resultsView';
 import { createSettingsView } from './components/settingsView';
+import { createHomeSkeleton } from './components/homeSkeleton';
 import { appState, AppState } from './state/appState';
 import { runSearch } from './data/searchService';
 import { ScreenRoute } from './types';
 import { getEffectiveQueryLength, MIN_EFFECTIVE_QUERY_LENGTH } from './utils/query';
+
+// Declare Lucide global
+declare global {
+  interface Window {
+    lucide?: {
+      createIcons: () => void;
+    };
+  }
+}
 
 function isMonetaryQuery(query: string): boolean {
   return query.trim().startsWith('$');
@@ -137,12 +147,7 @@ const homeScreen = document.createElement('section');
 homeScreen.id = 'screen-home';
 homeScreen.dataset.screen = 'home';
 homeScreen.className = 'screen screen--home';
-homeScreen.innerHTML = `
-  <div class="home-ghost">
-    <h1>Global search prototype</h1>
-    <p>This area stands in for future homepage content. Use the search bar above to open the quick results dialog.</p>
-  </div>
-`;
+homeScreen.appendChild(createHomeSkeleton());
 
 const resultsScreen = document.createElement('section');
 resultsScreen.id = 'screen-results';
@@ -158,6 +163,17 @@ settingsScreen.append(settingsView.element);
 
 main.append(homeScreen, resultsScreen, settingsScreen);
 root.append(header.element, main);
+
+// Initialize icons after header is in DOM
+requestAnimationFrame(() => {
+  if (window.lucide) {
+    try {
+      window.lucide.createIcons();
+    } catch (error) {
+      console.warn('Error initializing header icons:', error);
+    }
+  }
+});
 
 const screens: Record<ScreenRoute, HTMLElement> = {
   home: homeScreen,
@@ -364,6 +380,28 @@ appState.subscribe((state) => {
 
 document.addEventListener('keydown', handleGlobalKeydown);
 document.addEventListener('mousedown', handleDocumentClick);
+
+// Initialize Lucide icons - simplified to prevent loops
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.lucide) {
+    try {
+      window.lucide.createIcons();
+    } catch (error) {
+      console.warn('Error initializing Lucide icons:', error);
+    }
+  }
+});
+
+// Simple icon update function - called manually when needed
+function updateIcons() {
+  if (window.lucide) {
+    try {
+      window.lucide.createIcons();
+    } catch (error) {
+      console.warn('Error updating Lucide icons:', error);
+    }
+  }
+}
 
 // Initial render
 appState.setRoute('home');

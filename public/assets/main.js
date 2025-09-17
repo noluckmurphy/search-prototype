@@ -1,3 +1,68 @@
+// src/components/shortcutPill.ts
+function detectOS() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.includes("mac")) {
+    return "mac";
+  } else if (userAgent.includes("win")) {
+    return "windows";
+  } else if (userAgent.includes("linux")) {
+    return "linux";
+  }
+  return "other";
+}
+function getShortcutDisplay(os) {
+  switch (os) {
+    case "mac":
+      return "\u2318K";
+    case "windows":
+    case "linux":
+      return "Ctrl+K";
+    case "other":
+      return "\u2318K";
+    default:
+      return "\u2318K";
+  }
+}
+function getTooltipText(os) {
+  switch (os) {
+    case "mac":
+      return "Press / or \u2318K to focus search";
+    case "windows":
+    case "linux":
+      return "Press / or Ctrl+K to focus search";
+    case "other":
+      return "Press / or \u2318K to focus search";
+    default:
+      return "Press / or \u2318K to focus search";
+  }
+}
+function createShortcutPill(options = {}) {
+  const os = detectOS();
+  const shortcutDisplay = getShortcutDisplay(os);
+  const tooltipText = getTooltipText(os);
+  const pill = document.createElement("div");
+  pill.className = "shortcut-pill";
+  pill.setAttribute("title", tooltipText);
+  pill.setAttribute("aria-label", tooltipText);
+  pill.setAttribute("role", "img");
+  const keys = shortcutDisplay.split("+");
+  keys.forEach((key, index) => {
+    if (index > 0) {
+      const plus = document.createElement("span");
+      plus.className = "shortcut-pill__plus";
+      plus.textContent = "+";
+      pill.appendChild(plus);
+    }
+    const keyElement = document.createElement("kbd");
+    keyElement.className = "shortcut-pill__key";
+    keyElement.textContent = key;
+    pill.appendChild(keyElement);
+  });
+  return {
+    element: pill
+  };
+}
+
 // src/components/header.ts
 function createHeader(options) {
   const header2 = document.createElement("header");
@@ -6,6 +71,15 @@ function createHeader(options) {
   nav.className = "app-nav";
   const brand = document.createElement("div");
   brand.className = "brand";
+  const logoLink = document.createElement("button");
+  logoLink.type = "button";
+  logoLink.className = "logo-link";
+  logoLink.setAttribute("aria-label", "Go to Home");
+  const logoSvg = document.createElement("div");
+  logoSvg.className = "logo-svg";
+  logoSvg.innerHTML = `<svg id="btLogoIcon" aria-label="Logo SVG" fill="none" viewBox="0 0 78 97" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M32.058 18.013H15.706V.026H0V49.726c0 17.513 14.198 31.71 31.711 31.71 17.514 0 31.711-14.198 31.711-31.711 0-17.398-14.01-31.525-31.364-31.712Zm-.347 47.67c-8.813 0-15.958-7.145-15.958-15.958 0-8.814 7.145-15.958 15.958-15.958 8.814 0 15.958 7.144 15.958 15.958 0 8.813-7.144 15.958-15.958 15.958Z" fill="#001A43"></path><path d="m54.336 9.411-3.19 5.524c12.206 6.823 20.46 19.87 20.46 34.846 0 22.033-17.861 39.895-39.895 39.895-7.48 0-14.477-2.06-20.46-5.641l-3.188 5.523A46.004 46.004 0 0 0 31.71 96.07C57.235 96.07 78 75.305 78 49.781c0-17.311-9.554-32.43-23.664-40.37Z" fill="#00D8D8"></path></svg>`;
+  logoLink.appendChild(logoSvg);
+  brand.appendChild(logoLink);
   const searchArea = document.createElement("div");
   searchArea.className = "search-area";
   const searchForm = document.createElement("form");
@@ -17,9 +91,14 @@ function createHeader(options) {
   searchInput.id = "global-search";
   searchInput.placeholder = "Search projects, invoices, documents\u2026";
   searchInput.autocomplete = "off";
+  const searchIcon = document.createElement("i");
+  searchIcon.className = "search-icon";
+  searchIcon.setAttribute("data-lucide", "search");
+  const shortcutPill = createShortcutPill();
+  shortcutPill.element.className += " search-shortcut-pill";
   const dialogHost = document.createElement("div");
   dialogHost.className = "search-dialog-host";
-  searchForm.append(searchInput);
+  searchForm.append(searchIcon, searchInput, shortcutPill.element);
   searchArea.append(searchForm, dialogHost);
   const navActions = document.createElement("div");
   navActions.className = "nav-actions";
@@ -42,9 +121,11 @@ function createHeader(options) {
     options.onSearchChange(searchInput.value);
   });
   searchInput.addEventListener("focus", () => {
+    shortcutPill.element.style.display = "none";
     options.onSearchFocus?.();
   });
   searchInput.addEventListener("blur", () => {
+    shortcutPill.element.style.display = "inline-flex";
     options.onSearchBlur?.();
   });
   searchInput.addEventListener("keydown", (event) => {
@@ -55,6 +136,9 @@ function createHeader(options) {
     options.onSearchSubmit();
   });
   homeButton.addEventListener("click", () => {
+    options.onHome();
+  });
+  logoLink.addEventListener("click", () => {
     options.onHome();
   });
   navActions.addEventListener("click", (event) => {
@@ -100,6 +184,9 @@ function isPersonRecord(record) {
 }
 function isOrganizationRecord(record) {
   return record.entityType === "Organization";
+}
+function isBuildertrendRecord(record) {
+  return record.entityType === "Buildertrend";
 }
 
 // src/utils/format.ts
@@ -563,7 +650,7 @@ function renderDialogContents(container, state, options) {
   const seeAllButton = document.createElement("button");
   seeAllButton.type = "button";
   seeAllButton.className = "see-all-button";
-  seeAllButton.textContent = `See ${response.totalResults} results \u2192`;
+  seeAllButton.textContent = `See ${response.totalResults} result${response.totalResults === 1 ? "" : "s"} \u2192`;
   seeAllButton.addEventListener("click", () => options.onSeeAllResults());
   footer.append(seeAllButton);
   container.append(footer);
@@ -631,24 +718,63 @@ function renderGroup(group, query, isMonetarySearch) {
 }
 function renderGroupItem(item, query, isMonetarySearch) {
   const li = document.createElement("li");
-  li.className = "search-dialog__item";
+  if (isBuildertrendRecord(item)) {
+    li.className = "search-dialog__item search-dialog__item--buildertrend";
+    li.setAttribute("data-url", item.url);
+    li.setAttribute("tabindex", "0");
+    li.setAttribute("role", "button");
+    li.setAttribute("aria-label", `Navigate to ${item.title}`);
+    li.addEventListener("click", () => {
+      console.log("Navigate to:", item.url);
+    });
+    li.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        console.log("Navigate to:", item.url);
+      }
+    });
+  } else {
+    li.className = "search-dialog__item";
+  }
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+  const header2 = document.createElement("div");
+  header2.className = "search-dialog__item-header";
+  if (isBuildertrendRecord(item)) {
+    const icon = document.createElement("i");
+    icon.className = "search-dialog__item-icon";
+    icon.setAttribute("data-lucide", item.icon);
+    header2.append(icon);
+    requestAnimationFrame(() => {
+      if (window.lucide) {
+        try {
+          window.lucide.createIcons();
+        } catch (error) {
+          console.warn("Error updating icons:", error);
+        }
+      }
+    });
+  }
   const title = document.createElement("div");
   title.className = "search-dialog__item-title";
   title.innerHTML = highlightFn(item.title, query);
+  header2.append(title);
   const meta = document.createElement("div");
   meta.className = "search-dialog__item-meta";
   const metaText = buildItemMeta(item, query, isMonetarySearch);
   meta.innerHTML = highlightFn(metaText, query);
-  const match = findBestMatch(item, query);
-  if (match && match.field !== "title") {
-    const context = document.createElement("div");
-    context.className = "search-context";
-    const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 80, query);
-    context.innerHTML = highlightedSnippet;
-    li.append(title, meta, context);
+  if (!isBuildertrendRecord(item)) {
+    const match = findBestMatch(item, query);
+    if (match && match.field !== "title") {
+      const context = document.createElement("div");
+      context.className = "search-context";
+      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 80, query);
+      context.innerHTML = highlightedSnippet;
+      li.append(header2, meta, context);
+    } else {
+      li.append(header2, meta);
+    }
   } else {
-    li.append(title, meta);
+    li.append(header2, meta);
   }
   if (query && isFinancialRecord(item)) {
     const lineItemsMatch = renderMiniLineItems(item, query, isMonetarySearch);
@@ -660,6 +786,11 @@ function renderGroupItem(item, query, isMonetarySearch) {
 }
 function buildItemMeta(item, query, isMonetarySearch) {
   const parts = [];
+  if (isBuildertrendRecord(item)) {
+    parts.push(item.path);
+    parts.push(item.description);
+    return parts.filter(Boolean).join(" \u2022 ");
+  }
   parts.push(item.project);
   if (item.entityType === "Document") {
     parts.push(item.documentType);
@@ -771,7 +902,8 @@ var defaults_default = {
   lineItemsContextCount: 3,
   showLineItemsByDefault: true,
   collapseIrrelevantLineItems: true,
-  lineItemsCollapseThreshold: 5
+  lineItemsCollapseThreshold: 5,
+  maxFacetValues: 5
 };
 
 // src/state/store.ts
@@ -804,7 +936,8 @@ function normalize(state) {
     lineItemsContextCount: state.lineItemsContextCount ?? 3,
     showLineItemsByDefault: state.showLineItemsByDefault ?? true,
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
-    lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5
+    lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
+    maxFacetValues: state.maxFacetValues ?? 5
   };
 }
 function mergeSettings(base, overrides) {
@@ -1014,6 +1147,8 @@ function renderFacets(container, status, response, selections, options) {
     return;
   }
   container.classList.remove("is-empty");
+  const settings = settingsStore.getState();
+  const maxFacetValues = settings.maxFacetValues;
   facetsEntries.forEach(([key, values]) => {
     const block = document.createElement("section");
     block.className = "results-view__facet-block";
@@ -1022,9 +1157,15 @@ function renderFacets(container, status, response, selections, options) {
     block.append(heading);
     const list = document.createElement("ul");
     list.className = "results-view__facet-list";
-    values.forEach((facet) => {
+    const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
+    const initialCount = shouldLimit ? maxFacetValues : values.length;
+    const hiddenCount = values.length - initialCount;
+    values.forEach((facet, index) => {
       const listItem = document.createElement("li");
       listItem.className = "results-view__facet-item";
+      if (shouldLimit && index >= initialCount) {
+        listItem.classList.add("facet-item--hidden");
+      }
       const label = document.createElement("label");
       label.className = "facet-checkbox";
       const checkbox = document.createElement("input");
@@ -1048,6 +1189,34 @@ function renderFacets(container, status, response, selections, options) {
       });
     });
     block.append(list);
+    if (shouldLimit && hiddenCount > 0) {
+      const toggleContainer = document.createElement("div");
+      toggleContainer.className = "facet-toggle-container";
+      const toggleButton = document.createElement("button");
+      toggleButton.type = "button";
+      toggleButton.className = "facet-toggle-button";
+      toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
+      toggleButton.dataset.facetKey = key;
+      toggleContainer.append(toggleButton);
+      block.append(toggleContainer);
+      toggleButton.addEventListener("click", () => {
+        const isExpanded = toggleButton.classList.contains("is-expanded");
+        const allItems = list.querySelectorAll(".results-view__facet-item");
+        if (isExpanded) {
+          allItems.forEach((item, index) => {
+            if (index >= initialCount) {
+              item.classList.add("facet-item--hidden");
+            }
+          });
+          toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
+          toggleButton.classList.remove("is-expanded");
+        } else {
+          allItems.forEach((item) => item.classList.remove("facet-item--hidden"));
+          toggleButton.textContent = "Show less";
+          toggleButton.classList.add("is-expanded");
+        }
+      });
+    }
     container.append(block);
   });
 }
@@ -1103,16 +1272,50 @@ function renderGroup2(group, groupTitle, query, isMonetarySearch) {
 }
 function renderResultCard(item, query, isMonetarySearch) {
   const card = document.createElement("article");
-  card.className = "result-card";
+  if (isBuildertrendRecord(item)) {
+    card.className = "result-card result-card--buildertrend";
+    card.setAttribute("data-url", item.url);
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Navigate to ${item.title}`);
+    card.addEventListener("click", () => {
+      console.log("Navigate to:", item.url);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        console.log("Navigate to:", item.url);
+      }
+    });
+  } else {
+    card.className = "result-card";
+  }
   const header2 = document.createElement("div");
   header2.className = "result-card__header";
   const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
   const title = document.createElement("h3");
   title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
+  if (isBuildertrendRecord(item)) {
+    const icon = document.createElement("i");
+    icon.className = "result-card__icon";
+    icon.setAttribute("data-lucide", item.icon);
+    header2.append(icon, title);
+    requestAnimationFrame(() => {
+      if (window.lucide) {
+        try {
+          window.lucide.createIcons();
+        } catch (error) {
+          console.warn("Error updating icons:", error);
+        }
+      }
+    });
+  } else {
+    header2.append(title);
+  }
   const badge = document.createElement("span");
   badge.className = "result-card__badge";
   badge.textContent = formatEntityType(item.entityType);
-  header2.append(title, badge);
+  header2.append(badge);
   const summary = document.createElement("p");
   summary.className = "result-card__summary";
   summary.innerHTML = query && highlightFn ? highlightFn(item.summary, query) : item.summary;
@@ -1150,6 +1353,11 @@ function buildMetaItems(item, query, isMonetarySearch) {
     entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
     metas.push(entry);
   };
+  if (isBuildertrendRecord(item)) {
+    pushMeta("Navigate To", item.path);
+    pushMeta("Description", item.description);
+    return metas;
+  }
   pushMeta("Project", item.project);
   pushMeta("Status", item.status);
   if (item.entityType === "Document") {
@@ -1296,7 +1504,7 @@ function renderLineItems(item, query, isMonetarySearch) {
   const wrapper = document.createElement("div");
   wrapper.className = "result-card__line-items";
   const heading = document.createElement("h4");
-  heading.textContent = "Line items";
+  heading.textContent = `Line item${items.length === 1 ? "" : "s"}`;
   wrapper.append(heading);
   const renderLineItemRow = (line, index) => {
     const row = document.createElement("tr");
@@ -1316,7 +1524,7 @@ function renderLineItems(item, query, isMonetarySearch) {
   if (!shouldShowLineItems) {
     const toggleLink = document.createElement("button");
     toggleLink.className = "line-items-toggle";
-    toggleLink.textContent = `Show line items (${items.length})`;
+    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
     toggleLink.type = "button";
     const table2 = document.createElement("table");
     table2.className = "line-items-table";
@@ -1352,10 +1560,10 @@ function renderLineItems(item, query, isMonetarySearch) {
     toggleLink.addEventListener("click", () => {
       if (table2.style.display === "none") {
         table2.style.display = "table";
-        toggleLink.textContent = "Hide line items";
+        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
       } else {
         table2.style.display = "none";
-        toggleLink.textContent = `Show line items (${items.length})`;
+        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
       }
     });
     wrapper.append(toggleLink, table2);
@@ -1422,7 +1630,7 @@ function renderLineItems(item, query, isMonetarySearch) {
       collapsedRow.innerHTML = `
         <td colspan="5" class="line-item__collapsed-content">
           <span class="line-item__collapsed-text">...</span>
-          <span class="line-item__collapsed-count">${itemCount} items</span>
+          <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
         </td>
       `;
       tbody.append(collapsedRow);
@@ -1601,6 +1809,24 @@ function createSettingsView() {
   `;
   collapseThresholdField.append(collapseThresholdSelect);
   resultsSection.append(collapseThresholdField);
+  const maxFacetValuesField = document.createElement("div");
+  maxFacetValuesField.className = "settings-field";
+  maxFacetValuesField.innerHTML = `
+    <label for="max-facet-values">Max facet values to show</label>
+  `;
+  const maxFacetValuesSelect = document.createElement("select");
+  maxFacetValuesSelect.id = "max-facet-values";
+  maxFacetValuesSelect.innerHTML = `
+    <option value="3">3 values</option>
+    <option value="5">5 values</option>
+    <option value="7">7 values</option>
+    <option value="10">10 values</option>
+    <option value="15">15 values</option>
+    <option value="20">20 values</option>
+    <option value="0">Show all</option>
+  `;
+  maxFacetValuesField.append(maxFacetValuesSelect);
+  resultsSection.append(maxFacetValuesField);
   const groupSection = document.createElement("fieldset");
   groupSection.className = "settings-group";
   groupSection.innerHTML = `
@@ -1650,6 +1876,7 @@ function createSettingsView() {
     showLineItemsCheckbox.checked = state.showLineItemsByDefault;
     collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
     collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
+    maxFacetValuesSelect.value = String(state.maxFacetValues);
     renderGroupInputs(state.groupLimits);
   };
   form.addEventListener("submit", (event) => {
@@ -1660,6 +1887,8 @@ function createSettingsView() {
     const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
     const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
     const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
+    const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
+    const resolvedMaxFacetValues = Number.isFinite(maxFacetValues) && maxFacetValues >= 0 ? maxFacetValues : 5;
     const groupLimits = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -1671,6 +1900,7 @@ function createSettingsView() {
       showLineItemsByDefault: showLineItemsCheckbox.checked,
       collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
       lineItemsCollapseThreshold: resolvedCollapseThreshold,
+      maxFacetValues: resolvedMaxFacetValues,
       groupLimits
     });
     window.location.reload();
@@ -1685,6 +1915,196 @@ function createSettingsView() {
     element: container,
     render
   };
+}
+
+// src/components/skeletonComponents.ts
+function createSkeletonLine(options = {}) {
+  const { width = "100%", height = "1rem", className = "", animated = true } = options;
+  const line = document.createElement("div");
+  line.className = `skeleton-line ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  line.style.width = width;
+  line.style.height = height;
+  return line;
+}
+function createSkeletonRect(options = {}) {
+  const { width = "100%", height = "4rem", className = "", animated = true } = options;
+  const rect = document.createElement("div");
+  rect.className = `skeleton-rect ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  rect.style.width = width;
+  rect.style.height = height;
+  return rect;
+}
+function createSkeletonCircle(options = {}) {
+  const { width = "2rem", height = "2rem", className = "", animated = true } = options;
+  const circle = document.createElement("div");
+  circle.className = `skeleton-circle ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  circle.style.width = width;
+  circle.style.height = height;
+  return circle;
+}
+
+// src/components/homeSkeleton.ts
+function createHomeSkeleton() {
+  const container = document.createElement("div");
+  container.className = "skeleton-home";
+  const header2 = document.createElement("div");
+  header2.className = "skeleton-home__header";
+  const titleSection = document.createElement("div");
+  titleSection.className = "skeleton-home__title-section";
+  const projectTitle = createSkeletonLine({ width: "12rem", height: "1.5rem" });
+  const statusBadge = createSkeletonRect({ width: "4rem", height: "1.5rem", className: "skeleton-home__status-badge" });
+  titleSection.appendChild(projectTitle);
+  titleSection.appendChild(statusBadge);
+  header2.appendChild(titleSection);
+  const infoLines = document.createElement("div");
+  infoLines.className = "skeleton-home__info-lines";
+  const addressLine = createSkeletonLine({ width: "16rem", height: "1rem" });
+  const clockInLine = createSkeletonLine({ width: "14rem", height: "1rem" });
+  const actionLink = createSkeletonLine({ width: "8rem", height: "1rem", className: "skeleton-home__action-link" });
+  infoLines.appendChild(addressLine);
+  infoLines.appendChild(clockInLine);
+  infoLines.appendChild(actionLink);
+  header2.appendChild(infoLines);
+  const peopleSection = document.createElement("div");
+  peopleSection.className = "skeleton-home__people-section";
+  const clientsGroup = document.createElement("div");
+  clientsGroup.className = "skeleton-home__people-group";
+  const clientsLabel = createSkeletonLine({ width: "3rem", height: "1rem" });
+  const clientsAvatars = document.createElement("div");
+  clientsAvatars.className = "skeleton-home__people-avatars";
+  const clientAvatar = createSkeletonCircle({ width: "2.5rem", height: "2.5rem" });
+  clientsAvatars.appendChild(clientAvatar);
+  clientsGroup.appendChild(clientsLabel);
+  clientsGroup.appendChild(clientsAvatars);
+  peopleSection.appendChild(clientsGroup);
+  const managersGroup = document.createElement("div");
+  managersGroup.className = "skeleton-home__people-group";
+  const managersLabel = createSkeletonLine({ width: "6rem", height: "1rem" });
+  const managersAvatars = document.createElement("div");
+  managersAvatars.className = "skeleton-home__people-avatars";
+  const managerAvatar1 = createSkeletonCircle({ width: "2rem", height: "2rem" });
+  const managerAvatar2 = createSkeletonCircle({ width: "2rem", height: "2rem" });
+  managersAvatars.appendChild(managerAvatar1);
+  managersAvatars.appendChild(managerAvatar2);
+  managersGroup.appendChild(managersLabel);
+  managersGroup.appendChild(managersAvatars);
+  peopleSection.appendChild(managersGroup);
+  header2.appendChild(peopleSection);
+  container.appendChild(header2);
+  const mainContent = document.createElement("div");
+  mainContent.className = "skeleton-home__main-content";
+  const centralPanel = document.createElement("div");
+  centralPanel.className = "skeleton-home__central-panel";
+  const taskOverview = document.createElement("div");
+  taskOverview.className = "skeleton-home__task-overview";
+  const pastDueColumn = document.createElement("div");
+  pastDueColumn.className = "skeleton-home__task-column";
+  const pastDueHeader = createSkeletonLine({ width: "4rem", height: "1rem" });
+  pastDueColumn.appendChild(pastDueHeader);
+  taskOverview.appendChild(pastDueColumn);
+  const dueTodayColumn = document.createElement("div");
+  dueTodayColumn.className = "skeleton-home__task-column";
+  const dueTodayHeader = createSkeletonLine({ width: "5rem", height: "1rem" });
+  const thumbsUpIcon = createSkeletonRect({ width: "3rem", height: "3rem", className: "skeleton-home__task-icon" });
+  const motivationalMessage = createSkeletonLine({ width: "8rem", height: "1rem" });
+  dueTodayColumn.appendChild(dueTodayHeader);
+  dueTodayColumn.appendChild(thumbsUpIcon);
+  dueTodayColumn.appendChild(motivationalMessage);
+  taskOverview.appendChild(dueTodayColumn);
+  const actionItemsColumn = document.createElement("div");
+  actionItemsColumn.className = "skeleton-home__task-column";
+  const actionItemsHeader = createSkeletonLine({ width: "6rem", height: "1rem" });
+  actionItemsColumn.appendChild(actionItemsHeader);
+  taskOverview.appendChild(actionItemsColumn);
+  centralPanel.appendChild(taskOverview);
+  const activitySection = document.createElement("div");
+  activitySection.className = "skeleton-home__activity-section";
+  const activityHeader = document.createElement("div");
+  activityHeader.className = "skeleton-home__activity-header";
+  const activityTitle = createSkeletonLine({ width: "12rem", height: "1.25rem" });
+  const activityFilter = createSkeletonRect({ width: "3rem", height: "2rem", className: "skeleton-home__activity-filter" });
+  activityHeader.appendChild(activityTitle);
+  activityHeader.appendChild(activityFilter);
+  activitySection.appendChild(activityHeader);
+  const activityList = document.createElement("div");
+  activityList.className = "skeleton-home__activity-list";
+  const activityDate = createSkeletonLine({ width: "6rem", height: "1.25rem", className: "skeleton-home__activity-date" });
+  activityList.appendChild(activityDate);
+  const activityItems = document.createElement("div");
+  activityItems.className = "skeleton-home__activity-items";
+  for (let i = 0; i < 3; i++) {
+    const activityItem = document.createElement("div");
+    activityItem.className = "skeleton-home__activity-item";
+    const avatar = createSkeletonCircle({ width: "2rem", height: "2rem", className: "skeleton-home__activity-avatar" });
+    const content = document.createElement("div");
+    content.className = "skeleton-home__activity-content";
+    const primaryLine = createSkeletonLine({ width: "14rem", height: "1rem" });
+    const actionLine = createSkeletonLine({ width: "10rem", height: "0.875rem" });
+    if (i < 2) {
+      const detailLine = createSkeletonLine({ width: "8rem", height: "0.875rem" });
+      content.appendChild(detailLine);
+    }
+    content.appendChild(primaryLine);
+    content.appendChild(actionLine);
+    activityItem.appendChild(avatar);
+    activityItem.appendChild(content);
+    activityItems.appendChild(activityItem);
+  }
+  activityList.appendChild(activityItems);
+  activitySection.appendChild(activityList);
+  centralPanel.appendChild(activitySection);
+  mainContent.appendChild(centralPanel);
+  const sidebar = document.createElement("div");
+  sidebar.className = "skeleton-home__sidebar";
+  const updatesSection = document.createElement("div");
+  updatesSection.className = "skeleton-home__updates-section";
+  const updatesMetric = createSkeletonRect({ width: "4rem", height: "4rem", className: "skeleton-home__updates-metric" });
+  const updatesDescription = createSkeletonLine({ width: "10rem", height: "1rem" });
+  const updatesActions = document.createElement("div");
+  updatesActions.className = "skeleton-home__updates-actions";
+  const clientUpdatesBtn = createSkeletonRect({ width: "5rem", height: "2rem" });
+  const dailyLogsBtn = createSkeletonRect({ width: "4rem", height: "2rem" });
+  updatesActions.appendChild(clientUpdatesBtn);
+  updatesActions.appendChild(dailyLogsBtn);
+  updatesSection.appendChild(updatesMetric);
+  updatesSection.appendChild(updatesDescription);
+  updatesSection.appendChild(updatesActions);
+  sidebar.appendChild(updatesSection);
+  const agendaSection = document.createElement("div");
+  agendaSection.className = "skeleton-home__agenda-section";
+  const agendaHeader = document.createElement("div");
+  agendaHeader.className = "skeleton-home__agenda-header";
+  const agendaTitle = createSkeletonLine({ width: "8rem", height: "1.25rem" });
+  const agendaLink = createSkeletonLine({ width: "6rem", height: "1rem", className: "skeleton-home__agenda-link" });
+  agendaHeader.appendChild(agendaTitle);
+  agendaHeader.appendChild(agendaLink);
+  agendaSection.appendChild(agendaHeader);
+  const agendaList = document.createElement("div");
+  agendaList.className = "skeleton-home__agenda-list";
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (let i = 0; i < days.length; i++) {
+    const agendaItem = document.createElement("div");
+    agendaItem.className = "skeleton-home__agenda-item";
+    const dateIndicator = createSkeletonRect({ width: "2rem", height: "2rem", className: "skeleton-home__agenda-date" });
+    const content = document.createElement("div");
+    content.className = "skeleton-home__agenda-content";
+    const dayLine = createSkeletonLine({ width: "4rem", height: "1rem" });
+    const dateLine = createSkeletonLine({ width: "3rem", height: "0.875rem" });
+    content.appendChild(dayLine);
+    content.appendChild(dateLine);
+    if (i >= 5) {
+      const nonWorkdayLine = createSkeletonLine({ width: "5rem", height: "0.75rem" });
+      content.appendChild(nonWorkdayLine);
+    }
+    agendaItem.appendChild(dateIndicator);
+    agendaItem.appendChild(content);
+    agendaList.appendChild(agendaItem);
+  }
+  agendaSection.appendChild(agendaList);
+  sidebar.appendChild(agendaSection);
+  mainContent.appendChild(sidebar);
+  container.appendChild(mainContent);
+  return container;
 }
 
 // src/state/appState.ts
@@ -1772,6 +2192,7 @@ var appState = {
 
 // src/data/searchService.ts
 var GROUP_ORDER = [
+  "Buildertrend",
   "Document",
   "Person",
   "Organization",
@@ -1801,9 +2222,16 @@ async function loadCorpus() {
     return CORPUS;
   }
   try {
+    const allRecords = [];
+    try {
+      const buildertrendResponse = await fetch("./buildertrend-corpus.json");
+      const buildertrendData = await buildertrendResponse.json();
+      allRecords.push(...buildertrendData);
+    } catch (error) {
+      console.warn("Could not load Buildertrend corpus:", error);
+    }
     const indexResponse = await fetch("./corpus-parts/index.json");
     const indexData = await indexResponse.json();
-    const allRecords = [];
     for (const fileInfo of indexData.files) {
       const response = await fetch(`./corpus-parts/${fileInfo.filename}`);
       const partData = await response.json();
@@ -1832,6 +2260,16 @@ function normalizeRecord(record) {
     metadata: cleanMetadata
   };
   switch (record.entityType) {
+    case "Buildertrend":
+      return {
+        ...baseRecord,
+        entityType: "Buildertrend",
+        path: record.path,
+        description: record.description,
+        icon: record.icon,
+        url: record.url,
+        triggerQueries: record.triggerQueries
+      };
     case "Document":
       return {
         ...baseRecord,
@@ -1884,7 +2322,15 @@ function buildHaystack(record) {
     record.tags.join(" "),
     ...Object.values(record.metadata ?? {}).map((value) => value == null ? "" : String(value))
   ];
-  if (isFinancialRecord(record)) {
+  if (isBuildertrendRecord(record)) {
+    base.push(
+      record.path,
+      record.description,
+      record.icon,
+      record.url,
+      ...record.triggerQueries
+    );
+  } else if (isFinancialRecord(record)) {
     record.lineItems.forEach((item) => {
       base.push(item.lineItemTitle, item.lineItemDescription, item.lineItemType);
     });
@@ -1975,10 +2421,14 @@ function matchesMonetaryString(queryStr, dataValue) {
       return false;
     }
   } else if (querySignificantDigits >= 3) {
-    if (normalizedData.length >= 3) {
-      return normalizedData.startsWith(normalizedQuery);
+    if (normalizedData.length > querySignificantDigits) {
+      if (normalizedData.startsWith(normalizedQuery)) {
+        const nextDigit = normalizedData[querySignificantDigits];
+        return nextDigit === "0";
+      }
+      return false;
     } else {
-      return normalizedQuery.startsWith(normalizedData);
+      return false;
     }
   } else if (querySignificantDigits >= 2) {
     if (normalizedData.length >= 2) {
@@ -2123,6 +2573,9 @@ function matchesSelections(record, selections) {
   for (const key of Object.keys(selections)) {
     const values = selections[key];
     if (!values || values.size === 0) {
+      continue;
+    }
+    if (key === "groupBy") {
       continue;
     }
     const facetValue = getFacetValue(record, key);
@@ -2403,8 +2856,26 @@ function sortByRecency(records) {
 async function filterRecords({ query, selections, isMonetarySearch }) {
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   const corpus = await loadCorpus();
-  const filtered = corpus.filter((record) => {
+  const buildertrendMatches = [];
+  const otherMatches = [];
+  console.log("Starting search for:", searchQuery, "with corpus size:", corpus.length);
+  corpus.forEach((record, index) => {
     let matchesQueryResult;
+    if (isBuildertrendRecord(record)) {
+      console.log(`Checking Buildertrend record ${index}:`, record.title, "triggerQueries:", record.triggerQueries);
+      matchesQueryResult = record.triggerQueries.some((triggerQuery) => {
+        const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
+        if (match) {
+          console.log("Found exact match:", triggerQuery, "===", searchQuery);
+        }
+        return match;
+      });
+      if (matchesQueryResult) {
+        console.log("Buildertrend match found:", record.title, "for query:", searchQuery);
+        buildertrendMatches.push(record);
+      }
+      return;
+    }
     if (isMonetary) {
       matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
     } else if (hasMonetaryPotential3(searchQuery)) {
@@ -2412,9 +2883,17 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
     } else {
       matchesQueryResult = matchesQuery(record, searchQuery);
     }
-    return matchesQueryResult && matchesSelections(record, selections);
+    if (matchesQueryResult && matchesSelections(record, selections)) {
+      otherMatches.push(record);
+    }
   });
-  return searchQuery.trim() ? sortByRelevance(filtered, searchQuery, isMonetary) : sortByRecency(filtered);
+  const sortedOtherMatches = searchQuery.trim() ? sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
+  console.log('Search results for "' + searchQuery + '":', {
+    buildertrendMatches: buildertrendMatches.length,
+    otherMatches: sortedOtherMatches.length,
+    total: buildertrendMatches.length + sortedOtherMatches.length
+  });
+  return [...buildertrendMatches, ...sortedOtherMatches];
 }
 function determineGroupEntityType(records) {
   if (records.length === 0) {
@@ -2472,13 +2951,13 @@ function buildGroups(records, groupBy) {
         groupKey = record.entityType;
         break;
       case "Project":
-        groupKey = record.project;
+        groupKey = record.project || "No Project";
         break;
       case "Status":
-        groupKey = record.status;
+        groupKey = record.status || "No Status";
         break;
       case "Client":
-        groupKey = record.client;
+        groupKey = record.client || "No Client";
         break;
       default:
         groupKey = record.entityType;
@@ -2489,6 +2968,10 @@ function buildGroups(records, groupBy) {
     map.get(groupKey).push(record);
   });
   const sortedEntries = Array.from(map.entries()).sort((a, b) => {
+    const aIsEmpty = a[0].startsWith("No ");
+    const bIsEmpty = b[0].startsWith("No ");
+    if (aIsEmpty && !bIsEmpty) return 1;
+    if (!aIsEmpty && bIsEmpty) return -1;
     if (groupBy === "Type") {
       const orderA = GROUP_ORDER.indexOf(a[0]);
       const orderB = GROUP_ORDER.indexOf(b[0]);
@@ -2654,12 +3137,7 @@ var homeScreen = document.createElement("section");
 homeScreen.id = "screen-home";
 homeScreen.dataset.screen = "home";
 homeScreen.className = "screen screen--home";
-homeScreen.innerHTML = `
-  <div class="home-ghost">
-    <h1>Global search prototype</h1>
-    <p>This area stands in for future homepage content. Use the search bar above to open the quick results dialog.</p>
-  </div>
-`;
+homeScreen.appendChild(createHomeSkeleton());
 var resultsScreen = document.createElement("section");
 resultsScreen.id = "screen-results";
 resultsScreen.dataset.screen = "results";
@@ -2672,6 +3150,15 @@ settingsScreen.className = "screen screen--settings";
 settingsScreen.append(settingsView.element);
 main.append(homeScreen, resultsScreen, settingsScreen);
 root.append(header.element, main);
+requestAnimationFrame(() => {
+  if (window.lucide) {
+    try {
+      window.lucide.createIcons();
+    } catch (error) {
+      console.warn("Error initializing header icons:", error);
+    }
+  }
+});
 var screens = {
   home: homeScreen,
   results: resultsScreen,
@@ -2821,5 +3308,14 @@ appState.subscribe((state) => {
 });
 document.addEventListener("keydown", handleGlobalKeydown);
 document.addEventListener("mousedown", handleDocumentClick);
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.lucide) {
+    try {
+      window.lucide.createIcons();
+    } catch (error) {
+      console.warn("Error initializing Lucide icons:", error);
+    }
+  }
+});
 appState.setRoute("home");
 //# sourceMappingURL=main.js.map

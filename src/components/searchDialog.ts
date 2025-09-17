@@ -1,11 +1,22 @@
 import {
+  BuildertrendRecord,
   SearchGroup,
   SearchRecord,
   SearchResponse,
+  isBuildertrendRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
 } from '../types';
+
+// Declare Lucide global
+declare global {
+  interface Window {
+    lucide?: {
+      createIcons: () => void;
+    };
+  }
+}
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid } from '../utils/highlight';
@@ -152,7 +163,7 @@ function renderDialogContents(
   const seeAllButton = document.createElement('button');
   seeAllButton.type = 'button';
   seeAllButton.className = 'see-all-button';
-  seeAllButton.textContent = `See ${response.totalResults} results →`;
+  seeAllButton.textContent = `See ${response.totalResults} result${response.totalResults === 1 ? '' : 's'} →`;
   seeAllButton.addEventListener('click', () => options.onSeeAllResults());
 
   footer.append(seeAllButton);
@@ -233,29 +244,80 @@ function renderGroup(group: SearchGroup, query: string, isMonetarySearch?: boole
 
 function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: boolean): HTMLLIElement {
   const li = document.createElement('li');
-  li.className = 'search-dialog__item';
+  
+  // Add Buildertrend-specific styling and behavior
+  if (isBuildertrendRecord(item)) {
+    li.className = 'search-dialog__item search-dialog__item--buildertrend';
+    li.setAttribute('data-url', item.url);
+    li.setAttribute('tabindex', '0');
+    li.setAttribute('role', 'button');
+    li.setAttribute('aria-label', `Navigate to ${item.title}`);
+    
+    // Add click handler for navigation
+    li.addEventListener('click', () => {
+      // TODO: Implement navigation logic
+      console.log('Navigate to:', item.url);
+    });
+    
+    // Add keyboard support
+    li.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        console.log('Navigate to:', item.url);
+      }
+    });
+  } else {
+    li.className = 'search-dialog__item';
+  }
 
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
+
+  const header = document.createElement('div');
+  header.className = 'search-dialog__item-header';
+
+  // Add icon for Buildertrend records
+  if (isBuildertrendRecord(item)) {
+    const icon = document.createElement('i');
+    icon.className = 'search-dialog__item-icon';
+    icon.setAttribute('data-lucide', item.icon);
+    header.append(icon);
+    
+    // Update icons after DOM is ready
+    requestAnimationFrame(() => {
+      if (window.lucide) {
+        try {
+          window.lucide.createIcons();
+        } catch (error) {
+          console.warn('Error updating icons:', error);
+        }
+      }
+    });
+  }
 
   const title = document.createElement('div');
   title.className = 'search-dialog__item-title';
   title.innerHTML = highlightFn(item.title, query);
+  header.append(title);
 
   const meta = document.createElement('div');
   meta.className = 'search-dialog__item-meta';
   const metaText = buildItemMeta(item, query, isMonetarySearch);
   meta.innerHTML = highlightFn(metaText, query);
 
-  // Add context line showing what was matched
-  const match = findBestMatch(item, query);
-  if (match && match.field !== 'title') {
-    const context = document.createElement('div');
-    context.className = 'search-context';
-    const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 80, query);
-    context.innerHTML = highlightedSnippet;
-    li.append(title, meta, context);
+  // Add context line showing what was matched (skip for Buildertrend)
+  if (!isBuildertrendRecord(item)) {
+    const match = findBestMatch(item, query);
+    if (match && match.field !== 'title') {
+      const context = document.createElement('div');
+      context.className = 'search-context';
+      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValues(match.content, query) : getContextSnippet(match, 80, query);
+      context.innerHTML = highlightedSnippet;
+      li.append(header, meta, context);
+    } else {
+      li.append(header, meta);
+    }
   } else {
-    li.append(title, meta);
+    li.append(header, meta);
   }
 
   // Add line item matches for non-Document entities
@@ -271,6 +333,13 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
 
 function buildItemMeta(item: SearchRecord, query?: string, isMonetarySearch?: boolean): string {
   const parts: string[] = [];
+
+  if (isBuildertrendRecord(item)) {
+    parts.push(item.path);
+    parts.push(item.description);
+    return parts.filter(Boolean).join(' • ');
+  }
+
   parts.push(item.project);
 
   if (item.entityType === 'Document') {

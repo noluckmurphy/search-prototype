@@ -8,6 +8,7 @@ export interface SettingsState {
   showLineItemsByDefault: boolean;
   collapseIrrelevantLineItems: boolean;
   lineItemsCollapseThreshold: number;
+  maxFacetValues: number;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -21,6 +22,7 @@ function normalize(state: SettingsState): SettingsState {
     showLineItemsByDefault: state.showLineItemsByDefault ?? true,
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
+    maxFacetValues: state.maxFacetValues ?? 5,
   };
 }
 

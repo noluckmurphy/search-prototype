@@ -113,6 +113,27 @@ export function createSettingsView(): SettingsViewHandles {
   collapseThresholdField.append(collapseThresholdSelect);
   resultsSection.append(collapseThresholdField);
 
+  const maxFacetValuesField = document.createElement('div');
+  maxFacetValuesField.className = 'settings-field';
+  maxFacetValuesField.innerHTML = `
+    <label for="max-facet-values">Max facet values to show</label>
+  `;
+
+  const maxFacetValuesSelect = document.createElement('select');
+  maxFacetValuesSelect.id = 'max-facet-values';
+  maxFacetValuesSelect.innerHTML = `
+    <option value="3">3 values</option>
+    <option value="5">5 values</option>
+    <option value="7">7 values</option>
+    <option value="10">10 values</option>
+    <option value="15">15 values</option>
+    <option value="20">20 values</option>
+    <option value="0">Show all</option>
+  `;
+
+  maxFacetValuesField.append(maxFacetValuesSelect);
+  resultsSection.append(maxFacetValuesField);
+
   const groupSection = document.createElement('fieldset');
   groupSection.className = 'settings-group';
   groupSection.innerHTML = `
@@ -175,6 +196,7 @@ export function createSettingsView(): SettingsViewHandles {
     showLineItemsCheckbox.checked = state.showLineItemsByDefault;
     collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
     collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
+    maxFacetValuesSelect.value = String(state.maxFacetValues);
     renderGroupInputs(state.groupLimits);
   };
 
@@ -190,6 +212,9 @@ export function createSettingsView(): SettingsViewHandles {
     const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
     const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
 
+    const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
+    const resolvedMaxFacetValues = Number.isFinite(maxFacetValues) && maxFacetValues >= 0 ? maxFacetValues : 5;
+
     const groupLimits: Record<string, number> = {};
     groupInputs.forEach((input, key) => {
       const parsed = Number.parseInt(input.value, 10);
@@ -202,6 +227,7 @@ export function createSettingsView(): SettingsViewHandles {
       showLineItemsByDefault: showLineItemsCheckbox.checked,
       collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
       lineItemsCollapseThreshold: resolvedCollapseThreshold,
+      maxFacetValues: resolvedMaxFacetValues,
       groupLimits,
     });
 

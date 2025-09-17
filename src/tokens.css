@@ -39,4 +39,14 @@
   --icon-size-sm: 16px;
   --icon-size-md: 20px;
   --icon-size-lg: 24px;
+
+  /* Skeleton screen colors */
+  --skeleton-bg: #e5e7eb;
+  --skeleton-bg-animated: #f3f4f6;
+  --skeleton-shimmer: linear-gradient(
+    90deg,
+    var(--skeleton-bg) 0%,
+    var(--skeleton-bg-animated) 50%,
+    var(--skeleton-bg) 100%
+  );
 }

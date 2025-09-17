@@ -13,5 +13,6 @@
   "lineItemsContextCount": 3,
   "showLineItemsByDefault": true,
   "collapseIrrelevantLineItems": true,
-  "lineItemsCollapseThreshold": 5
+  "lineItemsCollapseThreshold": 5,
+  "maxFacetValues": 5
 }
