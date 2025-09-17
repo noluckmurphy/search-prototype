@@ -323,8 +323,11 @@ export function createSearchDialog(
   window.addEventListener('refresh-dialog', () => {
     if (previousState?.visible) {
       console.log('🔄 Refreshing dialog due to recent searches clear');
-      // Force a re-render by calling setState with the current state
-      setState(previousState);
+      // Force a re-render by directly calling renderDialogContents
+      // This bypasses the state comparison logic since we know we need to refresh
+      requestAnimationFrame(() => {
+        renderDialogContents(dialog, previousState!, options);
+      });
     }
   });
 

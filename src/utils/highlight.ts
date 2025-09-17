@@ -1,4 +1,5 @@
 import { SearchRecord, isFinancialRecord, isOrganizationRecord, isPersonRecord } from '../types';
+import { hasMonetaryValue } from './monetary';
 
 export interface HighlightMatch {
   field: string;
@@ -82,6 +83,136 @@ function extractTermsFromBooleanQuery(query: string): string[] {
   }
   
   return terms;
+}
+
+/**
+ * Hybrid highlighting for boolean queries that handles both text and monetary terms
+ * Uses the same position tracking approach to prevent double highlighting
+ */
+function highlightHybridBoolean(text: string, query: string, tokens: string[]): string {
+  let highlightedText = escapeHtml(text);
+  const textLower = text.toLowerCase();
+  
+  // Track which character positions have been highlighted to prevent overlaps
+  const highlightedPositions = new Set<number>();
+  
+  // Helper function to check if a position range is already highlighted
+  const isPositionHighlighted = (start: number, end: number): boolean => {
+    for (let i = start; i < end; i++) {
+      if (highlightedPositions.has(i)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  // Helper function to mark positions as highlighted
+  const markPositionsHighlighted = (start: number, end: number): void => {
+    for (let i = start; i < end; i++) {
+      highlightedPositions.add(i);
+    }
+  };
+  
+  // Helper function to apply highlighting with position tracking
+  const applyHighlighting = (pattern: RegExp, className: string): void => {
+    let match;
+    const matches: Array<{ match: string; start: number; end: number }> = [];
+    
+    // First, collect all matches and their positions
+    while ((match = pattern.exec(highlightedText)) !== null) {
+      const start = match.index;
+      const end = start + match[0].length;
+      
+      // Only add if not already highlighted
+      if (!isPositionHighlighted(start, end)) {
+        matches.push({ match: match[0], start, end });
+      }
+    }
+    
+    // Apply highlighting in reverse order to maintain positions
+    for (let i = matches.length - 1; i >= 0; i--) {
+      const { match: matchText, start, end } = matches[i];
+      const before = highlightedText.substring(0, start);
+      const after = highlightedText.substring(end);
+      const highlighted = `<mark class="${className}">${matchText}</mark>`;
+      
+      highlightedText = before + highlighted + after;
+      markPositionsHighlighted(start, start + highlighted.length);
+    }
+  };
+  
+  // Process each token to determine if it should be highlighted as text or monetary
+  for (const token of tokens) {
+    // Check if this token is a monetary query (starts with $)
+    if (token.startsWith('$')) {
+      const amountPart = token.slice(1).trim();
+      // Try monetary highlighting for this token by creating a monetary query
+      const monetaryQuery = `$${amountPart}`;
+      const { amounts, textTokens, range } = extractMonetaryTokens(monetaryQuery);
+      
+      if (amounts.length > 0 || textTokens.length > 0 || range) {
+        // Use the same position tracking approach for monetary highlighting
+        const originalQuery = monetaryQuery.replace(/[$\s]/g, '');
+        const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+        
+        if (commaPatternMatch) {
+          const [, integerPart, decimalPart] = commaPatternMatch;
+          const prefixPattern = `${integerPart}${decimalPart}`;
+          
+          const prefixPatternRegex = new RegExp(
+            `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
+            'g'
+          );
+          
+          applyHighlighting(prefixPatternRegex, 'monetary-highlight-partial');
+          continue;
+        }
+        
+        // Handle exact matches
+        for (const amount of amounts) {
+          const amountStr = amount.toString();
+          const amountWithCommas = amount.toLocaleString();
+          
+          const monetaryPattern = new RegExp(
+            `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+            'g'
+          );
+          applyHighlighting(monetaryPattern, 'monetary-highlight-exact');
+        }
+        continue;
+      }
+    }
+    
+    // Check if this token has monetary potential
+    if (hasMonetaryValue(token)) {
+      // Try monetary highlighting first by creating a monetary query
+      const monetaryQuery = `$${token}`;
+      const { amounts, textTokens, range } = extractMonetaryTokens(monetaryQuery);
+      
+      if (amounts.length > 0 || textTokens.length > 0 || range) {
+        // Use the same position tracking approach for monetary highlighting
+        for (const amount of amounts) {
+          const amountStr = amount.toString();
+          const amountWithCommas = amount.toLocaleString();
+          
+          const pattern = new RegExp(
+            `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+            'g'
+          );
+          applyHighlighting(pattern, 'monetary-highlight-exact');
+        }
+        continue;
+      }
+    }
+    
+    // If no monetary highlighting worked, try text highlighting
+    if (textLower.includes(token)) {
+      const regex = new RegExp(`(${escapeRegex(token)})`, 'gi');
+      applyHighlighting(regex, 'search-highlight');
+    }
+  }
+  
+  return highlightedText;
 }
 
 /**
@@ -605,10 +736,23 @@ function isPartialMonetaryMatch(queryAmount: number, dataValue: number): boolean
 /**
  * Enhanced monetary highlighting that shows different colors for exact vs partial matches
  * This provides better UX by visually distinguishing match types
+ * 
+ * NEW ARCHITECTURE: Single-pass highlighting with cache to prevent double highlighting
  */
 export function highlightMonetaryValuesWithPartialMatches(text: string, query: string): string {
   if (!query.trim()) {
     return escapeHtml(text);
+  }
+
+  // Check if this is a boolean query and extract search terms
+  const tokens = extractSearchTermsFromQuery(query);
+  if (tokens.length === 0) {
+    return escapeHtml(text);
+  }
+
+  // For boolean queries, use hybrid highlighting (both text and monetary)
+  if (isBooleanQuery(query)) {
+    return highlightHybridBoolean(text, query, tokens);
   }
 
   const { amounts, textTokens, range } = extractMonetaryTokens(query);
@@ -617,14 +761,88 @@ export function highlightMonetaryValuesWithPartialMatches(text: string, query: s
     return escapeHtml(text);
   }
 
+  // NEW APPROACH: Single-pass highlighting with position tracking
+  return highlightWithPositionTracking(text, query, amounts, textTokens, range);
+}
+
+/**
+ * Single-pass highlighting that tracks positions to prevent double highlighting
+ */
+function highlightWithPositionTracking(
+  text: string, 
+  query: string, 
+  amounts: number[], 
+  textTokens: string[], 
+  range: { min: number; max: number } | null
+): string {
+  const isExplicitMonetary = query.trim().startsWith('$');
   let highlightedText = escapeHtml(text);
   
-  // For explicit monetary searches (queries starting with $), be more restrictive
-  const isExplicitMonetary = query.trim().startsWith('$');
+  // Track which character positions have been highlighted to prevent overlaps
+  const highlightedPositions = new Set<number>();
   
-  // Highlight numeric values that match the query amounts
-  if (amounts.length > 0) {
-    // First pass: highlight exact matches with green
+  // Helper function to check if a position range is already highlighted
+  const isPositionHighlighted = (start: number, end: number): boolean => {
+    for (let i = start; i < end; i++) {
+      if (highlightedPositions.has(i)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  // Helper function to mark positions as highlighted
+  const markPositionsHighlighted = (start: number, end: number): void => {
+    for (let i = start; i < end; i++) {
+      highlightedPositions.add(i);
+    }
+  };
+  
+  // Helper function to apply highlighting with position tracking
+  const applyHighlighting = (pattern: RegExp, className: string): void => {
+    let match;
+    const matches: Array<{ match: string; start: number; end: number }> = [];
+    
+    // First, collect all matches and their positions
+    while ((match = pattern.exec(highlightedText)) !== null) {
+      const start = match.index;
+      const end = start + match[0].length;
+      
+      // Only add if not already highlighted
+      if (!isPositionHighlighted(start, end)) {
+        matches.push({ match: match[0], start, end });
+      }
+    }
+    
+    // Apply highlighting in reverse order to maintain positions
+    for (let i = matches.length - 1; i >= 0; i--) {
+      const { match: matchText, start, end } = matches[i];
+      const before = highlightedText.substring(0, start);
+      const after = highlightedText.substring(end);
+      const highlighted = `<mark class="${className}">${matchText}</mark>`;
+      
+      highlightedText = before + highlighted + after;
+      markPositionsHighlighted(start, start + highlighted.length);
+    }
+  };
+  
+  // 1. Handle comma pattern matches first (highest priority)
+  const originalQuery = query.replace(/[$\s]/g, '');
+  const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
+  if (commaPatternMatch) {
+    const [, integerPart, decimalPart] = commaPatternMatch;
+    const prefixPattern = `${integerPart}${decimalPart}`;
+    
+    const prefixPatternRegex = new RegExp(
+      `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
+      'g'
+    );
+    
+    applyHighlighting(prefixPatternRegex, 'monetary-highlight-partial');
+  }
+  
+  // 2. Handle exact matches (only if no comma pattern highlighting occurred)
+  if (!commaPatternMatch) {
     for (const amount of amounts) {
       const amountStr = amount.toString();
       const amountWithCommas = amount.toLocaleString();
@@ -634,70 +852,58 @@ export function highlightMonetaryValuesWithPartialMatches(text: string, query: s
           `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
           'g'
         );
-        highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight-exact">$1</mark>');
+        applyHighlighting(monetaryPattern, 'monetary-highlight-exact');
       } else {
         const pattern = new RegExp(
           `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
           'g'
         );
-        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-exact">$1</mark>');
+        applyHighlighting(pattern, 'monetary-highlight-exact');
       }
     }
+  }
+  
+  // 3. Handle partial matches (only if no exact matches were found)
+  const hasExactMatches = highlightedText.includes('monetary-highlight-exact');
+  const hasPartialMatches = highlightedText.includes('monetary-highlight-partial');
+  const shouldDoPartialMatching = !isExplicitMonetary || (!hasExactMatches && !hasPartialMatches);
+  
+  if (shouldDoPartialMatching) {
+    const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
+    let match;
+    const partialMatches: Array<{ match: string; start: number; end: number; numericValue: number }> = [];
     
-    // Special handling for comma pattern matches (like "$5,06")
-    // Check if the original query has comma patterns that should match prefix values
-    const originalQuery = query.replace(/[$\s]/g, '');
-    const commaPatternMatch = originalQuery.match(/^(\d+),(\d+)$/);
-    if (commaPatternMatch) {
-      const [, integerPart, decimalPart] = commaPatternMatch;
-      const prefixPattern = `${integerPart}${decimalPart}`; // "506" for "$5,06"
+    // Collect partial matches
+    while ((match = monetaryValuePattern.exec(highlightedText)) !== null) {
+      const start = match.index;
+      const end = start + match[0].length;
       
-      // Highlight monetary values that start with this prefix pattern
-      // Account for comma thousands separators in formatted currency (e.g., "$5,068")
-      // For "506", we want to match both "$5068" and "$5,068"
-      const prefixPatternRegex = new RegExp(
-        `(\\$\\b${escapeRegex(prefixPattern)}\\d*\\b|\\$\\b${escapeRegex(prefixPattern.slice(0, -2))},${escapeRegex(prefixPattern.slice(-2))}\\d*\\b)`,
-        'g'
-      );
-      
-      highlightedText = highlightedText.replace(prefixPatternRegex, (match) => {
-        // Skip if already highlighted to prevent double wrapping
-        if (match.includes('<mark')) {
-          return match;
-        }
-        return `<mark class="monetary-highlight-partial">${match}</mark>`;
-      });
-    }
-    
-    // Second pass: highlight partial matches with yellow
-    // For explicit monetary searches, only do partial matching if no exact matches were found
-    const hasExactMatches = highlightedText.includes('monetary-highlight-exact');
-    const shouldDoPartialMatching = !isExplicitMonetary || !hasExactMatches;
-    
-    if (shouldDoPartialMatching) {
-      const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
-      highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
-        // Skip if already highlighted
-        if (match.includes('<mark')) {
-          return match;
-        }
-        
-        // Extract the numeric value from the match
-        const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+      if (!isPositionHighlighted(start, end)) {
+        const numericValue = parseFloat(match[0].replace(/[$,\s]/g, ''));
         
         // Check if any query amount is a partial match of this value
         for (const queryAmount of amounts) {
           if (isPartialMonetaryMatch(queryAmount, numericValue)) {
-            return `<mark class="monetary-highlight-partial">${match}</mark>`;
+            partialMatches.push({ match: match[0], start, end, numericValue });
+            break;
           }
         }
-        
-        return match;
-      });
+      }
+    }
+    
+    // Apply partial match highlighting in reverse order
+    for (let i = partialMatches.length - 1; i >= 0; i--) {
+      const { match: matchText, start, end } = partialMatches[i];
+      const before = highlightedText.substring(0, start);
+      const after = highlightedText.substring(end);
+      const highlighted = `<mark class="monetary-highlight-partial">${matchText}</mark>`;
+      
+      highlightedText = before + highlighted + after;
+      markPositionsHighlighted(start, start + highlighted.length);
     }
   }
   
-  // Handle range highlighting
+  // 4. Handle range highlighting
   if (range) {
     const rangePatterns = [
       new RegExp(`\\b${escapeRegex(range.min.toString())}\\s*-\\s*${escapeRegex(range.max.toString())}\\b`, 'g'),
@@ -707,30 +913,43 @@ export function highlightMonetaryValuesWithPartialMatches(text: string, query: s
     ];
     
     for (const pattern of rangePatterns) {
-      highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight-range">$&</mark>');
+      applyHighlighting(pattern, 'monetary-highlight-range');
     }
     
-    // Additionally, highlight any monetary values in the text that fall within the range
+    // Additionally, highlight monetary values within range
     const monetaryValuePattern = /\$?[\d,]+(?:\.\d{2})?/g;
-    highlightedText = highlightedText.replace(monetaryValuePattern, (match) => {
-      const numericValue = parseFloat(match.replace(/[$,\s]/g, ''));
+    let match;
+    const rangeMatches: Array<{ match: string; start: number; end: number }> = [];
+    
+    while ((match = monetaryValuePattern.exec(highlightedText)) !== null) {
+      const start = match.index;
+      const end = start + match[0].length;
       
-      if (!isNaN(numericValue) && numericValue >= range.min && numericValue <= range.max) {
-        if (!match.includes('<mark')) {
-          return `<mark class="monetary-highlight-range">${match}</mark>`;
+      if (!isPositionHighlighted(start, end)) {
+        const numericValue = parseFloat(match[0].replace(/[$,\s]/g, ''));
+        
+        if (!isNaN(numericValue) && numericValue >= range.min && numericValue <= range.max) {
+          rangeMatches.push({ match: match[0], start, end });
         }
       }
+    }
+    
+    // Apply range highlighting in reverse order
+    for (let i = rangeMatches.length - 1; i >= 0; i--) {
+      const { match: matchText, start, end } = rangeMatches[i];
+      const before = highlightedText.substring(0, start);
+      const after = highlightedText.substring(end);
+      const highlighted = `<mark class="monetary-highlight-range">${matchText}</mark>`;
       
-      return match;
-    });
+      highlightedText = before + highlighted + after;
+      markPositionsHighlighted(start, start + highlighted.length);
+    }
   }
   
-  // Also highlight any text tokens that match
-  if (textTokens.length > 0) {
-    for (const token of textTokens) {
-      const regex = new RegExp(`(${escapeRegex(token)})`, 'gi');
-      highlightedText = highlightedText.replace(regex, '<mark class="monetary-highlight-text">$1</mark>');
-    }
+  // 5. Handle text tokens
+  for (const token of textTokens) {
+    const regex = new RegExp(`(${escapeRegex(token)})`, 'gi');
+    applyHighlighting(regex, 'monetary-highlight-text');
   }
   
   return highlightedText;

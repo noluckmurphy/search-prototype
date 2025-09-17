@@ -1,6 +1,6 @@
 /* Theme tokens for the search prototype */
 :root {
-  /* Color palette */
+  /* Base color palette */
   --color-bg: #f9fafb;
   --color-surface: #ffffff;
   --color-border: #d0d5dd;
@@ -9,6 +9,77 @@
   --color-accent: #2563eb;
   --color-accent-soft: rgba(37, 99, 235, 0.1);
   --color-danger: #d92d20;
+
+  /* Search highlighting colors */
+  --color-search-highlight-bg: #fef3c7;
+  --color-search-highlight-text: #000;
+  --color-search-context-bg: #fef3c7;
+  --color-search-context-text: #92400e;
+
+  /* Monetary search highlighting colors */
+  --color-monetary-highlight-bg: #dcfce7;
+  --color-monetary-highlight-text: #0a3118;
+  --color-monetary-highlight-border: #258b49;
+  --color-monetary-exact-bg: #dcfce7;
+  --color-monetary-exact-text: #186733;
+  --color-monetary-exact-border: #186733;
+  --color-monetary-text-bg: #f3e8ff;
+  --color-monetary-text-text: #15512a;
+  --color-monetary-partial-text: #15512a;
+
+  /* Monetary search mode colors */
+  --color-monetary-mode-icon: #22c55e;
+  --color-monetary-mode-border: #22c55e;
+  --color-monetary-mode-border-focus: #16a34a;
+  --color-monetary-mode-text: #15803d;
+  --color-monetary-mode-bg-start: #f0fdf4;
+  --color-monetary-mode-bg-end: #dcfce7;
+
+  /* Buildertrend brand colors */
+  --color-buildertrend-primary: #3399ff;
+  --color-buildertrend-bg: #f0f8ff;
+  --color-buildertrend-bg-hover: #e6f3ff;
+  --color-buildertrend-border: #b3d9ff;
+  --color-buildertrend-outline: #3399ff;
+  --color-buildertrend-badge-bg: #3399ff;
+  --color-buildertrend-badge-text: white;
+
+  /* Button and interactive colors */
+  --color-button-primary-bg: #dc2626;
+  --color-button-primary-border: #dc2626;
+  --color-button-primary-hover-bg: #b91c1c;
+  --color-button-primary-hover-border: #b91c1c;
+  --color-button-primary-active-bg: #991b1b;
+  --color-button-primary-active-border: #991b1b;
+  --color-button-primary-text: white;
+
+  /* Navigation and header colors */
+  --color-nav-bg: rgb(0, 86, 123);
+  --color-nav-text: #fff;
+  --color-nav-button-bg: rgba(255, 255, 255, 0.1);
+  --color-nav-button-border: rgba(255, 255, 255, 0.2);
+  --color-nav-button-text: rgba(255, 255, 255, 0.9);
+  --color-nav-button-hover-bg: rgba(255, 255, 255, 0.15);
+  --color-nav-button-hover-border: rgba(255, 255, 255, 0.3);
+  --color-nav-button-active-bg: rgba(255, 255, 255, 0.2);
+  --color-nav-button-active-border: rgba(255, 255, 255, 0.4);
+
+  /* Shortcut pill colors */
+  --color-shortcut-pill-bg: #e5e7eb;
+  --color-shortcut-pill-text: #6b7280;
+  --color-shortcut-pill-border: #d1d5db;
+
+  /* Interactive state colors */
+  --color-hover-bg: rgba(0, 0, 0, 0.02);
+  --color-selected-bg: rgba(0, 0, 0, 0.04);
+  --color-selected-hover-bg: rgba(0, 0, 0, 0.06);
+
+  /* Shadow colors */
+  --color-shadow-soft: rgba(15, 23, 42, 0.08);
+  --color-shadow-popover: rgba(15, 23, 42, 0.16);
+  --color-shadow-buildertrend: rgba(51, 153, 255, 0.2);
+  --color-shadow-shortcut: rgba(0, 0, 0, 0.1);
+  --color-shadow-card: rgba(0, 0, 0, 0.1);
 
   /* Typography */
   --font-family-base: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -32,8 +103,8 @@
   /* Radius + shadows */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
-  --shadow-popover: 0 20px 45px rgba(15, 23, 42, 0.16);
+  --shadow-soft: 0 10px 25px var(--color-shadow-soft);
+  --shadow-popover: 0 20px 45px var(--color-shadow-popover);
 
   /* Icon sizes */
   --icon-size-sm: 16px;
@@ -49,4 +120,10 @@
     var(--skeleton-bg-animated) 50%,
     var(--skeleton-bg) 100%
   );
+
+  /* Viewport breakpoints for wider layouts */
+  --viewport-padding: var(--space-xl);
+  --container-max-width: 1100px;
+  --container-max-width-wide: 1400px;
+  --container-max-width-extra-wide: 1600px;
 }

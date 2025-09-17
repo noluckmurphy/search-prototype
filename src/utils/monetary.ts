@@ -233,7 +233,13 @@ export function extractMonetaryAmounts(query: string): MonetaryValue[] {
 export function hasMonetaryValue(text: string): boolean {
   // Check for currency symbols or decimal patterns
   // Use simple string checks instead of complex regex
-  return text.includes('$') || text.includes('.') || text.includes(',');
+  if (text.includes('$') || text.includes('.') || text.includes(',')) {
+    return true;
+  }
+  
+  // Also check if it's a pure number (like "5068")
+  const trimmed = text.trim();
+  return /^\d+$/.test(trimmed);
 }
 
 /**

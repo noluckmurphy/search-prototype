@@ -458,40 +458,105 @@ function matchesQuery(record: SearchRecord, query: string): boolean {
 }
 
 function matchesBooleanQuery(record: SearchRecord, parsedQuery: ParsedQuery): boolean {
+  console.log(`🔍 matchesBooleanQuery called for record "${record.title}" with query:`, JSON.stringify(parsedQuery, null, 2));
+  
   if (parsedQuery.type === 'simple') {
-    // For simple queries, use the existing matching logic
-    return matchesQuery(record, parsedQuery.query);
+    // For simple queries, use monetary-aware matching logic
+    const result = matchesQueryWithMonetarySupport(record, parsedQuery.query);
+    console.log(`🔍 Simple query "${parsedQuery.query}" result: ${result}`);
+    return result;
   }
   
   const booleanQuery = parsedQuery as BooleanQuery;
   
   // Evaluate left side
   const leftMatch = typeof booleanQuery.left === 'string' 
-    ? matchesQuery(record, booleanQuery.left)
+    ? matchesQueryWithMonetarySupport(record, booleanQuery.left)
     : matchesBooleanQuery(record, booleanQuery.left);
   
-  // Handle NOT operator (only has left side)
+  console.log(`🔍 Left side match: ${leftMatch}`);
+  
+  // Handle NOT operator (left AND NOT right)
   if (booleanQuery.operator === 'NOT') {
-    return !leftMatch;
+    if (!booleanQuery.right) {
+      const result = !leftMatch;
+      console.log(`🔍 NOT result (no right): ${result}`);
+      return result;
+    }
+    
+    const rightMatch = typeof booleanQuery.right === 'string'
+      ? matchesQueryWithMonetarySupport(record, booleanQuery.right)
+      : matchesBooleanQuery(record, booleanQuery.right);
+    
+    console.log(`🔍 Right side match for NOT: ${rightMatch}`);
+    const result = leftMatch && !rightMatch;
+    console.log(`🔍 NOT result: ${leftMatch} && !${rightMatch} = ${result}`);
+    return result;
   }
   
   // Handle AND and OR operators (have both left and right sides)
   if (!booleanQuery.right) {
+    console.log(`🔍 No right side, returning left match: ${leftMatch}`);
     return leftMatch;
   }
   
   const rightMatch = typeof booleanQuery.right === 'string'
-    ? matchesQuery(record, booleanQuery.right)
+    ? matchesQueryWithMonetarySupport(record, booleanQuery.right)
     : matchesBooleanQuery(record, booleanQuery.right);
   
+  console.log(`🔍 Right side match: ${rightMatch}`);
+  
+  let result;
   switch (booleanQuery.operator) {
     case 'AND':
-      return leftMatch && rightMatch;
+      result = leftMatch && rightMatch;
+      console.log(`🔍 AND result: ${leftMatch} && ${rightMatch} = ${result}`);
+      break;
     case 'OR':
-      return leftMatch || rightMatch;
+      result = leftMatch || rightMatch;
+      console.log(`🔍 OR result: ${leftMatch} || ${rightMatch} = ${result}`);
+      break;
     default:
-      return leftMatch;
+      result = leftMatch;
+      console.log(`🔍 Default result: ${result}`);
   }
+  
+  return result;
+}
+
+/**
+ * Matches a query term with support for both text and monetary matching
+ */
+function matchesQueryWithMonetarySupport(record: SearchRecord, query: string): boolean {
+  console.log(`🔍 matchesQueryWithMonetarySupport called for record "${record.title}" with query: "${query}"`);
+  
+  // Check if this is a monetary query (starts with $)
+  if (query.startsWith('$')) {
+    const amountPart = query.slice(1).trim();
+    console.log(`🔍 Monetary query detected, amount part: "${amountPart}"`);
+    const monetaryMatch = matchesMonetaryQuery(record, amountPart);
+    console.log(`🔍 Monetary match for "${amountPart}": ${monetaryMatch}`);
+    return monetaryMatch;
+  }
+  
+  // First try regular text matching
+  const textMatch = matchesQuery(record, query);
+  console.log(`🔍 Text match for "${query}": ${textMatch}`);
+  if (textMatch) {
+    return true;
+  }
+  
+  // If no text match and query has monetary potential, try monetary matching
+  const hasMonetary = hasMonetaryPotential(query);
+  console.log(`🔍 Has monetary potential for "${query}": ${hasMonetary}`);
+  if (hasMonetary) {
+    const monetaryMatch = matchesMonetaryQuery(record, query);
+    console.log(`🔍 Monetary match for "${query}": ${monetaryMatch}`);
+    return monetaryMatch;
+  }
+  
+  console.log(`🔍 No match for "${query}"`);
+  return false;
 }
 
 function matchesHybridQuery(record: SearchRecord, query: string): boolean {
@@ -821,14 +886,14 @@ function calculateRelevanceScore(record: SearchRecord, query: string): number {
 
 function calculateBooleanRelevanceScore(record: SearchRecord, parsedQuery: ParsedQuery): number {
   if (parsedQuery.type === 'simple') {
-    return calculateRelevanceScore(record, parsedQuery.query);
+    return calculateRelevanceScoreWithMonetarySupport(record, parsedQuery.query);
   }
   
   const booleanQuery = parsedQuery as BooleanQuery;
   
   // Calculate scores for left and right sides
   const leftScore = typeof booleanQuery.left === 'string' 
-    ? calculateRelevanceScore(record, booleanQuery.left)
+    ? calculateRelevanceScoreWithMonetarySupport(record, booleanQuery.left)
     : calculateBooleanRelevanceScore(record, booleanQuery.left);
   
   if (booleanQuery.operator === 'NOT') {
@@ -842,7 +907,7 @@ function calculateBooleanRelevanceScore(record: SearchRecord, parsedQuery: Parse
   }
   
   const rightScore = typeof booleanQuery.right === 'string'
-    ? calculateRelevanceScore(record, booleanQuery.right)
+    ? calculateRelevanceScoreWithMonetarySupport(record, booleanQuery.right)
     : calculateBooleanRelevanceScore(record, booleanQuery.right);
   
   switch (booleanQuery.operator) {
@@ -855,6 +920,24 @@ function calculateBooleanRelevanceScore(record: SearchRecord, parsedQuery: Parse
     default:
       return leftScore;
   }
+}
+
+/**
+ * Calculates relevance score with support for both text and monetary matching
+ */
+function calculateRelevanceScoreWithMonetarySupport(record: SearchRecord, query: string): number {
+  // First try regular text scoring
+  const textScore = calculateRelevanceScore(record, query);
+  if (textScore > 0) {
+    return textScore;
+  }
+  
+  // If no text score and query has monetary potential, try monetary scoring
+  if (hasMonetaryPotential(query)) {
+    return calculateMonetaryRelevanceScore(record, query);
+  }
+  
+  return 0;
 }
 
 function calculateHybridRelevanceScore(record: SearchRecord, query: string): number {
@@ -1116,11 +1199,18 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
   const buildertrendMatches: SearchRecord[] = [];
   const otherMatches: SearchRecord[] = [];
   
-  console.log('Starting search for:', searchQuery, 'with corpus size:', corpus.length);
+  console.log('🔍 Starting search for:', searchQuery, 'with corpus size:', corpus.length);
+  console.log('🔍 Original query:', query);
+  console.log('🔍 Is monetary:', isMonetary);
   
   // Check if this is a boolean query
   const isBoolean = isBooleanQuery(searchQuery);
   const parsedQuery = isBoolean ? parseBooleanQuery(searchQuery) : null;
+  
+  console.log('🔍 Is boolean query:', isBoolean);
+  if (isBoolean && parsedQuery) {
+    console.log('🔍 Parsed boolean query:', JSON.stringify(parsedQuery, null, 2));
+  }
   
   corpus.forEach((record, index) => {
     let matchesQueryResult: boolean;

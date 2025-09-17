@@ -1,6 +1,6 @@
 /plan.md
 public/assets/main.js.map
-public/assets/main.css.map
+public/assets/*.map
 test-comma-parsing.html
 debug-monetary-ranking.js
 debug-208777.js
@@ -22,3 +22,18 @@ test-boolean-search.js
 test-regex-pattern.js
 debug-highlighting.html
 test-boolean-highlighting.js
+debug-5-0-highlighting.html
+test-boolean-highlighting-debug.js
+test-comprehensive-highlighting.html
+test-comprehensive-line-item-fix.html
+test-double-highlighting-fix.html
+test-double-highlighting-fix.js
+test-hybrid-highlighting.js
+test-line-item-final-fix.html
+test-line-item-highlighting.html
+test-monetary-boolean-comprehensive.js
+test-monetary-boolean-fix.js
+test-monetary-boolean-simple.js
+test-monetary-highlighting-fix.js
+test-monetary-value-fix.js
+test-new-architecture.html
