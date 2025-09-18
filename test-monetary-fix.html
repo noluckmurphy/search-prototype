@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monetary Search Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #ccc;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .pass {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .fail {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .test-input {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .test-result {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .highlighted {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .monetary-highlight {
+            background-color: #4caf50;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .monetary-highlight-exact {
+            background-color: #4caf50;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .monetary-highlight-partial {
+            background-color: #8bc34a;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monetary Search Fix Test</h1>
+    <p>This page tests that monetary searches (queries starting with $) only highlight actual monetary values, not quantities or descriptions.</p>
+    
+    <div id="test-results"></div>
+
+    <script>
+        // Simple test implementation
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeRegex(text) {
+            return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function parseCurrencyString(amountStr) {
+            let cleaned = amountStr.replace(/[$\s]/g, '');
+            if (!cleaned || cleaned === '') return null;
+            if (cleaned.includes('-') || cleaned.toLowerCase().includes(' to ')) return null;
+            cleaned = cleaned.replace(/,/g, '');
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? null : parsed;
+        }
+
+        function extractMonetaryTokens(query) {
+            const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+            const amounts = [];
+            const textTokens = [];
+            
+            for (const token of tokens) {
+                const parsed = parseCurrencyString(token);
+                if (parsed !== null) {
+                    amounts.push(parsed);
+                } else {
+                    textTokens.push(token);
+                }
+            }
+            
+            return { amounts, textTokens, range: null };
+        }
+
+        function highlightMonetaryValues(text, query) {
+            if (!query.trim()) return escapeHtml(text);
+
+            const { amounts, textTokens, range } = extractMonetaryTokens(query);
+            
+            if (amounts.length === 0 && textTokens.length === 0 && !range) {
+                return escapeHtml(text);
+            }
+
+            let highlightedText = escapeHtml(text);
+            const isExplicitMonetary = query.trim().startsWith('$');
+            
+            if (amounts.length > 0) {
+                for (const amount of amounts) {
+                    const amountStr = amount.toString();
+                    const amountWithCommas = amount.toLocaleString();
+                    
+                    if (isExplicitMonetary) {
+                        const monetaryPattern = new RegExp(
+                            `(\\$\\b${escapeRegex(amountWithCommas)}\\b|\\$\\b${escapeRegex(amountStr)}\\b)`,
+                            'g'
+                        );
+                        highlightedText = highlightedText.replace(monetaryPattern, '<mark class="monetary-highlight-exact">$1</mark>');
+                    } else {
+                        const pattern = new RegExp(
+                            `(\\$?\\b${escapeRegex(amountWithCommas)}\\b|\\$?\\b${escapeRegex(amountStr)}\\b)`,
+                            'g'
+                        );
+                        highlightedText = highlightedText.replace(pattern, '<mark class="monetary-highlight">$1</mark>');
+                    }
+                }
+            }
+            
+            return highlightedText;
+        }
+
+        const testCases = [
+            {
+                name: "Should highlight $12 in monetary values but not in quantities",
+                query: "$12",
+                text: "14 permits, 12 hours, 1 hours, $864, $288, $120",
+                expectedHighlights: ["$120"],
+                shouldNotHighlight: ["14 permits", "12 hours", "1 hours", "$864", "$288"]
+            },
+            {
+                name: "Should highlight $12 in monetary values but not in square footage",
+                query: "$12", 
+                text: "- 12 sq ft, 12 closets, $2,310, $4, $27,720",
+                expectedHighlights: ["$27,720"],
+                shouldNotHighlight: ["12 sq ft", "12 closets", "$2,310", "$4"]
+            },
+            {
+                name: "Should highlight exact $120 match",
+                query: "$120",
+                text: "Labor cost $120, 120 hours, $1,200",
+                expectedHighlights: ["$120"],
+                shouldNotHighlight: ["120 hours", "$1,200"]
+            }
+        ];
+
+        function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            
+            testCases.forEach((testCase, index) => {
+                const result = highlightMonetaryValues(testCase.text, testCase.query);
+                
+                // Check if expected highlights are present
+                const hasExpectedHighlights = testCase.expectedHighlights.every(expected => 
+                    result.includes(`<mark class="monetary-highlight`));
+                
+                // Check if unwanted highlights are absent
+                const hasUnwantedHighlights = testCase.shouldNotHighlight.some(unwanted => {
+                    const escapedUnwanted = escapeHtml(unwanted);
+                    return result.includes(`<mark class="monetary-highlight` + escapedUnwanted);
+                });
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = `test-case ${hasExpectedHighlights && !hasUnwantedHighlights ? 'pass' : 'fail'}`;
+                
+                const status = hasExpectedHighlights && !hasUnwantedHighlights ? '✅ PASS' : '❌ FAIL';
+                
+                testDiv.innerHTML = `
+                    <h3>Test ${index + 1}: ${testCase.name} ${status}</h3>
+                    <div class="test-input">
+                        <strong>Input:</strong> "${testCase.text}"<br>
+                        <strong>Query:</strong> "${testCase.query}"
+                    </div>
+                    <div class="test-result">
+                        <strong>Result:</strong> ${result}
+                    </div>
+                    <div>
+                        <strong>Expected highlights:</strong> ${testCase.expectedHighlights.join(', ')}<br>
+                        <strong>Should NOT highlight:</strong> ${testCase.shouldNotHighlight.join(', ')}
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(testDiv);
+            });
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

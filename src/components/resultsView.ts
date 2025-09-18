@@ -641,31 +641,14 @@ function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch
   return items.some((lineItem) => {
     let searchableFields: string[] = [];
     
-    if (isMonetarySearch && lineItem.fieldMetadata) {
-      // For monetary searches, only check fields marked as 'monetary' in metadata
+    if (isMonetarySearch) {
+      // For monetary searches, ONLY check actual monetary value fields
+      // Never check quantities, descriptions, or other non-monetary fields
       const monetaryFields: string[] = [];
       
-      if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
-        monetaryFields.push(lineItem.lineItemTitle);
-      }
-      if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
-        monetaryFields.push(lineItem.lineItemDescription);
-      }
-      if (lineItem.fieldMetadata.lineItemType === 'monetary') {
-        monetaryFields.push(lineItem.lineItemType);
-      }
-      if (lineItem.fieldMetadata.lineItemQuantity === 'monetary') {
-        monetaryFields.push(lineItem.lineItemQuantity?.toString() || '');
-      }
-      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === 'monetary') {
-        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
-      }
-      if (lineItem.fieldMetadata.lineItemUnitPrice === 'monetary') {
-        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      }
-      if (lineItem.fieldMetadata.lineItemTotal === 'monetary') {
-        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      }
+      // Only include unit price and total as these are the actual monetary values
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
       
       searchableFields = monetaryFields.filter(field => field && field.trim() !== '');
     } else {
@@ -702,31 +685,14 @@ function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMoneta
   items.forEach((lineItem: any, index: number) => {
     let searchableFields: string[] = [];
     
-    if (isMonetarySearch && lineItem.fieldMetadata) {
-      // For monetary searches, only check fields marked as 'monetary' in metadata
+    if (isMonetarySearch) {
+      // For monetary searches, ONLY check actual monetary value fields
+      // Never check quantities, descriptions, or other non-monetary fields
       const monetaryFields: string[] = [];
       
-      if (lineItem.fieldMetadata.lineItemTitle === 'monetary') {
-        monetaryFields.push(lineItem.lineItemTitle);
-      }
-      if (lineItem.fieldMetadata.lineItemDescription === 'monetary') {
-        monetaryFields.push(lineItem.lineItemDescription);
-      }
-      if (lineItem.fieldMetadata.lineItemType === 'monetary') {
-        monetaryFields.push(lineItem.lineItemType);
-      }
-      if (lineItem.fieldMetadata.lineItemQuantity === 'monetary') {
-        monetaryFields.push(lineItem.lineItemQuantity?.toString() || '');
-      }
-      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === 'monetary') {
-        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
-      }
-      if (lineItem.fieldMetadata.lineItemUnitPrice === 'monetary') {
-        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      }
-      if (lineItem.fieldMetadata.lineItemTotal === 'monetary') {
-        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      }
+      // Only include unit price and total as these are the actual monetary values
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
       
       searchableFields = monetaryFields.filter(field => field && field.trim() !== '');
     } else {
@@ -844,9 +810,11 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   const settings = settingsStore.getState();
   const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
   
-  // If there are matches in line items, always show them (respect lineItemsContextCount setting)
-  // If no matches, respect the showLineItemsByDefault setting
-  const shouldShowLineItems = hasMatches || settings.showLineItemsByDefault;
+  // If showLineItemsByDefault is true, always show line items
+  // If showLineItemsByDefault is false, always show toggle (even with matches)
+  // But we still need to track if there are matches for context logic
+  const shouldShowLineItems = settings.showLineItemsByDefault;
+  
 
   const wrapper = document.createElement('div');
   wrapper.className = 'result-card__line-items';
@@ -880,19 +848,28 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     // Add cost code column if available
     const costCodeDisplay = line.costCodeName || line.costCode || '';
     
+    // For monetary searches, only highlight monetary fields (unit price and total)
+    // For non-monetary searches, highlight all fields
+    const shouldHighlightDescription = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightCostCode = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightType = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightQuantity = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightUnitPrice = query && highlightFn; // Always highlight monetary fields
+    const shouldHighlightTotal = query && highlightFn; // Always highlight monetary fields
+    
     row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      ${costCodeDisplay ? `<td class="line-item__cost-code">${query && highlightFn ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ''}
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
+      <td class="line-item__description">${shouldHighlightDescription ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      ${costCodeDisplay ? `<td class="line-item__cost-code">${shouldHighlightCostCode ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ''}
+      <td class="line-item__type">${shouldHighlightType ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${shouldHighlightQuantity ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${shouldHighlightUnitPrice ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${shouldHighlightTotal ? highlightFn(total, query) : total}</td>
     `;
     return row;
   };
 
   // Function to render table content (supports both grouped and ungrouped views)
-  const renderTableContent = (container?: HTMLElement) => {
+  const renderTableContent = (container?: HTMLElement, forceShowAll: boolean = false) => {
     const targetContainer = container || wrapper;
     // Remove existing table if it exists
     const existingTable = targetContainer.querySelector('.line-items-table');
@@ -932,7 +909,10 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
       // Determine which items to show based on matches and context
       let itemsToShow: any[] = [];
       
-      if (hasMatches && contextCount > 0) {
+      if (forceShowAll) {
+        // Show all items when forceShowAll is true
+        itemsToShow = items;
+      } else if (hasMatches && contextCount > 0) {
         const matchingIndices = getMatchingLineItemIndices(item as any, query, isMonetarySearch);
         
         if (matchingIndices.length > 0) {
@@ -1013,36 +993,8 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
         
         const showAllButton = showAllRow.querySelector('.line-item__show-all-button') as HTMLButtonElement;
         showAllButton.addEventListener('click', () => {
-          // Remove all existing rows
-          tbody.innerHTML = '';
-          
-          // Re-group with all items
-          const allGroups = groupLineItemsByCostCode(items);
-          const sortedCategories = Object.keys(allGroups).sort((a, b) => {
-            const getNumericOrder = (categoryId: string) => {
-              if (categoryId === 'buildertrend-default') return 9999;
-              const match = categoryId.match(/(\d+)/);
-              return match ? parseInt(match[1]) : 9999;
-            };
-            return getNumericOrder(a) - getNumericOrder(b);
-          });
-          
-          sortedCategories.forEach(categoryId => {
-            const group = allGroups[categoryId];
-            
-            // Add category header row
-            const categoryRow = document.createElement('tr');
-            categoryRow.className = 'line-item__category-header';
-            const colspan = hasCostCodes ? 6 : 5;
-            categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
-            tbody.append(categoryRow);
-            
-            // Add line items for this category
-            group.items.forEach((item: any, index: number) => {
-              const row = renderLineItemRow(item, index);
-              tbody.append(row);
-            });
-          });
+          // Re-render with all items
+          renderTableContent(targetContainer, true);
         });
       }
     } else {
@@ -1176,14 +1128,8 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
         
         const showAllButton = showAllRow.querySelector('.line-item__show-all-button') as HTMLButtonElement;
         showAllButton.addEventListener('click', () => {
-          // Remove all existing rows
-          tbody.innerHTML = '';
-          
-          // Add all items
-          items.forEach((line: any, index: number) => {
-            const row = renderLineItemRow(line, index);
-            tbody.append(row);
-          });
+          // Re-render with all items
+          renderTableContent(targetContainer, true);
         });
       }
     }

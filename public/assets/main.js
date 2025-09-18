@@ -3566,29 +3566,10 @@ function hasLineItemMatches(item, query, isMonetarySearch) {
   const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
   return items.some((lineItem) => {
     let searchableFields = [];
-    if (isMonetarySearch && lineItem.fieldMetadata) {
+    if (isMonetarySearch) {
       const monetaryFields = [];
-      if (lineItem.fieldMetadata.lineItemTitle === "monetary") {
-        monetaryFields.push(lineItem.lineItemTitle);
-      }
-      if (lineItem.fieldMetadata.lineItemDescription === "monetary") {
-        monetaryFields.push(lineItem.lineItemDescription);
-      }
-      if (lineItem.fieldMetadata.lineItemType === "monetary") {
-        monetaryFields.push(lineItem.lineItemType);
-      }
-      if (lineItem.fieldMetadata.lineItemQuantity === "monetary") {
-        monetaryFields.push(lineItem.lineItemQuantity?.toString() || "");
-      }
-      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === "monetary") {
-        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
-      }
-      if (lineItem.fieldMetadata.lineItemUnitPrice === "monetary") {
-        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      }
-      if (lineItem.fieldMetadata.lineItemTotal === "monetary") {
-        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      }
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
       searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
     } else {
       searchableFields = [
@@ -3616,29 +3597,10 @@ function getMatchingLineItemIndices(item, query, isMonetarySearch) {
   const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
   items.forEach((lineItem, index) => {
     let searchableFields = [];
-    if (isMonetarySearch && lineItem.fieldMetadata) {
+    if (isMonetarySearch) {
       const monetaryFields = [];
-      if (lineItem.fieldMetadata.lineItemTitle === "monetary") {
-        monetaryFields.push(lineItem.lineItemTitle);
-      }
-      if (lineItem.fieldMetadata.lineItemDescription === "monetary") {
-        monetaryFields.push(lineItem.lineItemDescription);
-      }
-      if (lineItem.fieldMetadata.lineItemType === "monetary") {
-        monetaryFields.push(lineItem.lineItemType);
-      }
-      if (lineItem.fieldMetadata.lineItemQuantity === "monetary") {
-        monetaryFields.push(lineItem.lineItemQuantity?.toString() || "");
-      }
-      if (lineItem.fieldMetadata.lineItemQuantityUnitOfMeasure === "monetary") {
-        monetaryFields.push(lineItem.lineItemQuantityUnitOfMeasure);
-      }
-      if (lineItem.fieldMetadata.lineItemUnitPrice === "monetary") {
-        monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      }
-      if (lineItem.fieldMetadata.lineItemTotal === "monetary") {
-        monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      }
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
       searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
     } else {
       searchableFields = [
@@ -3717,7 +3679,7 @@ function renderLineItems(item, query, isMonetarySearch) {
   }
   const settings = settingsStore.getState();
   const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
-  const shouldShowLineItems = hasMatches || settings.showLineItemsByDefault;
+  const shouldShowLineItems = settings.showLineItemsByDefault;
   const wrapper = document.createElement("div");
   wrapper.className = "result-card__line-items";
   const groupLineItemsByCostCode = (items2) => {
@@ -3739,17 +3701,23 @@ function renderLineItems(item, query, isMonetarySearch) {
     const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
     const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
     const costCodeDisplay = line.costCodeName || line.costCode || "";
+    const shouldHighlightDescription = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightCostCode = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightType = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightQuantity = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightUnitPrice = query && highlightFn;
+    const shouldHighlightTotal = query && highlightFn;
     row.innerHTML = `
-      <td class="line-item__description">${query && highlightFn ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      ${costCodeDisplay ? `<td class="line-item__cost-code">${query && highlightFn ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ""}
-      <td class="line-item__type">${query && highlightFn ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${query && highlightFn ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${query && highlightFn ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${query && highlightFn ? highlightFn(total, query) : total}</td>
+      <td class="line-item__description">${shouldHighlightDescription ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      ${costCodeDisplay ? `<td class="line-item__cost-code">${shouldHighlightCostCode ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ""}
+      <td class="line-item__type">${shouldHighlightType ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${shouldHighlightQuantity ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${shouldHighlightUnitPrice ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${shouldHighlightTotal ? highlightFn(total, query) : total}</td>
     `;
     return row;
   };
-  const renderTableContent = (container) => {
+  const renderTableContent = (container, forceShowAll = false) => {
     const targetContainer = container || wrapper;
     const existingTable = targetContainer.querySelector(".line-items-table");
     if (existingTable) {
@@ -3775,7 +3743,9 @@ function renderLineItems(item, query, isMonetarySearch) {
       const contextCount = settings.lineItemsContextCount;
       const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
       let itemsToShow = [];
-      if (hasMatches && contextCount > 0) {
+      if (forceShowAll) {
+        itemsToShow = items;
+      } else if (hasMatches && contextCount > 0) {
         const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
         if (matchingIndices.length > 0) {
           if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
@@ -3836,28 +3806,7 @@ function renderLineItems(item, query, isMonetarySearch) {
         tbody.append(showAllRow);
         const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
         showAllButton.addEventListener("click", () => {
-          tbody.innerHTML = "";
-          const allGroups = groupLineItemsByCostCode(items);
-          const sortedCategories2 = Object.keys(allGroups).sort((a, b) => {
-            const getNumericOrder = (categoryId) => {
-              if (categoryId === "buildertrend-default") return 9999;
-              const match = categoryId.match(/(\d+)/);
-              return match ? parseInt(match[1]) : 9999;
-            };
-            return getNumericOrder(a) - getNumericOrder(b);
-          });
-          sortedCategories2.forEach((categoryId) => {
-            const group = allGroups[categoryId];
-            const categoryRow = document.createElement("tr");
-            categoryRow.className = "line-item__category-header";
-            const colspan2 = hasCostCodes ? 6 : 5;
-            categoryRow.innerHTML = `<td colspan="${colspan2}" class="line-item__category-title">${group.categoryName}</td>`;
-            tbody.append(categoryRow);
-            group.items.forEach((item2, index) => {
-              const row = renderLineItemRow(item2, index);
-              tbody.append(row);
-            });
-          });
+          renderTableContent(targetContainer, true);
         });
       }
     } else {
@@ -3963,11 +3912,7 @@ function renderLineItems(item, query, isMonetarySearch) {
         tbody.append(showAllRow);
         const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
         showAllButton.addEventListener("click", () => {
-          tbody.innerHTML = "";
-          items.forEach((line, index) => {
-            const row = renderLineItemRow(line, index);
-            tbody.append(row);
-          });
+          renderTableContent(targetContainer, true);
         });
       }
     }
