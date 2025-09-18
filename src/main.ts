@@ -170,8 +170,10 @@ searchDialog.setState({
 
 const resultsView = createResultsView({
   onFacetToggle: (key, value) => {
+    console.log('🎯 onFacetToggle called:', { key, value });
     appState.toggleFacet(key, value);
     const query = (appState.getState().lastSubmittedQuery || appState.getState().searchQuery).trim();
+    console.log('🔍 Triggering search after facet toggle with query:', query);
     if (query) {
       void performSearch(query, { openDialog: false });
     }
@@ -182,6 +184,11 @@ const resultsView = createResultsView({
     if (query) {
       void performSearch(query, { openDialog: false });
     }
+  },
+  onSortByChange: (sortBy) => {
+    console.log('🎯 onSortByChange called:', sortBy);
+    appState.setSortBy(sortBy);
+    // No need to trigger a new search - just update the sort state
   },
 });
 
@@ -277,9 +284,18 @@ async function performSearch(
   appState.setStatus('loading');
 
   try {
+    const facetSelections = appState.getState().facetSelections;
+    
+    console.log('🔍 performSearch - facetSelections:', {
+      allSelections: Object.keys(facetSelections).map(key => ({
+        key,
+        values: Array.from(facetSelections[key] || [])
+      }))
+    });
+    
     const response = await runSearch({
       query: trimmed,
-      selections: appState.getState().facetSelections,
+      selections: facetSelections,
     });
 
     if (requestId !== activeSearchToken) {
@@ -423,6 +439,7 @@ appState.subscribe((state) => {
   const resultsStateChanged = !previousState ||
     previousState.recentResponse !== state.recentResponse ||
     previousState.facetSelections !== state.facetSelections ||
+    previousState.sortBy !== state.sortBy ||
     previousState.searchStatus !== state.searchStatus ||
     previousState.lastSubmittedQuery !== state.lastSubmittedQuery ||
     previousState.searchQuery !== state.searchQuery ||
@@ -432,6 +449,7 @@ appState.subscribe((state) => {
     resultsView.render({
       response: state.recentResponse,
       selections: state.facetSelections,
+      sortBy: state.sortBy,
       status: state.searchStatus,
       query: state.lastSubmittedQuery || state.searchQuery,
       errorMessage: state.errorMessage,

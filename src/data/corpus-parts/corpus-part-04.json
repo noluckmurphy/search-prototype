@@ -65,7 +65,8 @@
         "lineItemTotal": 1288,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2024-04-14T21:43:08.282Z"
   },
   {
     "id": "payment-008",
@@ -123,7 +124,8 @@
         "lineItemTotal": 3538,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2023-10-15T07:24:44.071Z"
   },
   {
     "id": "payment-009",
@@ -181,7 +183,8 @@
         "lineItemTotal": 2280,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2023-09-17T22:51:30.279Z"
   },
   {
     "id": "payment-010",
@@ -249,7 +252,8 @@
         "lineItemTotal": 1953,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2023-10-11T11:25:08.390Z"
   },
   {
     "id": "payment-011",
@@ -307,7 +311,8 @@
         "lineItemTotal": 14268,
         "lineItemType": "Subcontractor"
       }
-    ]
+    ],
+    "createdAt": "2023-10-21T07:45:41.800Z"
   },
   {
     "id": "payment-012",
@@ -365,7 +370,8 @@
         "lineItemTotal": 24330,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2023-09-21T17:34:44.842Z"
   },
   {
     "id": "payment-013",
@@ -423,7 +429,8 @@
         "lineItemTotal": 5424,
         "lineItemType": "Subcontractor"
       }
-    ]
+    ],
+    "createdAt": "2023-06-27T16:51:14.351Z"
   },
   {
     "id": "payment-014",
@@ -471,7 +478,8 @@
         "lineItemTotal": 3052,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2023-02-17T04:16:46.982Z"
   },
   {
     "id": "payment-015",
@@ -539,7 +547,8 @@
         "lineItemTotal": 9858,
         "lineItemType": "Other"
       }
-    ]
+    ],
+    "createdAt": "2023-10-04T05:53:51.063Z"
   },
   {
     "id": "payment-016",
@@ -607,7 +616,8 @@
         "lineItemTotal": 7370,
         "lineItemType": "Subcontractor"
       }
-    ]
+    ],
+    "createdAt": "2023-11-22T01:57:22.658Z"
   },
   {
     "id": "document-021",
@@ -631,7 +641,8 @@
       "tradeFocus": "Drywall"
     },
     "documentType": "Specification Sheet",
-    "author": "Sarah Mitchell"
+    "author": "Sarah Mitchell",
+    "createdAt": "2024-01-02T04:50:34.069Z"
   },
   {
     "id": "document-022",
@@ -655,7 +666,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Inspection Report",
-    "author": "David Thompson"
+    "author": "David Thompson",
+    "createdAt": "2024-01-13T02:30:51.798Z"
   },
   {
     "id": "document-023",
@@ -679,7 +691,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Schedule",
-    "author": "Emily Rodriguez"
+    "author": "Emily Rodriguez",
+    "createdAt": "2024-01-08T15:07:39.294Z"
   },
   {
     "id": "document-024",
@@ -703,7 +716,8 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Inspection Report",
-    "author": "Michael Chang"
+    "author": "Michael Chang",
+    "createdAt": "2024-01-10T00:25:44.941Z"
   },
   {
     "id": "document-025",
@@ -727,7 +741,8 @@
       "tradeFocus": "Appliances"
     },
     "documentType": "Installation Guide",
-    "author": "Robert Garcia"
+    "author": "Robert Garcia",
+    "createdAt": "2024-01-08T12:27:04.434Z"
   },
   {
     "id": "document-026",
@@ -751,7 +766,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Specification Sheet",
-    "author": "Lisa Chen"
+    "author": "Lisa Chen",
+    "createdAt": "2024-01-29T15:08:43.557Z"
   },
   {
     "id": "document-027",
@@ -775,7 +791,8 @@
       "tradeFocus": "Flooring"
     },
     "documentType": "Schedule",
-    "author": "James Wilson"
+    "author": "James Wilson",
+    "createdAt": "2024-02-11T21:13:02.957Z"
   },
   {
     "id": "document-028",
@@ -799,7 +816,8 @@
       "tradeFocus": "Tile"
     },
     "documentType": "Installation Guide",
-    "author": "Maria Rodriguez"
+    "author": "Maria Rodriguez",
+    "createdAt": "2024-02-04T05:15:02.396Z"
   },
   {
     "id": "document-029",
@@ -823,7 +841,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Installation Guide",
-    "author": "Christopher Lee"
+    "author": "Christopher Lee",
+    "createdAt": "2024-02-23T13:17:01.270Z"
   },
   {
     "id": "document-030",
@@ -847,7 +866,8 @@
       "tradeFocus": "HVAC"
     },
     "documentType": "Inspection Report",
-    "author": "Emily Foster"
+    "author": "Emily Foster",
+    "createdAt": "2024-01-31T22:54:41.092Z"
   },
   {
     "id": "document-031",
@@ -871,7 +891,8 @@
       "tradeFocus": "Insulation"
     },
     "documentType": "Specification Sheet",
-    "author": "Jennifer Martinez"
+    "author": "Jennifer Martinez",
+    "createdAt": "2024-02-19T05:05:44.916Z"
   },
   {
     "id": "document-032",
@@ -895,7 +916,8 @@
       "tradeFocus": "Windows"
     },
     "documentType": "Installation Guide",
-    "author": "Kevin Park"
+    "author": "Kevin Park",
+    "createdAt": "2024-02-20T06:40:58.445Z"
   },
   {
     "id": "document-033",
@@ -919,7 +941,8 @@
       "tradeFocus": "Doors"
     },
     "documentType": "Schedule",
-    "author": "Michael Rodriguez"
+    "author": "Michael Rodriguez",
+    "createdAt": "2024-02-27T16:28:13.737Z"
   },
   {
     "id": "document-034",
@@ -943,7 +966,8 @@
       "tradeFocus": "Paint"
     },
     "documentType": "Specification Sheet",
-    "author": "Sarah Johnson"
+    "author": "Sarah Johnson",
+    "createdAt": "2024-03-18T17:53:17.307Z"
   },
   {
     "id": "document-035",
@@ -967,7 +991,8 @@
       "tradeFocus": "Landscaping"
     },
     "documentType": "Installation Plan",
-    "author": "Robert Taylor"
+    "author": "Robert Taylor",
+    "createdAt": "2024-03-13T17:56:13.997Z"
   },
   {
     "id": "document-036",
@@ -991,7 +1016,8 @@
       "tradeFocus": "Cabinets"
     },
     "documentType": "Installation Guide",
-    "author": "Amanda Wilson"
+    "author": "Amanda Wilson",
+    "createdAt": "2024-03-13T02:07:47.978Z"
   },
   {
     "id": "document-037",
@@ -1015,7 +1041,8 @@
       "tradeFocus": "Countertops"
     },
     "documentType": "Installation Guide",
-    "author": "Michael Foster"
+    "author": "Michael Foster",
+    "createdAt": "2024-03-27T05:13:45.667Z"
   },
   {
     "id": "document-038",
@@ -1039,7 +1066,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Schedule",
-    "author": "Sarah Martinez"
+    "author": "Sarah Martinez",
+    "createdAt": "2024-03-24T09:53:08.578Z"
   },
   {
     "id": "document-039",
@@ -1063,7 +1091,8 @@
       "tradeFocus": "Fireplace"
     },
     "documentType": "Specification Sheet",
-    "author": "Kevin Lee"
+    "author": "Kevin Lee",
+    "createdAt": "2024-04-08T20:14:38.115Z"
   },
   {
     "id": "document-040",
@@ -1087,6 +1116,7 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Installation Guide",
-    "author": "Lisa Johnson"
+    "author": "Lisa Johnson",
+    "createdAt": "2024-04-09T04:28:13.471Z"
   }
 ]

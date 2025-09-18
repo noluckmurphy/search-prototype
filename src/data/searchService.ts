@@ -826,6 +826,7 @@ function bucketIssuedDate(dateString: string): string {
   return 'Older than 2 years';
 }
 
+
 function computeFacets(records: SearchRecord[]): Partial<Record<FacetKey, FacetValue[]>> {
   const facetMaps: Partial<Record<FacetKey, Map<string, number>>> = {};
 
@@ -869,6 +870,7 @@ function computeFacets(records: SearchRecord[]): Partial<Record<FacetKey, FacetV
       ];
       continue;
     }
+    
     
     const map = facetMaps[key];
     if (!map || map.size === 0) {
@@ -1233,7 +1235,150 @@ function sortByRecency(records: SearchRecord[]): SearchRecord[] {
   );
 }
 
+function sortByMostRecent(records: SearchRecord[], query: string, isMonetary: boolean = false): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get the most recent date for each record (updatedAt or createdAt/issuedDate)
+    const getMostRecentDate = (record: SearchRecord): Date => {
+      const updatedDate = new Date(record.updatedAt);
+      let createdDate: Date;
+      
+      if (isFinancialRecord(record)) {
+        // For financial records, use issuedDate as created date
+        createdDate = new Date(record.issuedDate);
+      } else {
+        // For other records, use createdAt
+        createdDate = new Date(record.createdAt);
+      }
+      
+      return updatedDate > createdDate ? updatedDate : createdDate;
+    };
+    
+    const dateA = getMostRecentDate(a);
+    const dateB = getMostRecentDate(b);
+    
+    // Primary sort by date (descending - most recent first)
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateB.getTime() - dateA.getTime();
+    }
+    
+    // Secondary sort by relevance as tiebreaker
+    let scoreA: number;
+    let scoreB: number;
+    
+    const isBoolean = isBooleanQuery(query);
+    const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+    
+    if (isBoolean && parsedQuery) {
+      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+    } else if (isMonetary) {
+      scoreA = calculateMonetaryRelevanceScore(a, query);
+      scoreB = calculateMonetaryRelevanceScore(b, query);
+    } else if (hasMonetaryPotential(query)) {
+      scoreA = calculateHybridRelevanceScore(a, query);
+      scoreB = calculateHybridRelevanceScore(b, query);
+    } else {
+      scoreA = calculateRelevanceScore(a, query);
+      scoreB = calculateRelevanceScore(b, query);
+    }
+    
+    return scoreB - scoreA;
+  });
+}
+
+function sortByDueFirst(records: SearchRecord[], query: string, isMonetary: boolean = false): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get due date or fallback to updatedAt
+    const getDueDate = (record: SearchRecord): Date => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    
+    // Primary sort by due date (ascending - soonest first)
+    if (dueDateA.getTime() !== dueDateB.getTime()) {
+      return dueDateA.getTime() - dueDateB.getTime();
+    }
+    
+    // Secondary sort by relevance as tiebreaker
+    let scoreA: number;
+    let scoreB: number;
+    
+    const isBoolean = isBooleanQuery(query);
+    const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+    
+    if (isBoolean && parsedQuery) {
+      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+    } else if (isMonetary) {
+      scoreA = calculateMonetaryRelevanceScore(a, query);
+      scoreB = calculateMonetaryRelevanceScore(b, query);
+    } else if (hasMonetaryPotential(query)) {
+      scoreA = calculateHybridRelevanceScore(a, query);
+      scoreB = calculateHybridRelevanceScore(b, query);
+    } else {
+      scoreA = calculateRelevanceScore(a, query);
+      scoreB = calculateRelevanceScore(b, query);
+    }
+    
+    return scoreB - scoreA;
+  });
+}
+
+function sortByDueLast(records: SearchRecord[], query: string, isMonetary: boolean = false): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get due date or fallback to updatedAt
+    const getDueDate = (record: SearchRecord): Date => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    
+    // Primary sort by due date (descending - latest first)
+    if (dueDateA.getTime() !== dueDateB.getTime()) {
+      return dueDateB.getTime() - dueDateA.getTime();
+    }
+    
+    // Secondary sort by relevance as tiebreaker
+    let scoreA: number;
+    let scoreB: number;
+    
+    const isBoolean = isBooleanQuery(query);
+    const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+    
+    if (isBoolean && parsedQuery) {
+      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+    } else if (isMonetary) {
+      scoreA = calculateMonetaryRelevanceScore(a, query);
+      scoreB = calculateMonetaryRelevanceScore(b, query);
+    } else if (hasMonetaryPotential(query)) {
+      scoreA = calculateHybridRelevanceScore(a, query);
+      scoreB = calculateHybridRelevanceScore(b, query);
+    } else {
+      scoreA = calculateRelevanceScore(a, query);
+      scoreB = calculateRelevanceScore(b, query);
+    }
+    
+    return scoreB - scoreA;
+  });
+}
+
 async function filterRecords({ query, selections, isMonetarySearch }: SearchOptions): Promise<SearchRecord[]> {
+  console.log('🔍 filterRecords called with:', {
+    query,
+    selections: Object.keys(selections || {}),
+    isMonetarySearch
+  });
+  
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   
   const corpus = await loadCorpus();
@@ -1295,7 +1440,7 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
     }
   });
   
-  // Sort other matches by relevance/recency
+  // Sort other matches by relevance (default sorting)
   const sortedOtherMatches = searchQuery.trim() ? sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
   
   console.log('Search results for "' + searchQuery + '":', {
@@ -1476,6 +1621,12 @@ export async function runSearch(
     groupLimits?: Record<string, number>;
   },
 ): Promise<SearchResponse> {
+  console.log('🚀 runSearch called with options:', {
+    query: options.query,
+    selections: Object.keys(options.selections || {}),
+    isMonetarySearch: options.isMonetarySearch
+  });
+  
   const settings = settingsStore.getState();
   const meanDelay = overrides?.delayMs ?? settings.searchDelayMs;
   const variance = settings.searchDelayVarianceMs;
@@ -1485,7 +1636,10 @@ export async function runSearch(
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   
   const records = await filterRecords(searchOptions);
+  console.log('📊 filterRecords returned', records.length, 'records');
+  
   const facets = computeFacets(records);
+  console.log('🎯 computeFacets returned facets for keys:', Object.keys(facets));
   
   // Determine grouping option from selections
   const groupBy = options.selections?.groupBy?.values().next().value;

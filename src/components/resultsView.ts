@@ -6,11 +6,93 @@ import {
   SearchGroup,
   SearchRecord,
   SearchResponse,
+  SortOption,
   isBuildertrendRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
 } from '../types';
+import { settingsStore } from '../state/settingsStore';
+
+// Client-side sorting functions
+function sortRecordsByMostRecent(records: SearchRecord[]): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get the most recent date for each record (updatedAt or createdAt/issuedDate)
+    const getMostRecentDate = (record: SearchRecord): Date => {
+      const updatedDate = new Date(record.updatedAt);
+      let createdDate: Date;
+      
+      if (isFinancialRecord(record)) {
+        // For financial records, use issuedDate as created date
+        createdDate = new Date(record.issuedDate);
+      } else {
+        // For other records, use createdAt
+        createdDate = new Date(record.createdAt);
+      }
+      
+      return updatedDate > createdDate ? updatedDate : createdDate;
+    };
+    
+    const dateA = getMostRecentDate(a);
+    const dateB = getMostRecentDate(b);
+    
+    // Sort by date (descending - most recent first)
+    return dateB.getTime() - dateA.getTime();
+  });
+}
+
+function sortRecordsByDueFirst(records: SearchRecord[]): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get due date or fallback to updatedAt
+    const getDueDate = (record: SearchRecord): Date => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    
+    // Sort by due date (ascending - soonest first)
+    return dueDateA.getTime() - dueDateB.getTime();
+  });
+}
+
+function sortRecordsByDueLast(records: SearchRecord[]): SearchRecord[] {
+  return [...records].sort((a, b) => {
+    // Get due date or fallback to updatedAt
+    const getDueDate = (record: SearchRecord): Date => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    
+    // Sort by due date (descending - latest first)
+    return dueDateB.getTime() - dueDateA.getTime();
+  });
+}
+
+function sortRecords(records: SearchRecord[], sortBy: SortOption): SearchRecord[] {
+  console.log('🔄 Client-side sorting with sortBy:', sortBy, 'for', records.length, 'records');
+  
+  switch (sortBy) {
+    case 'mostRecent':
+      return sortRecordsByMostRecent(records);
+    case 'dueFirst':
+      return sortRecordsByDueFirst(records);
+    case 'dueLast':
+      return sortRecordsByDueLast(records);
+    case 'relevance':
+    default:
+      // For relevance, keep the original order (already sorted by relevance from server)
+      return records;
+  }
+}
 
 // Declare Lucide global
 declare global {
@@ -23,7 +105,7 @@ declare global {
 import { formatCurrency, formatDate, formatEntityType } from '../utils/format';
 import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid, highlightMonetaryValuesWithPartialMatches } from '../utils/highlight';
-import { settingsStore } from '../state/settingsStore';
+import { settingsStore, LineItemBehavior } from '../state/settingsStore';
 import { MIN_EFFECTIVE_QUERY_LENGTH, isQueryTooShort } from '../utils/query';
 
 // Helper function to detect if a query has monetary potential (for hybrid highlighting)
@@ -57,6 +139,7 @@ function getHighlightFunction(query: string, isMonetarySearch: boolean) {
   issuedDate: 'Issued',
   totalValue: 'Total',
   groupBy: 'Group by',
+  sortBy: 'Sort by',
   personType: 'Person Type',
   contactOrganization: 'Contact Organization',
   organizationType: 'Organization Type',
@@ -68,11 +151,13 @@ function getHighlightFunction(query: string, isMonetarySearch: boolean) {
 export interface ResultsViewOptions {
   onFacetToggle(key: FacetKey, value: string): void;
   onClearFacets?(): void;
+  onSortByChange?(sortBy: SortOption): void;
 }
 
 export interface ResultsRenderContext {
   response: SearchResponse | null;
   selections: FacetSelectionState;
+  sortBy: SortOption;
   status: SearchStatus;
   query: string;
   errorMessage?: string;
@@ -119,21 +204,23 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
     options.onClearFacets?.();
   });
 
+
   // Track previous context to avoid unnecessary re-renders
   let previousContext: ResultsRenderContext | null = null;
 
   const render = (context: ResultsRenderContext) => {
-    const { response, selections, status, query, errorMessage, isMonetarySearch } = context;
+    const { response, selections, sortBy, status, query, errorMessage, isMonetarySearch } = context;
 
     // Only update summary if relevant state changed
     const summaryChanged = !previousContext ||
       previousContext.status !== status ||
       previousContext.response !== response ||
       previousContext.query !== query ||
-      previousContext.errorMessage !== errorMessage;
+      previousContext.errorMessage !== errorMessage ||
+      previousContext.sortBy !== sortBy;
 
     if (summaryChanged) {
-      renderSummary(summaryEl, status, response, query, errorMessage);
+      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
     }
 
     // Only update facets if relevant state changed
@@ -146,18 +233,20 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       renderFacets(facetsContainer, status, response, selections, options);
     }
 
+
     // Only update results if relevant state changed
     const resultsChanged = !previousContext ||
       previousContext.status !== status ||
       previousContext.response !== response ||
       previousContext.query !== query ||
       previousContext.errorMessage !== errorMessage ||
-      previousContext.isMonetarySearch !== isMonetarySearch;
+      previousContext.isMonetarySearch !== isMonetarySearch ||
+      previousContext.sortBy !== sortBy;
 
     if (resultsChanged) {
       // Use requestAnimationFrame to defer heavy DOM operations
       requestAnimationFrame(() => {
-        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
+        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
       });
     }
 
@@ -183,7 +272,11 @@ function renderSummary(
   response: SearchResponse | null,
   query: string,
   errorMessage?: string,
+  sortBy?: SortOption,
+  onSortByChange?: (sortBy: SortOption) => void,
 ) {
+  target.innerHTML = '';
+
   switch (status) {
     case 'idle':
       if (isQueryTooShort(query)) {
@@ -193,7 +286,7 @@ function renderSummary(
       }
       return;
     case 'loading':
-      target.textContent = query ? `Searching for “${query}”…` : 'Searching…';
+      target.textContent = query ? `Searching for "${query}"…` : 'Searching…';
       return;
     case 'error':
       target.textContent = errorMessage ?? 'Search failed. Try again.';
@@ -203,9 +296,59 @@ function renderSummary(
         target.textContent = 'No results.';
         return;
       }
-      target.textContent = `${response.totalResults} result${
-        response.totalResults === 1 ? '' : 's'
-      } for “${response.query}”.`;
+      
+      // Create the summary with integrated sort control
+      const resultText = response.totalResults === 1 ? 'result' : 'results';
+      const shouldShowSort = response.totalResults > 1 && sortBy && onSortByChange;
+      
+      if (shouldShowSort) {
+        // Create container for text and sort control
+        const container = document.createElement('div');
+        container.className = 'results-summary-with-sort';
+        
+        // Create text span
+        const textSpan = document.createElement('span');
+        textSpan.textContent = `${response.totalResults} ${resultText} for "${response.query}" sorted by `;
+        
+        // Create sort select
+        const sortSelect = document.createElement('select');
+        sortSelect.className = 'results-summary__sort-select';
+        
+        // Define sort options with labels
+        const sortOptions = [
+          { value: 'relevance', label: 'Relevance' },
+          { value: 'mostRecent', label: 'Most Recent' },
+          { value: 'dueFirst', label: 'Due First' },
+          { value: 'dueLast', label: 'Due Last' },
+        ];
+        
+        // Add options to select
+        sortOptions.forEach(option => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.label;
+          sortSelect.appendChild(optionElement);
+        });
+        
+        // Set current selection
+        sortSelect.value = sortBy;
+        
+        // Add change event listener
+        sortSelect.addEventListener('change', () => {
+          const newSort = sortSelect.value as SortOption;
+          console.log('🔄 Sort By changed from', sortBy, 'to', newSort);
+          if (newSort !== sortBy) {
+            console.log('🎯 Calling onSortByChange for sortBy:', newSort);
+            onSortByChange(newSort);
+          }
+        });
+        
+        container.append(textSpan, sortSelect);
+        target.appendChild(container);
+      } else {
+        // Simple text for single result or no sort control
+        target.textContent = `${response.totalResults} ${resultText} for "${response.query}".`;
+      }
       return;
     default:
       target.textContent = '';
@@ -370,6 +513,7 @@ function renderGroups(
   query: string,
   errorMessage?: string,
   isMonetarySearch?: boolean,
+  sortBy?: SortOption,
 ) {
   container.innerHTML = '';
 
@@ -424,9 +568,33 @@ function renderGroups(
     facetsContainer.style.display = '';
   }
 
+  // Apply client-side sorting if sortBy is specified and not relevance
+  let sortedResponse = response;
+  if (sortBy && sortBy !== 'relevance') {
+    console.log('🔄 Applying client-side sorting:', sortBy);
+    
+    // Sort the records
+    const sortedRecords = sortRecords(response.records, sortBy);
+    
+    // Create a new response with sorted records
+    sortedResponse = {
+      ...response,
+      records: sortedRecords,
+      // Also sort the groups if they exist
+      fullGroups: response.fullGroups.map(group => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      })),
+      limitedGroups: response.limitedGroups.map(group => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      }))
+    };
+  }
+
   // If results are grouped, render groups; otherwise render as flat list
-  if (response.isGrouped) {
-    response.fullGroups.forEach((group) => {
+  if (sortedResponse.isGrouped) {
+    sortedResponse.fullGroups.forEach((group) => {
       container.append(renderGroup(group, group.groupTitle, query, isMonetarySearch));
     });
   } else {
@@ -434,7 +602,7 @@ function renderGroups(
     const flatList = document.createElement('div');
     flatList.className = 'results-list';
     
-    response.records.forEach((record) => {
+    sortedResponse.records.forEach((record) => {
       flatList.append(renderResultCard(record, query, isMonetarySearch));
     });
     
@@ -660,8 +828,13 @@ function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch
         lineItem.lineItemQuantity?.toString(),
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal)
-      ].filter(field => field && field.trim() !== '');
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field): field is string => field != null && field.trim() !== '');
     }
     
     return searchableFields.some((value) => {
@@ -704,8 +877,13 @@ function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMoneta
         lineItem.lineItemQuantity?.toString(),
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal)
-      ].filter(field => field && field.trim() !== '');
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field): field is string => field != null && field.trim() !== '');
     }
     
     const hasMatch = searchableFields.some((value) => {
@@ -797,6 +975,27 @@ function calculateDisplayRanges(
   return ranges;
 }
 
+// Helper function to extract context count from behavior setting
+function getContextCountFromBehavior(behavior: LineItemBehavior): number {
+  switch (behavior) {
+    case 'show-matched-only':
+      return 0;
+    case 'show-matched-with-context-1':
+      return 1;
+    case 'show-matched-with-context-2':
+      return 2;
+    case 'show-matched-with-context-3':
+      return 3;
+    case 'show-matched-with-context-5':
+      return 5;
+    case 'show-all-always':
+    case 'hide-all-always':
+      return 0; // Not used for these behaviors
+    default:
+      return 3;
+  }
+}
+
 function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement | null {
   if (!isFinancialRecord(item)) {
     return null;
@@ -810,10 +1009,11 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   const settings = settingsStore.getState();
   const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
   
-  // If showLineItemsByDefault is true, always show line items
-  // If showLineItemsByDefault is false, always show toggle (even with matches)
-  // But we still need to track if there are matches for context logic
-  const shouldShowLineItems = settings.showLineItemsByDefault;
+  // Determine behavior based on the new setting
+  const behavior = settings.lineItemBehavior;
+  const shouldShowLineItems = behavior !== 'hide-all-always';
+  const shouldShowAllItems = behavior === 'show-all-always';
+  const contextCount = getContextCountFromBehavior(behavior);
   
 
   const wrapper = document.createElement('div');
@@ -903,16 +1103,18 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     
     if (hasCostCodes) {
       // Render grouped by cost code category, but respect context settings
-      const contextCount = settings.lineItemsContextCount;
       const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
       
-      // Determine which items to show based on matches and context
+      // Determine which items to show based on behavior setting
       let itemsToShow: any[] = [];
       
-      if (forceShowAll) {
-        // Show all items when forceShowAll is true
+      if (forceShowAll || shouldShowAllItems) {
+        // Show all items when forceShowAll is true or behavior is show-all-always
         itemsToShow = items;
-      } else if (hasMatches && contextCount > 0) {
+      } else if (behavior === 'hide-all-always') {
+        // Don't show any items when behavior is hide-all-always
+        itemsToShow = [];
+      } else if (hasMatches && (behavior === 'show-matched-only' || behavior.startsWith('show-matched-with-context'))) {
         const matchingIndices = getMatchingLineItemIndices(item as any, query, isMonetarySearch);
         
         if (matchingIndices.length > 0) {
@@ -940,11 +1142,11 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
             itemsToShow = items.slice(startIndex, endIndex);
           }
         } else {
-          // Fallback: show first contextCount items
-          itemsToShow = items.slice(0, contextCount);
+          // No matches found, don't show any items for matched-only behaviors
+          itemsToShow = [];
         }
       } else {
-        // No matches or contextCount is 0: show all items
+        // No matches or behavior doesn't require matches: show all items
         itemsToShow = items;
       }
       
@@ -999,14 +1201,21 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
       }
     } else {
       // Render ungrouped (original logic)
-      const contextCount = settings.lineItemsContextCount;
       const highlightFn = query ? getHighlightFunction(query, isMonetarySearch || false) : null;
       
       // Determine which items to show initially
       let displayRanges: Array<{ start: number; end: number; isCollapsed?: boolean }> = [];
       let hiddenItems: any[] = [];
       
-      if (hasMatches && contextCount > 0) {
+      if (forceShowAll || shouldShowAllItems) {
+        // Show all items when forceShowAll is true or behavior is show-all-always
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      } else if (behavior === 'hide-all-always') {
+        // Don't show any items when behavior is hide-all-always
+        displayRanges = [];
+        hiddenItems = items;
+      } else if (hasMatches && (behavior === 'show-matched-only' || behavior.startsWith('show-matched-with-context'))) {
         const matchingIndices = getMatchingLineItemIndices(item as any, query, isMonetarySearch);
         
         if (matchingIndices.length > 0) {
@@ -1039,12 +1248,12 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
             ];
           }
         } else {
-          // Fallback: show first contextCount items
-          displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
-          hiddenItems = items.slice(contextCount);
+          // No matches found, don't show any items for matched-only behaviors
+          displayRanges = [];
+          hiddenItems = items;
         }
       } else {
-        // No matches or contextCount is 0: show all items
+        // No matches or behavior doesn't require matches: show all items
         displayRanges = [{ start: 0, end: items.length - 1 }];
         hiddenItems = [];
       }
@@ -1138,8 +1347,8 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     targetContainer.append(table);
   };
 
-  // If we shouldn't show line items by default and there are no matches, show a toggle link
-  if (!shouldShowLineItems) {
+  // Handle the hide-all-always behavior
+  if (behavior === 'hide-all-always') {
     const toggleLink = document.createElement('button');
     toggleLink.className = 'line-items-toggle';
     toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
@@ -1166,7 +1375,35 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
     return wrapper;
   }
 
-  // Show line items normally (either because there are matches or setting is enabled)
+  // For matched-only behaviors without matches, show a toggle link
+  if ((behavior === 'show-matched-only' || behavior.startsWith('show-matched-with-context')) && !hasMatches) {
+    const toggleLink = document.createElement('button');
+    toggleLink.className = 'line-items-toggle';
+    toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
+    toggleLink.type = 'button';
+    
+    const tableContainer = document.createElement('div');
+    tableContainer.style.display = 'none';
+    
+    toggleLink.addEventListener('click', () => {
+      if (tableContainer.style.display === 'none') {
+        tableContainer.style.display = 'block';
+        toggleLink.textContent = `Hide line item${items.length === 1 ? '' : 's'}`;
+        // Render table content when first shown
+        if (!tableContainer.querySelector('.line-items-table')) {
+          renderTableContent(tableContainer);
+        }
+      } else {
+        tableContainer.style.display = 'none';
+        toggleLink.textContent = `Show line item${items.length === 1 ? '' : 's'} (${items.length})`;
+      }
+    });
+    
+    wrapper.append(toggleLink, tableContainer);
+    return wrapper;
+  }
+
+  // Show line items normally (for show-all-always or when there are matches for matched behaviors)
   // Render the table content using the new function
   renderTableContent();
 

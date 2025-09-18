@@ -374,7 +374,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-02-09T17:35:14.918Z"
   },
   {
     "id": "bill-010",
@@ -590,7 +591,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-04-17T06:40:53.331Z"
   },
   {
     "id": "bill-011",
@@ -921,7 +923,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-30T03:17:03.732Z"
   },
   {
     "id": "bill-012",
@@ -1252,7 +1255,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-15T21:32:48.757Z"
   },
   {
     "id": "bill-013",
@@ -1468,7 +1472,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-03-18T17:38:03.735Z"
   },
   {
     "id": "bill-014",
@@ -1776,7 +1781,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-29T23:02:01.541Z"
   },
   {
     "id": "bill-015",
@@ -2153,7 +2159,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-02-15T20:52:03.704Z"
   },
   {
     "id": "bill-016",
@@ -2484,7 +2491,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-01-04T16:32:49.417Z"
   },
   {
     "id": "receipt-001",
@@ -2584,7 +2592,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-12-25T06:40:41.598Z"
   },
   {
     "id": "receipt-002",
@@ -2891,7 +2900,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-14T18:42:42.351Z"
   },
   {
     "id": "receipt-003",
@@ -3106,7 +3116,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-16T15:48:36.420Z"
   },
   {
     "id": "receipt-004",
@@ -3413,7 +3424,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-29T09:32:44.563Z"
   },
   {
     "id": "receipt-005",
@@ -3720,7 +3732,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-03-05T23:56:03.966Z"
   },
   {
     "id": "receipt-006",
@@ -5361,7 +5374,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-28T01:36:52.271Z"
   },
   {
     "id": "receipt-007",
@@ -5714,7 +5728,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-09T15:40:30.120Z"
   },
   {
     "id": "receipt-008",
@@ -6021,7 +6036,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-07-21T18:11:27.008Z"
   },
   {
     "id": "receipt-009",
@@ -6397,7 +6413,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-05T19:56:06.395Z"
   },
   {
     "id": "receipt-010",
@@ -6474,7 +6491,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-22T07:15:14.863Z"
   },
   {
     "id": "receipt-011",
@@ -6735,7 +6753,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-08T21:32:16.806Z"
   },
   {
     "id": "receipt-012",
@@ -8560,7 +8579,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-01-29T02:31:58.033Z"
   },
   {
     "id": "receipt-013",
@@ -8821,7 +8841,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-09-25T14:56:39.893Z"
   },
   {
     "id": "receipt-014",
@@ -9036,7 +9057,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-03T00:00:09.685Z"
   },
   {
     "id": "receipt-015",
@@ -9320,7 +9342,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-02-23T04:58:14.068Z"
   },
   {
     "id": "receipt-016",
@@ -9604,7 +9627,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-03-07T21:32:42.249Z"
   },
   {
     "id": "payment-001",
@@ -9729,7 +9753,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-30T13:49:00.162Z"
   },
   {
     "id": "payment-002",
@@ -9854,7 +9879,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-03-10T11:14:50.974Z"
   },
   {
     "id": "payment-003",
@@ -9933,7 +9959,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-22T02:19:40.136Z"
   },
   {
     "id": "payment-004",
@@ -10058,7 +10085,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-10T05:20:45.486Z"
   },
   {
     "id": "payment-005",
@@ -10229,7 +10257,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-12-13T16:22:12.738Z"
   },
   {
     "id": "payment-006",
@@ -10354,6 +10383,7 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-06T04:53:40.494Z"
   }
 ]

@@ -1,4 +1,4 @@
-import { FacetKey, FacetSelectionState, ScreenRoute, SearchResponse } from '../types';
+import { FacetKey, FacetSelectionState, ScreenRoute, SearchResponse, SortOption } from '../types';
 import { createStore } from './store';
 
 export type SearchStatus = 'idle' | 'loading' | 'ready' | 'error';
@@ -8,6 +8,7 @@ export interface AppState {
   searchQuery: string;
   lastSubmittedQuery: string;
   facetSelections: FacetSelectionState;
+  sortBy: SortOption;
   recentResponse: SearchResponse | null;
   searchStatus: SearchStatus;
   dialogOpen: boolean;
@@ -19,6 +20,7 @@ const initialState: AppState = {
   searchQuery: '',
   lastSubmittedQuery: '',
   facetSelections: {},
+  sortBy: 'relevance',
   recentResponse: null,
   searchStatus: 'idle',
   dialogOpen: false,
@@ -59,20 +61,28 @@ export const appState = {
   setLastSubmittedQuery(query: string) {
     store.setState({ lastSubmittedQuery: query });
   },
+  setSortBy(sortBy: SortOption) {
+    console.log('🔄 setSortBy called:', sortBy);
+    store.setState({ sortBy });
+  },
   clearFacets() {
     store.setState({ facetSelections: {} });
   },
   toggleFacet(key: FacetKey, value: string) {
+    console.log('🔄 toggleFacet called:', { key, value });
     store.setState((prev) => {
       const selections = cloneSelections(prev.facetSelections);
+      console.log('🔄 Previous selections:', Object.keys(selections).map(k => ({ key: k, values: Array.from(selections[k] || []) })));
       
       // Special handling for groupBy facet - only one option can be selected at a time
       if (key === 'groupBy') {
         if (selections[key]?.has(value)) {
           // If the same value is selected, deselect it
+          console.log('🔄 Deselecting', key, value);
           delete selections[key];
         } else {
           // Select the new value and clear any other groupBy selections
+          console.log('🔄 Selecting', key, value);
           selections[key] = new Set([value]);
         }
       } else {
@@ -92,6 +102,7 @@ export const appState = {
         }
       }
 
+      console.log('🔄 New selections:', Object.keys(selections).map(k => ({ key: k, values: Array.from(selections[k] || []) })));
       return {
         ...prev,
         facetSelections: selections,

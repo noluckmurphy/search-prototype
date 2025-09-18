@@ -1,4 +1,4 @@
-import { settingsStore } from '../state/settingsStore';
+import { settingsStore, LineItemBehavior } from '../state/settingsStore';
 import { formatEntityType } from '../utils/format';
 import { SearchEntityType } from '../types';
 
@@ -83,37 +83,27 @@ export function createSettingsView(): SettingsViewHandles {
     <legend>Full Results Page</legend>
   `;
 
-  const lineItemsContextField = document.createElement('div');
-  lineItemsContextField.className = 'settings-field';
-  lineItemsContextField.innerHTML = `
-    <label for="line-items-context">Line items context around matches</label>
+
+  const lineItemBehaviorField = document.createElement('div');
+  lineItemBehaviorField.className = 'settings-field';
+  lineItemBehaviorField.innerHTML = `
+    <label for="line-item-behavior">Line item behavior on results page</label>
   `;
 
-  const lineItemsContextSelect = document.createElement('select');
-  lineItemsContextSelect.id = 'line-items-context';
-  lineItemsContextSelect.innerHTML = `
-    <option value="1">1 before/after</option>
-    <option value="2">2 before/after</option>
-    <option value="3">3 before/after</option>
-    <option value="0">All line items</option>
+  const lineItemBehaviorSelect = document.createElement('select');
+  lineItemBehaviorSelect.id = 'line-item-behavior';
+  lineItemBehaviorSelect.innerHTML = `
+    <option value="show-matched-only">Show only matched line items</option>
+    <option value="show-matched-with-context-1">Show matched line items with 1 additional line of context before/after</option>
+    <option value="show-matched-with-context-2">Show matched line items with 2 additional lines of context before/after</option>
+    <option value="show-matched-with-context-3">Show matched line items with 3 additional lines of context before/after</option>
+    <option value="show-matched-with-context-5">Show matched line items with 5 additional lines of context before/after</option>
+    <option value="show-all-always">Always show all line items</option>
+    <option value="hide-all-always">Always hide all line items, including matched</option>
   `;
 
-  lineItemsContextField.append(lineItemsContextSelect);
-  resultsSection.append(lineItemsContextField);
-
-  const showLineItemsField = document.createElement('div');
-  showLineItemsField.className = 'settings-field settings-field--checkbox';
-
-  const showLineItemsCheckbox = document.createElement('input');
-  showLineItemsCheckbox.id = 'show-line-items-default';
-  showLineItemsCheckbox.type = 'checkbox';
-
-  const showLineItemsLabel = document.createElement('label');
-  showLineItemsLabel.htmlFor = 'show-line-items-default';
-  showLineItemsLabel.textContent = 'Show line items by default (uncheck to collapse behind "Show line items" link)';
-
-  showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
-  resultsSection.append(showLineItemsField);
+  lineItemBehaviorField.append(lineItemBehaviorSelect);
+  resultsSection.append(lineItemBehaviorField);
 
   const collapseLineItemsField = document.createElement('div');
   collapseLineItemsField.className = 'settings-field settings-field--checkbox';
@@ -228,8 +218,7 @@ export function createSettingsView(): SettingsViewHandles {
     delayInput.value = String(state.searchDelayMs);
     varianceInput.value = String(state.searchDelayVarianceMs);
     recentSearchesSelect.value = String(state.recentSearchesDisplayLimit);
-    lineItemsContextSelect.value = String(state.lineItemsContextCount);
-    showLineItemsCheckbox.checked = state.showLineItemsByDefault;
+    lineItemBehaviorSelect.value = state.lineItemBehavior;
     collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
     collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
     maxFacetValuesSelect.value = String(state.maxFacetValues);
@@ -244,9 +233,6 @@ export function createSettingsView(): SettingsViewHandles {
 
     const nextVariance = Number.parseInt(varianceInput.value, 10);
     const resolvedVariance = Number.isFinite(nextVariance) && nextVariance >= 0 ? nextVariance : 10;
-
-    const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
-    const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
 
     const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
     const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
@@ -266,8 +252,7 @@ export function createSettingsView(): SettingsViewHandles {
     settingsStore.update({
       searchDelayMs: resolvedDelay,
       searchDelayVarianceMs: resolvedVariance,
-      lineItemsContextCount: resolvedLineItemsContext,
-      showLineItemsByDefault: showLineItemsCheckbox.checked,
+      lineItemBehavior: lineItemBehaviorSelect.value as LineItemBehavior,
       collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
       lineItemsCollapseThreshold: resolvedCollapseThreshold,
       maxFacetValues: resolvedMaxFacetValues,

@@ -962,7 +962,12 @@ function renderMiniLineItems(item: SearchRecord, query: string, isMonetarySearch
       { value: lineItem.lineItemQuantity?.toString(), field: 'quantity' },
       { value: lineItem.lineItemQuantityUnitOfMeasure, field: 'unit' },
       { value: formatCurrency(lineItem.lineItemUnitPrice), field: 'unitPrice' },
-      { value: formatCurrency(lineItem.lineItemTotal), field: 'total' }
+      { value: formatCurrency(lineItem.lineItemTotal), field: 'total' },
+      // Add cost code fields for matching
+      { value: lineItem.costCode, field: 'costCode' },
+      { value: lineItem.costCodeName, field: 'costCodeName' },
+      { value: lineItem.costCodeCategory, field: 'costCodeCategory' },
+      { value: lineItem.costCodeCategoryName, field: 'costCodeCategoryName' }
     ];
     
     // Check if any field has actual highlighting (contains <mark> tags)

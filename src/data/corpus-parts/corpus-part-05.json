@@ -21,7 +21,8 @@
       "tradeFocus": "Roofing"
     },
     "documentType": "Specification Sheet",
-    "author": "Christopher Wilson"
+    "author": "Christopher Wilson",
+    "createdAt": "2024-04-07T19:22:11.884Z"
   },
   {
     "id": "document-042",
@@ -45,7 +46,8 @@
       "tradeFocus": "Siding"
     },
     "documentType": "Installation Guide",
-    "author": "David Kim"
+    "author": "David Kim",
+    "createdAt": "2024-04-10T03:22:40.691Z"
   },
   {
     "id": "document-043",
@@ -69,7 +71,8 @@
       "tradeFocus": "Gutters"
     },
     "documentType": "Schedule",
-    "author": "Sarah Foster"
+    "author": "Sarah Foster",
+    "createdAt": "2024-04-08T10:01:39.160Z"
   },
   {
     "id": "document-044",
@@ -93,7 +96,8 @@
       "tradeFocus": "Garage"
     },
     "documentType": "Installation Guide",
-    "author": "Michael Rodriguez"
+    "author": "Michael Rodriguez",
+    "createdAt": "2024-04-27T01:02:02.205Z"
   },
   {
     "id": "document-045",
@@ -117,7 +121,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Installation Plan",
-    "author": "Emily Chen"
+    "author": "Emily Chen",
+    "createdAt": "2024-04-22T11:06:01.675Z"
   },
   {
     "id": "document-046",
@@ -141,7 +146,8 @@
       "tradeFocus": "Waterproofing"
     },
     "documentType": "Specification Sheet",
-    "author": "Christopher Martinez"
+    "author": "Christopher Martinez",
+    "createdAt": "2024-05-15T11:11:38.577Z"
   },
   {
     "id": "document-047",
@@ -165,7 +171,8 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Construction Guide",
-    "author": "Amanda Kim"
+    "author": "Amanda Kim",
+    "createdAt": "2024-05-23T16:16:08.290Z"
   },
   {
     "id": "document-048",
@@ -189,7 +196,8 @@
       "tradeFocus": "Fencing"
     },
     "documentType": "Schedule",
-    "author": "Thomas Rodriguez"
+    "author": "Thomas Rodriguez",
+    "createdAt": "2024-05-01T05:24:02.034Z"
   },
   {
     "id": "document-049",
@@ -213,7 +221,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Specification Sheet",
-    "author": "Michael Chen"
+    "author": "Michael Chen",
+    "createdAt": "2024-05-13T19:12:19.360Z"
   },
   {
     "id": "document-050",
@@ -237,7 +246,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Construction Guide",
-    "author": "Sarah Wilson"
+    "author": "Sarah Wilson",
+    "createdAt": "2024-05-16T20:35:31.968Z"
   },
   {
     "id": "document-051",
@@ -261,7 +271,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Installation Guide",
-    "author": "Christopher Taylor"
+    "author": "Christopher Taylor",
+    "createdAt": "2024-05-27T13:25:33.127Z"
   },
   {
     "id": "document-052",
@@ -285,7 +296,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Specification Sheet",
-    "author": "Amanda Foster"
+    "author": "Amanda Foster",
+    "createdAt": "2024-06-15T22:48:09.909Z"
   },
   {
     "id": "document-053",
@@ -309,7 +321,8 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Installation Plan",
-    "author": "Thomas Wilson"
+    "author": "Thomas Wilson",
+    "createdAt": "2024-05-27T20:20:38.006Z"
   },
   {
     "id": "document-054",
@@ -333,7 +346,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Installation Guide",
-    "author": "Michael Lee"
+    "author": "Michael Lee",
+    "createdAt": "2024-06-01T09:41:58.474Z"
   },
   {
     "id": "document-055",
@@ -357,7 +371,8 @@
       "tradeFocus": "Security"
     },
     "documentType": "Installation Guide",
-    "author": "Sarah Martinez"
+    "author": "Sarah Martinez",
+    "createdAt": "2024-06-27T09:52:27.641Z"
   },
   {
     "id": "document-056",
@@ -381,7 +396,8 @@
       "tradeFocus": "Smart Home"
     },
     "documentType": "Integration Guide",
-    "author": "Amanda Rodriguez"
+    "author": "Amanda Rodriguez",
+    "createdAt": "2024-07-05T22:19:58.030Z"
   },
   {
     "id": "document-057",
@@ -405,7 +421,8 @@
       "tradeFocus": "Audio"
     },
     "documentType": "Installation Guide",
-    "author": "Christopher Wilson"
+    "author": "Christopher Wilson",
+    "createdAt": "2024-06-30T02:20:46.975Z"
   },
   {
     "id": "document-058",
@@ -429,7 +446,8 @@
       "tradeFocus": "HVAC"
     },
     "documentType": "Construction Guide",
-    "author": "Michael Martinez"
+    "author": "Michael Martinez",
+    "createdAt": "2024-06-30T10:29:40.462Z"
   },
   {
     "id": "document-059",
@@ -453,7 +471,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Installation Guide",
-    "author": "David Chen"
+    "author": "David Chen",
+    "createdAt": "2024-07-16T21:37:14.221Z"
   },
   {
     "id": "document-060",
@@ -477,7 +496,8 @@
       "tradeFocus": "Pool"
     },
     "documentType": "Installation Plan",
-    "author": "Sarah Foster"
+    "author": "Sarah Foster",
+    "createdAt": "2024-07-29T00:58:56.692Z"
   },
   {
     "id": "document-061",
@@ -501,7 +521,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Installation Guide",
-    "author": "Christopher Kim"
+    "author": "Christopher Kim",
+    "createdAt": "2024-08-04T07:53:10.512Z"
   },
   {
     "id": "document-062",
@@ -525,7 +546,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Construction Guide",
-    "author": "Amanda Taylor"
+    "author": "Amanda Taylor",
+    "createdAt": "2024-07-21T03:50:49.931Z"
   },
   {
     "id": "document-063",
@@ -549,7 +571,8 @@
       "tradeFocus": "Gas"
     },
     "documentType": "Installation Guide",
-    "author": "Michael Foster"
+    "author": "Michael Foster",
+    "createdAt": "2024-07-26T06:56:54.309Z"
   },
   {
     "id": "document-064",
@@ -573,7 +596,8 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Construction Guide",
-    "author": "Kevin Lee"
+    "author": "Kevin Lee",
+    "createdAt": "2024-08-18T02:52:55.234Z"
   },
   {
     "id": "document-065",
@@ -597,7 +621,8 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Installation Plan",
-    "author": "David Rodriguez"
+    "author": "David Rodriguez",
+    "createdAt": "2024-08-24T14:47:14.286Z"
   },
   {
     "id": "document-066",
@@ -621,7 +646,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Installation Guide",
-    "author": "Christopher Martinez"
+    "author": "Christopher Martinez",
+    "createdAt": "2024-08-27T18:17:59.792Z"
   },
   {
     "id": "document-067",
@@ -645,7 +671,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Installation Guide",
-    "author": "Amanda Kim"
+    "author": "Amanda Kim",
+    "createdAt": "2024-08-12T15:36:48.913Z"
   },
   {
     "id": "document-068",
@@ -669,7 +696,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Installation Plan",
-    "author": "Michael Chen"
+    "author": "Michael Chen",
+    "createdAt": "2024-09-07T14:46:31.737Z"
   },
   {
     "id": "document-069",
@@ -693,7 +721,8 @@
       "tradeFocus": "Landscaping"
     },
     "documentType": "Installation Guide",
-    "author": "Sarah Wilson"
+    "author": "Sarah Wilson",
+    "createdAt": "2024-09-03T10:51:08.222Z"
   },
   {
     "id": "document-070",
@@ -717,6 +746,7 @@
       "tradeFocus": "Framing"
     },
     "documentType": "Construction Guide",
-    "author": "Kevin Anderson"
+    "author": "Kevin Anderson",
+    "createdAt": "2024-08-24T13:16:15.795Z"
   }
 ]

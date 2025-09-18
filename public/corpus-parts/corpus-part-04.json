@@ -76,7 +76,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-04-14T21:43:08.282Z"
   },
   {
     "id": "payment-008",
@@ -224,7 +225,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-15T07:24:44.071Z"
   },
   {
     "id": "payment-009",
@@ -326,7 +328,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-09-17T22:51:30.279Z"
   },
   {
     "id": "payment-010",
@@ -382,7 +385,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-11T11:25:08.390Z"
   },
   {
     "id": "payment-011",
@@ -553,7 +557,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-21T07:45:41.800Z"
   },
   {
     "id": "payment-012",
@@ -632,7 +637,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-09-21T17:34:44.842Z"
   },
   {
     "id": "payment-013",
@@ -711,7 +717,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-06-27T16:51:14.351Z"
   },
   {
     "id": "payment-014",
@@ -836,7 +843,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-02-17T04:16:46.982Z"
   },
   {
     "id": "payment-015",
@@ -961,7 +969,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-10-04T05:53:51.063Z"
   },
   {
     "id": "payment-016",
@@ -1017,7 +1026,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-22T01:57:22.658Z"
   },
   {
     "id": "document-021",
@@ -1112,7 +1122,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-07T21:36:03.845Z"
   },
   {
     "id": "document-022",
@@ -1184,7 +1195,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-13T00:05:31.954Z"
   },
   {
     "id": "document-023",
@@ -1233,7 +1245,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-01T21:09:47.760Z"
   },
   {
     "id": "document-024",
@@ -1282,7 +1295,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-12-31T17:33:14.935Z"
   },
   {
     "id": "document-025",
@@ -1400,7 +1414,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-25T20:46:53.150Z"
   },
   {
     "id": "document-026",
@@ -1518,7 +1533,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-30T15:27:32.298Z"
   },
   {
     "id": "document-027",
@@ -1590,7 +1606,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-28T00:32:55.490Z"
   },
   {
     "id": "document-028",
@@ -1692,7 +1709,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-13T18:58:40.347Z"
   },
   {
     "id": "document-029",
@@ -1787,7 +1805,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-15T11:09:44.164Z"
   },
   {
     "id": "document-030",
@@ -1836,7 +1855,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-26T22:55:50.004Z"
   },
   {
     "id": "document-031",
@@ -1954,7 +1974,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-20T13:17:15.555Z"
   },
   {
     "id": "document-032",
@@ -2026,7 +2047,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-27T07:11:44.350Z"
   },
   {
     "id": "document-033",
@@ -2144,7 +2166,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-12T09:24:22.243Z"
   },
   {
     "id": "document-034",
@@ -2262,7 +2285,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-23T13:34:13.832Z"
   },
   {
     "id": "document-035",
@@ -2334,7 +2358,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-02-28T12:28:36.519Z"
   },
   {
     "id": "document-036",
@@ -2452,7 +2477,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-02T21:08:57.773Z"
   },
   {
     "id": "document-037",
@@ -2547,7 +2573,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-26T23:29:21.100Z"
   },
   {
     "id": "document-038",
@@ -2619,7 +2646,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-16T22:56:30.671Z"
   },
   {
     "id": "document-039",
@@ -2691,7 +2719,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-29T06:11:18.813Z"
   },
   {
     "id": "document-040",
@@ -2740,6 +2769,7 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-04-18T15:45:21.761Z"
   }
 ]

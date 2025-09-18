@@ -92,7 +92,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-29T00:48:30.810Z"
   },
   {
     "id": "document-042",
@@ -187,7 +188,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-04-24T18:53:39.938Z"
   },
   {
     "id": "document-043",
@@ -270,7 +272,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-04-13T12:55:42.157Z"
   },
   {
     "id": "document-044",
@@ -319,7 +322,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-07T21:41:10.249Z"
   },
   {
     "id": "document-045",
@@ -437,7 +441,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-04-16T03:32:42.355Z"
   },
   {
     "id": "document-046",
@@ -486,7 +491,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-02T09:13:06.114Z"
   },
   {
     "id": "document-047",
@@ -558,7 +564,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-23T00:12:08.491Z"
   },
   {
     "id": "document-048",
@@ -653,7 +660,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-30T13:53:26.315Z"
   },
   {
     "id": "document-049",
@@ -771,7 +779,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-03T00:39:41.534Z"
   },
   {
     "id": "document-050",
@@ -866,7 +875,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-31T12:56:16.401Z"
   },
   {
     "id": "document-051",
@@ -961,7 +971,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-22T11:24:56.719Z"
   },
   {
     "id": "document-052",
@@ -1056,7 +1067,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-21T17:57:43.962Z"
   },
   {
     "id": "document-053",
@@ -1128,7 +1140,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-08T20:11:33.411Z"
   },
   {
     "id": "document-054",
@@ -1200,7 +1213,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-14T12:03:29.751Z"
   },
   {
     "id": "document-055",
@@ -1249,7 +1263,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-19T08:23:52.031Z"
   },
   {
     "id": "document-056",
@@ -1298,7 +1313,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-20T00:42:30.328Z"
   },
   {
     "id": "document-057",
@@ -1416,7 +1432,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-07-07T08:47:45.660Z"
   },
   {
     "id": "document-058",
@@ -1488,7 +1505,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-07-16T00:00:40.035Z"
   },
   {
     "id": "document-059",
@@ -1537,7 +1555,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-06-26T15:58:28.252Z"
   },
   {
     "id": "document-060",
@@ -1573,7 +1592,8 @@
         "lineItemTotal": 136,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2024-07-05T23:56:31.740Z"
   },
   {
     "id": "document-061",
@@ -1645,7 +1665,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-07-08T10:02:15.563Z"
   },
   {
     "id": "document-062",
@@ -1717,7 +1738,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-08-04T01:39:21.664Z"
   },
   {
     "id": "document-063",
@@ -1835,7 +1857,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-08-05T05:09:54.358Z"
   },
   {
     "id": "document-064",
@@ -1907,7 +1930,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-07-22T14:33:45.956Z"
   },
   {
     "id": "document-065",
@@ -1943,7 +1967,8 @@
         "lineItemTotal": 20,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2024-07-30T07:29:50.933Z"
   },
   {
     "id": "document-066",
@@ -2061,7 +2086,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-08-26T03:18:03.145Z"
   },
   {
     "id": "document-067",
@@ -2110,7 +2136,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-09-02T19:38:11.079Z"
   },
   {
     "id": "document-068",
@@ -2205,7 +2232,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-09-02T14:34:25.506Z"
   },
   {
     "id": "document-069",
@@ -2300,7 +2328,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-08-19T06:32:54.816Z"
   },
   {
     "id": "document-070",
@@ -2418,6 +2447,7 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-09-04T02:56:37.909Z"
   }
 ]

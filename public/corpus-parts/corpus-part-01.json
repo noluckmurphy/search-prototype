@@ -115,7 +115,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-05-18T08:12:55.016Z"
   },
   {
     "id": "document-002",
@@ -187,7 +188,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-06-20T02:13:30.182Z"
   },
   {
     "id": "document-003",
@@ -236,7 +238,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-10-04T10:35:42.181Z"
   },
   {
     "id": "document-004",
@@ -308,7 +311,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2022-12-23T11:45:43.009Z"
   },
   {
     "id": "document-005",
@@ -380,7 +384,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-09T01:06:17.744Z"
   },
   {
     "id": "document-006",
@@ -429,7 +434,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2022-12-28T09:27:27.388Z"
   },
   {
     "id": "document-007",
@@ -524,7 +530,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-04-03T03:23:09.977Z"
   },
   {
     "id": "document-008",
@@ -573,7 +580,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-01-19T13:32:20.864Z"
   },
   {
     "id": "document-009",
@@ -645,7 +653,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-02T06:12:22.502Z"
   },
   {
     "id": "document-010",
@@ -740,7 +749,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-03-20T11:10:56.153Z"
   },
   {
     "id": "document-011",
@@ -835,7 +845,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-11-28T14:20:21.805Z"
   },
   {
     "id": "document-012",
@@ -884,7 +895,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-05-04T07:26:04.209Z"
   },
   {
     "id": "document-013",
@@ -933,7 +945,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2022-12-22T03:54:39.426Z"
   },
   {
     "id": "document-014",
@@ -1051,7 +1064,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-03-18T16:26:52.432Z"
   },
   {
     "id": "document-015",
@@ -1100,7 +1114,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-05-26T20:14:08.949Z"
   },
   {
     "id": "document-016",
@@ -1172,7 +1187,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-04-25T23:06:44.888Z"
   },
   {
     "id": "document-017",
@@ -1290,7 +1306,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2024-01-25T20:57:09.773Z"
   },
   {
     "id": "document-018",
@@ -1362,7 +1379,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-04-27T17:55:13.102Z"
   },
   {
     "id": "document-019",
@@ -1434,7 +1452,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-11-11T02:13:09.263Z"
   },
   {
     "id": "document-020",
@@ -1552,7 +1571,8 @@
           "lineItemType": "non-monetary"
         }
       }
-    ]
+    ],
+    "createdAt": "2023-10-05T18:58:10.184Z"
   },
   {
     "id": "clientinvoice-001",
@@ -1791,7 +1811,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-02-06T02:17:05.656Z"
   },
   {
     "id": "clientinvoice-002",
@@ -2007,7 +2028,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-01-01T14:11:31.444Z"
   },
   {
     "id": "clientinvoice-003",
@@ -2085,7 +2107,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-03-19T00:54:05.038Z"
   },
   {
     "id": "clientinvoice-004",
@@ -2324,7 +2347,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-09-19T11:52:58.884Z"
   },
   {
     "id": "clientinvoice-005",
@@ -2471,7 +2495,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-09-01T16:33:19.485Z"
   },
   {
     "id": "clientinvoice-006",
@@ -2641,7 +2666,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-11T22:47:02.831Z"
   },
   {
     "id": "clientinvoice-007",
@@ -2788,7 +2814,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-12-29T04:46:50.075Z"
   },
   {
     "id": "clientinvoice-008",
@@ -2889,7 +2916,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-11-27T18:59:29.884Z"
   },
   {
     "id": "clientinvoice-009",
@@ -3105,7 +3133,8 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2023-08-12T17:18:05.607Z"
   },
   {
     "id": "clientinvoice-010",
@@ -3275,6 +3304,7 @@
       "title": "non-monetary",
       "summary": "non-monetary",
       "totalValue": "monetary"
-    }
+    },
+    "createdAt": "2024-02-07T16:11:20.090Z"
   }
 ]

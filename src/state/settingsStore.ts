@@ -1,12 +1,20 @@
 import defaultsJson from '../config/defaults.json';
 import { createStore } from './store';
 
+export type LineItemBehavior = 
+  | 'show-matched-only'           // Option 1: Show only matched line items
+  | 'show-matched-with-context-1' // Option 2a: Show matched + 1 line context
+  | 'show-matched-with-context-2' // Option 2b: Show matched + 2 lines context  
+  | 'show-matched-with-context-3' // Option 2c: Show matched + 3 lines context
+  | 'show-matched-with-context-5' // Option 2d: Show matched + 5 lines context
+  | 'show-all-always'            // Option 3: Always show all line items
+  | 'hide-all-always';           // Option 4: Always hide all line items
+
 export interface SettingsState {
   searchDelayMs: number;
   searchDelayVarianceMs: number;
   groupLimits: Record<string, number>;
-  lineItemsContextCount: number;
-  showLineItemsByDefault: boolean;
+  lineItemBehavior: LineItemBehavior;
   collapseIrrelevantLineItems: boolean;
   lineItemsCollapseThreshold: number;
   maxFacetValues: number;
@@ -21,8 +29,7 @@ function normalize(state: SettingsState): SettingsState {
     ...state,
     groupLimits: { ...state.groupLimits },
     searchDelayVarianceMs: state.searchDelayVarianceMs ?? 10,
-    lineItemsContextCount: state.lineItemsContextCount ?? 3,
-    showLineItemsByDefault: state.showLineItemsByDefault ?? true,
+    lineItemBehavior: state.lineItemBehavior ?? 'show-matched-with-context-3',
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
     maxFacetValues: state.maxFacetValues ?? 5,

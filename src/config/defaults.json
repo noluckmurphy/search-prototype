@@ -11,8 +11,7 @@
     "Person": 4,
     "Organization": 4
   },
-  "lineItemsContextCount": 3,
-  "showLineItemsByDefault": true,
+  "lineItemBehavior": "show-matched-with-context-3",
   "collapseIrrelevantLineItems": true,
   "lineItemsCollapseThreshold": 5,
   "maxFacetValues": 5,

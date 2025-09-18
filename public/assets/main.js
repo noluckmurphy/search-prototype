@@ -2323,8 +2323,7 @@ var defaults_default = {
     Person: 4,
     Organization: 4
   },
-  lineItemsContextCount: 3,
-  showLineItemsByDefault: true,
+  lineItemBehavior: "show-matched-with-context-3",
   collapseIrrelevantLineItems: true,
   lineItemsCollapseThreshold: 5,
   maxFacetValues: 5,
@@ -2359,8 +2358,7 @@ function normalize(state) {
     ...state,
     groupLimits: { ...state.groupLimits },
     searchDelayVarianceMs: state.searchDelayVarianceMs ?? 10,
-    lineItemsContextCount: state.lineItemsContextCount ?? 3,
-    showLineItemsByDefault: state.showLineItemsByDefault ?? true,
+    lineItemBehavior: state.lineItemBehavior ?? "show-matched-with-context-3",
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
     maxFacetValues: state.maxFacetValues ?? 5,
@@ -3102,7 +3100,12 @@ function renderMiniLineItems(item, query, isMonetarySearch) {
       { value: lineItem.lineItemQuantity?.toString(), field: "quantity" },
       { value: lineItem.lineItemQuantityUnitOfMeasure, field: "unit" },
       { value: formatCurrency(lineItem.lineItemUnitPrice), field: "unitPrice" },
-      { value: formatCurrency(lineItem.lineItemTotal), field: "total" }
+      { value: formatCurrency(lineItem.lineItemTotal), field: "total" },
+      // Add cost code fields for matching
+      { value: lineItem.costCode, field: "costCode" },
+      { value: lineItem.costCodeName, field: "costCodeName" },
+      { value: lineItem.costCodeCategory, field: "costCodeCategory" },
+      { value: lineItem.costCodeCategoryName, field: "costCodeCategoryName" }
     ];
     return searchableFields.some(({ value }) => {
       if (!value) return false;
@@ -3151,6 +3154,63 @@ function escapeHtml2(value) {
 }
 
 // src/components/resultsView.ts
+function sortRecordsByMostRecent(records) {
+  return [...records].sort((a, b) => {
+    const getMostRecentDate = (record) => {
+      const updatedDate = new Date(record.updatedAt);
+      let createdDate;
+      if (isFinancialRecord(record)) {
+        createdDate = new Date(record.issuedDate);
+      } else {
+        createdDate = new Date(record.createdAt);
+      }
+      return updatedDate > createdDate ? updatedDate : createdDate;
+    };
+    const dateA = getMostRecentDate(a);
+    const dateB = getMostRecentDate(b);
+    return dateB.getTime() - dateA.getTime();
+  });
+}
+function sortRecordsByDueFirst(records) {
+  return [...records].sort((a, b) => {
+    const getDueDate = (record) => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    return dueDateA.getTime() - dueDateB.getTime();
+  });
+}
+function sortRecordsByDueLast(records) {
+  return [...records].sort((a, b) => {
+    const getDueDate = (record) => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    return dueDateB.getTime() - dueDateA.getTime();
+  });
+}
+function sortRecords(records, sortBy) {
+  console.log("\u{1F504} Client-side sorting with sortBy:", sortBy, "for", records.length, "records");
+  switch (sortBy) {
+    case "mostRecent":
+      return sortRecordsByMostRecent(records);
+    case "dueFirst":
+      return sortRecordsByDueFirst(records);
+    case "dueLast":
+      return sortRecordsByDueLast(records);
+    case "relevance":
+    default:
+      return records;
+  }
+}
 function getHighlightFunction2(query, isMonetarySearch) {
   if (isMonetarySearch) {
     return highlightMonetaryValuesWithPartialMatches;
@@ -3167,6 +3227,7 @@ var FACET_LABELS = {
   issuedDate: "Issued",
   totalValue: "Total",
   groupBy: "Group by",
+  sortBy: "Sort by",
   personType: "Person Type",
   contactOrganization: "Contact Organization",
   organizationType: "Organization Type",
@@ -3203,19 +3264,19 @@ function createResultsView(options) {
   });
   let previousContext = null;
   const render = (context) => {
-    const { response, selections, status, query, errorMessage, isMonetarySearch } = context;
-    const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage;
+    const { response, selections, sortBy, status, query, errorMessage, isMonetarySearch } = context;
+    const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.sortBy !== sortBy;
     if (summaryChanged) {
-      renderSummary(summaryEl, status, response, query, errorMessage);
+      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
     }
     const facetsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.selections !== selections;
     if (facetsChanged) {
       renderFacets(facetsContainer, status, response, selections, options);
     }
-    const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch;
+    const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch || previousContext.sortBy !== sortBy;
     if (resultsChanged) {
       requestAnimationFrame(() => {
-        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch);
+        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
       });
     }
     const selectionsChanged = !previousContext || previousContext.selections !== selections;
@@ -3230,7 +3291,8 @@ function createResultsView(options) {
     render
   };
 }
-function renderSummary(target, status, response, query, errorMessage) {
+function renderSummary(target, status, response, query, errorMessage, sortBy, onSortByChange) {
+  target.innerHTML = "";
   switch (status) {
     case "idle":
       if (isQueryTooShort(query)) {
@@ -3240,7 +3302,7 @@ function renderSummary(target, status, response, query, errorMessage) {
       }
       return;
     case "loading":
-      target.textContent = query ? `Searching for \u201C${query}\u201D\u2026` : "Searching\u2026";
+      target.textContent = query ? `Searching for "${query}"\u2026` : "Searching\u2026";
       return;
     case "error":
       target.textContent = errorMessage ?? "Search failed. Try again.";
@@ -3250,7 +3312,41 @@ function renderSummary(target, status, response, query, errorMessage) {
         target.textContent = "No results.";
         return;
       }
-      target.textContent = `${response.totalResults} result${response.totalResults === 1 ? "" : "s"} for \u201C${response.query}\u201D.`;
+      const resultText = response.totalResults === 1 ? "result" : "results";
+      const shouldShowSort = response.totalResults > 1 && sortBy && onSortByChange;
+      if (shouldShowSort) {
+        const container = document.createElement("div");
+        container.className = "results-summary-with-sort";
+        const textSpan = document.createElement("span");
+        textSpan.textContent = `${response.totalResults} ${resultText} for "${response.query}" sorted by `;
+        const sortSelect = document.createElement("select");
+        sortSelect.className = "results-summary__sort-select";
+        const sortOptions = [
+          { value: "relevance", label: "Relevance" },
+          { value: "mostRecent", label: "Most Recent" },
+          { value: "dueFirst", label: "Due First" },
+          { value: "dueLast", label: "Due Last" }
+        ];
+        sortOptions.forEach((option) => {
+          const optionElement = document.createElement("option");
+          optionElement.value = option.value;
+          optionElement.textContent = option.label;
+          sortSelect.appendChild(optionElement);
+        });
+        sortSelect.value = sortBy;
+        sortSelect.addEventListener("change", () => {
+          const newSort = sortSelect.value;
+          console.log("\u{1F504} Sort By changed from", sortBy, "to", newSort);
+          if (newSort !== sortBy) {
+            console.log("\u{1F3AF} Calling onSortByChange for sortBy:", newSort);
+            onSortByChange(newSort);
+          }
+        });
+        container.append(textSpan, sortSelect);
+        target.appendChild(container);
+      } else {
+        target.textContent = `${response.totalResults} ${resultText} for "${response.query}".`;
+      }
       return;
     default:
       target.textContent = "";
@@ -3362,7 +3458,7 @@ function renderFacets(container, status, response, selections, options) {
     container.append(block);
   });
 }
-function renderGroups(container, status, response, query, errorMessage, isMonetarySearch) {
+function renderGroups(container, status, response, query, errorMessage, isMonetarySearch, sortBy) {
   container.innerHTML = "";
   if (status === "idle") {
     if (isQueryTooShort(query)) {
@@ -3401,14 +3497,32 @@ function renderGroups(container, status, response, query, errorMessage, isMoneta
   if (facetsContainer) {
     facetsContainer.style.display = "";
   }
-  if (response.isGrouped) {
-    response.fullGroups.forEach((group) => {
+  let sortedResponse = response;
+  if (sortBy && sortBy !== "relevance") {
+    console.log("\u{1F504} Applying client-side sorting:", sortBy);
+    const sortedRecords = sortRecords(response.records, sortBy);
+    sortedResponse = {
+      ...response,
+      records: sortedRecords,
+      // Also sort the groups if they exist
+      fullGroups: response.fullGroups.map((group) => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      })),
+      limitedGroups: response.limitedGroups.map((group) => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      }))
+    };
+  }
+  if (sortedResponse.isGrouped) {
+    sortedResponse.fullGroups.forEach((group) => {
       container.append(renderGroup2(group, group.groupTitle, query, isMonetarySearch));
     });
   } else {
     const flatList = document.createElement("div");
     flatList.className = "results-list";
-    response.records.forEach((record) => {
+    sortedResponse.records.forEach((record) => {
       flatList.append(renderResultCard(record, query, isMonetarySearch));
     });
     container.append(flatList);
@@ -3579,8 +3693,13 @@ function hasLineItemMatches(item, query, isMonetarySearch) {
         lineItem.lineItemQuantity?.toString(),
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal)
-      ].filter((field) => field && field.trim() !== "");
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field) => field != null && field.trim() !== "");
     }
     return searchableFields.some((value) => {
       if (!value) return false;
@@ -3610,8 +3729,13 @@ function getMatchingLineItemIndices(item, query, isMonetarySearch) {
         lineItem.lineItemQuantity?.toString(),
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal)
-      ].filter((field) => field && field.trim() !== "");
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field) => field != null && field.trim() !== "");
     }
     const hasMatch = searchableFields.some((value) => {
       if (!value) return false;
@@ -3669,6 +3793,26 @@ function calculateDisplayRanges(groups, contextCount, totalItems) {
   }
   return ranges;
 }
+function getContextCountFromBehavior(behavior) {
+  switch (behavior) {
+    case "show-matched-only":
+      return 0;
+    case "show-matched-with-context-1":
+      return 1;
+    case "show-matched-with-context-2":
+      return 2;
+    case "show-matched-with-context-3":
+      return 3;
+    case "show-matched-with-context-5":
+      return 5;
+    case "show-all-always":
+    case "hide-all-always":
+      return 0;
+    // Not used for these behaviors
+    default:
+      return 3;
+  }
+}
 function renderLineItems(item, query, isMonetarySearch) {
   if (!isFinancialRecord(item)) {
     return null;
@@ -3679,7 +3823,10 @@ function renderLineItems(item, query, isMonetarySearch) {
   }
   const settings = settingsStore.getState();
   const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
-  const shouldShowLineItems = settings.showLineItemsByDefault;
+  const behavior = settings.lineItemBehavior;
+  const shouldShowLineItems = behavior !== "hide-all-always";
+  const shouldShowAllItems = behavior === "show-all-always";
+  const contextCount = getContextCountFromBehavior(behavior);
   const wrapper = document.createElement("div");
   wrapper.className = "result-card__line-items";
   const groupLineItemsByCostCode = (items2) => {
@@ -3740,12 +3887,13 @@ function renderLineItems(item, query, isMonetarySearch) {
     table.append(thead);
     const tbody = document.createElement("tbody");
     if (hasCostCodes) {
-      const contextCount = settings.lineItemsContextCount;
       const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
       let itemsToShow = [];
-      if (forceShowAll) {
+      if (forceShowAll || shouldShowAllItems) {
         itemsToShow = items;
-      } else if (hasMatches && contextCount > 0) {
+      } else if (behavior === "hide-all-always") {
+        itemsToShow = [];
+      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
         const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
         if (matchingIndices.length > 0) {
           if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
@@ -3766,7 +3914,7 @@ function renderLineItems(item, query, isMonetarySearch) {
             itemsToShow = items.slice(startIndex, endIndex);
           }
         } else {
-          itemsToShow = items.slice(0, contextCount);
+          itemsToShow = [];
         }
       } else {
         itemsToShow = items;
@@ -3810,11 +3958,16 @@ function renderLineItems(item, query, isMonetarySearch) {
         });
       }
     } else {
-      const contextCount = settings.lineItemsContextCount;
       const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
       let displayRanges = [];
       let hiddenItems = [];
-      if (hasMatches && contextCount > 0) {
+      if (forceShowAll || shouldShowAllItems) {
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      } else if (behavior === "hide-all-always") {
+        displayRanges = [];
+        hiddenItems = items;
+      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
         const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
         if (matchingIndices.length > 0) {
           if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
@@ -3840,8 +3993,8 @@ function renderLineItems(item, query, isMonetarySearch) {
             ];
           }
         } else {
-          displayRanges = [{ start: 0, end: Math.min(contextCount - 1, items.length - 1) }];
-          hiddenItems = items.slice(contextCount);
+          displayRanges = [];
+          hiddenItems = items;
         }
       } else {
         displayRanges = [{ start: 0, end: items.length - 1 }];
@@ -3919,7 +4072,29 @@ function renderLineItems(item, query, isMonetarySearch) {
     table.append(tbody);
     targetContainer.append(table);
   };
-  if (!shouldShowLineItems) {
+  if (behavior === "hide-all-always") {
+    const toggleLink = document.createElement("button");
+    toggleLink.className = "line-items-toggle";
+    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+    toggleLink.type = "button";
+    const tableContainer = document.createElement("div");
+    tableContainer.style.display = "none";
+    toggleLink.addEventListener("click", () => {
+      if (tableContainer.style.display === "none") {
+        tableContainer.style.display = "block";
+        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
+        if (!tableContainer.querySelector(".line-items-table")) {
+          renderTableContent(tableContainer);
+        }
+      } else {
+        tableContainer.style.display = "none";
+        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+      }
+    });
+    wrapper.append(toggleLink, tableContainer);
+    return wrapper;
+  }
+  if ((behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context")) && !hasMatches) {
     const toggleLink = document.createElement("button");
     toggleLink.className = "line-items-toggle";
     toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
@@ -4217,31 +4392,24 @@ function createSettingsView() {
   resultsSection.innerHTML = `
     <legend>Full Results Page</legend>
   `;
-  const lineItemsContextField = document.createElement("div");
-  lineItemsContextField.className = "settings-field";
-  lineItemsContextField.innerHTML = `
-    <label for="line-items-context">Line items context around matches</label>
+  const lineItemBehaviorField = document.createElement("div");
+  lineItemBehaviorField.className = "settings-field";
+  lineItemBehaviorField.innerHTML = `
+    <label for="line-item-behavior">Line item behavior on results page</label>
   `;
-  const lineItemsContextSelect = document.createElement("select");
-  lineItemsContextSelect.id = "line-items-context";
-  lineItemsContextSelect.innerHTML = `
-    <option value="1">1 before/after</option>
-    <option value="2">2 before/after</option>
-    <option value="3">3 before/after</option>
-    <option value="0">All line items</option>
+  const lineItemBehaviorSelect = document.createElement("select");
+  lineItemBehaviorSelect.id = "line-item-behavior";
+  lineItemBehaviorSelect.innerHTML = `
+    <option value="show-matched-only">Show only matched line items</option>
+    <option value="show-matched-with-context-1">Show matched line items with 1 additional line of context before/after</option>
+    <option value="show-matched-with-context-2">Show matched line items with 2 additional lines of context before/after</option>
+    <option value="show-matched-with-context-3">Show matched line items with 3 additional lines of context before/after</option>
+    <option value="show-matched-with-context-5">Show matched line items with 5 additional lines of context before/after</option>
+    <option value="show-all-always">Always show all line items</option>
+    <option value="hide-all-always">Always hide all line items, including matched</option>
   `;
-  lineItemsContextField.append(lineItemsContextSelect);
-  resultsSection.append(lineItemsContextField);
-  const showLineItemsField = document.createElement("div");
-  showLineItemsField.className = "settings-field settings-field--checkbox";
-  const showLineItemsCheckbox = document.createElement("input");
-  showLineItemsCheckbox.id = "show-line-items-default";
-  showLineItemsCheckbox.type = "checkbox";
-  const showLineItemsLabel = document.createElement("label");
-  showLineItemsLabel.htmlFor = "show-line-items-default";
-  showLineItemsLabel.textContent = 'Show line items by default (uncheck to collapse behind "Show line items" link)';
-  showLineItemsField.append(showLineItemsCheckbox, showLineItemsLabel);
-  resultsSection.append(showLineItemsField);
+  lineItemBehaviorField.append(lineItemBehaviorSelect);
+  resultsSection.append(lineItemBehaviorField);
   const collapseLineItemsField = document.createElement("div");
   collapseLineItemsField.className = "settings-field settings-field--checkbox";
   const collapseLineItemsCheckbox = document.createElement("input");
@@ -4332,8 +4500,7 @@ function createSettingsView() {
     delayInput.value = String(state.searchDelayMs);
     varianceInput.value = String(state.searchDelayVarianceMs);
     recentSearchesSelect.value = String(state.recentSearchesDisplayLimit);
-    lineItemsContextSelect.value = String(state.lineItemsContextCount);
-    showLineItemsCheckbox.checked = state.showLineItemsByDefault;
+    lineItemBehaviorSelect.value = state.lineItemBehavior;
     collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
     collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
     maxFacetValuesSelect.value = String(state.maxFacetValues);
@@ -4345,8 +4512,6 @@ function createSettingsView() {
     const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
     const nextVariance = Number.parseInt(varianceInput.value, 10);
     const resolvedVariance = Number.isFinite(nextVariance) && nextVariance >= 0 ? nextVariance : 10;
-    const lineItemsContext = Number.parseInt(lineItemsContextSelect.value, 10);
-    const resolvedLineItemsContext = Number.isFinite(lineItemsContext) && lineItemsContext >= 0 ? lineItemsContext : 3;
     const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
     const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
     const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
@@ -4361,8 +4526,7 @@ function createSettingsView() {
     settingsStore.update({
       searchDelayMs: resolvedDelay,
       searchDelayVarianceMs: resolvedVariance,
-      lineItemsContextCount: resolvedLineItemsContext,
-      showLineItemsByDefault: showLineItemsCheckbox.checked,
+      lineItemBehavior: lineItemBehaviorSelect.value,
       collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
       lineItemsCollapseThreshold: resolvedCollapseThreshold,
       maxFacetValues: resolvedMaxFacetValues,
@@ -4579,6 +4743,7 @@ var initialState2 = {
   searchQuery: "",
   lastSubmittedQuery: "",
   facetSelections: {},
+  sortBy: "relevance",
   recentResponse: null,
   searchStatus: "idle",
   dialogOpen: false,
@@ -4616,16 +4781,24 @@ var appState = {
   setLastSubmittedQuery(query) {
     store2.setState({ lastSubmittedQuery: query });
   },
+  setSortBy(sortBy) {
+    console.log("\u{1F504} setSortBy called:", sortBy);
+    store2.setState({ sortBy });
+  },
   clearFacets() {
     store2.setState({ facetSelections: {} });
   },
   toggleFacet(key, value) {
+    console.log("\u{1F504} toggleFacet called:", { key, value });
     store2.setState((prev) => {
       const selections = cloneSelections(prev.facetSelections);
+      console.log("\u{1F504} Previous selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
       if (key === "groupBy") {
         if (selections[key]?.has(value)) {
+          console.log("\u{1F504} Deselecting", key, value);
           delete selections[key];
         } else {
+          console.log("\u{1F504} Selecting", key, value);
           selections[key] = /* @__PURE__ */ new Set([value]);
         }
       } else {
@@ -4641,6 +4814,7 @@ var appState = {
           selections[key] = current;
         }
       }
+      console.log("\u{1F504} New selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
       return {
         ...prev,
         facetSelections: selections
@@ -5534,6 +5708,11 @@ function sortByRecency(records) {
   );
 }
 async function filterRecords({ query, selections, isMonetarySearch }) {
+  console.log("\u{1F50D} filterRecords called with:", {
+    query,
+    selections: Object.keys(selections || {}),
+    isMonetarySearch
+  });
   const { isMonetary, searchQuery } = parseMonetaryQuery(query);
   const corpus = await loadCorpus();
   const buildertrendMatches = [];
@@ -5707,6 +5886,11 @@ function generateNormalRandom(mean, variance) {
   return mean + z0 * Math.sqrt(variance);
 }
 async function runSearch(options, overrides) {
+  console.log("\u{1F680} runSearch called with options:", {
+    query: options.query,
+    selections: Object.keys(options.selections || {}),
+    isMonetarySearch: options.isMonetarySearch
+  });
   const settings = settingsStore.getState();
   const meanDelay = overrides?.delayMs ?? settings.searchDelayMs;
   const variance = settings.searchDelayVarianceMs;
@@ -5714,7 +5898,9 @@ async function runSearch(options, overrides) {
   const { isMonetary } = parseMonetaryQuery(options.query);
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   const records = await filterRecords(searchOptions);
+  console.log("\u{1F4CA} filterRecords returned", records.length, "records");
   const facets = computeFacets(records);
+  console.log("\u{1F3AF} computeFacets returned facets for keys:", Object.keys(facets));
   const groupBy = options.selections?.groupBy?.values().next().value;
   const isGrouped = groupBy && groupBy !== "None";
   const fullGroups = buildGroups(records, groupBy);
@@ -5847,8 +6033,10 @@ searchDialog.setState({
 });
 var resultsView = createResultsView({
   onFacetToggle: (key, value) => {
+    console.log("\u{1F3AF} onFacetToggle called:", { key, value });
     appState.toggleFacet(key, value);
     const query = (appState.getState().lastSubmittedQuery || appState.getState().searchQuery).trim();
+    console.log("\u{1F50D} Triggering search after facet toggle with query:", query);
     if (query) {
       void performSearch(query, { openDialog: false });
     }
@@ -5859,6 +6047,10 @@ var resultsView = createResultsView({
     if (query) {
       void performSearch(query, { openDialog: false });
     }
+  },
+  onSortByChange: (sortBy) => {
+    console.log("\u{1F3AF} onSortByChange called:", sortBy);
+    appState.setSortBy(sortBy);
   }
 });
 var settingsView = createSettingsView();
@@ -5934,9 +6126,16 @@ async function performSearch(query, options = {}) {
   const requestId = ++activeSearchToken;
   appState.setStatus("loading");
   try {
+    const facetSelections = appState.getState().facetSelections;
+    console.log("\u{1F50D} performSearch - facetSelections:", {
+      allSelections: Object.keys(facetSelections).map((key) => ({
+        key,
+        values: Array.from(facetSelections[key] || [])
+      }))
+    });
     const response = await runSearch({
       query: trimmed,
-      selections: appState.getState().facetSelections
+      selections: facetSelections
     });
     if (requestId !== activeSearchToken) {
       return;
@@ -6037,11 +6236,12 @@ appState.subscribe((state) => {
       // Preserve existing selection or default to -1
     });
   }
-  const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.errorMessage !== state.errorMessage;
+  const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.sortBy !== state.sortBy || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.errorMessage !== state.errorMessage;
   if (resultsStateChanged) {
     resultsView.render({
       response: state.recentResponse,
       selections: state.facetSelections,
+      sortBy: state.sortBy,
       status: state.searchStatus,
       query: state.lastSubmittedQuery || state.searchQuery,
       errorMessage: state.errorMessage,

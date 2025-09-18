@@ -46,6 +46,7 @@ export interface SearchRecordBase {
   client: string;
   status: string;
   updatedAt: string;
+  createdAt: string;
   tags: string[];
   metadata: Record<string, string | number | boolean | null>;
 }
@@ -180,6 +181,8 @@ export interface SearchResponse {
 export type ScreenRoute = 'home' | 'results' | 'settings';
 
 export type FacetSelectionState = Partial<Record<FacetKey, Set<string>>>;
+
+export type SortOption = 'relevance' | 'mostRecent' | 'dueFirst' | 'dueLast';
 
 export interface SearchOptions {
   query: string;

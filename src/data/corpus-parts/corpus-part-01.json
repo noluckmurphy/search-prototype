@@ -21,7 +21,8 @@
       "tradeFocus": "Roofing"
     },
     "documentType": "Punch List",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2023-04-28T13:04:34.262Z"
   },
   {
     "id": "document-002",
@@ -45,7 +46,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Specification Sheet",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "createdAt": "2023-06-22T21:44:34.456Z"
   },
   {
     "id": "document-003",
@@ -69,7 +71,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Inspection Report",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "createdAt": "2023-10-24T04:06:52.961Z"
   },
   {
     "id": "document-004",
@@ -93,7 +96,8 @@
       "tradeFocus": "Finish Carpentry"
     },
     "documentType": "Specification Sheet",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "createdAt": "2023-01-10T08:24:16.308Z"
   },
   {
     "id": "document-005",
@@ -117,7 +121,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Change Order",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2024-03-04T21:24:02.917Z"
   },
   {
     "id": "document-006",
@@ -141,7 +146,8 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Punch List",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2023-01-03T19:09:38.736Z"
   },
   {
     "id": "document-007",
@@ -165,7 +171,8 @@
       "tradeFocus": "Plumbing"
     },
     "documentType": "Permit Package",
-    "author": "Rebecca Miles"
+    "author": "Rebecca Miles",
+    "createdAt": "2023-04-08T19:07:18.274Z"
   },
   {
     "id": "document-008",
@@ -189,7 +196,8 @@
       "tradeFocus": "Landscaping"
     },
     "documentType": "Permit Package",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "createdAt": "2023-01-10T15:26:25.969Z"
   },
   {
     "id": "document-009",
@@ -213,7 +221,8 @@
       "tradeFocus": "Finish Carpentry"
     },
     "documentType": "Inspection Report",
-    "author": "Miguel Alvarez"
+    "author": "Miguel Alvarez",
+    "createdAt": "2023-12-20T03:16:20.594Z"
   },
   {
     "id": "document-010",
@@ -237,7 +246,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Permit Package",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "createdAt": "2023-04-04T01:26:48.706Z"
   },
   {
     "id": "document-011",
@@ -261,7 +271,8 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Inspection Report",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2023-11-18T17:50:22.489Z"
   },
   {
     "id": "document-012",
@@ -285,7 +296,8 @@
       "tradeFocus": "Sitework"
     },
     "documentType": "Punch List",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "createdAt": "2024-05-07T15:23:02.945Z"
   },
   {
     "id": "document-013",
@@ -309,7 +321,8 @@
       "tradeFocus": "HVAC"
     },
     "documentType": "Inspection Report",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "createdAt": "2022-12-27T07:22:12.619Z"
   },
   {
     "id": "document-014",
@@ -333,7 +346,8 @@
       "tradeFocus": "Concrete"
     },
     "documentType": "Punch List",
-    "author": "Olivia Chen"
+    "author": "Olivia Chen",
+    "createdAt": "2024-04-09T08:56:50.291Z"
   },
   {
     "id": "document-015",
@@ -357,7 +371,8 @@
       "tradeFocus": "Solar"
     },
     "documentType": "Inspection Report",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2023-05-23T18:24:12.372Z"
   },
   {
     "id": "document-016",
@@ -381,7 +396,8 @@
       "tradeFocus": "Roofing"
     },
     "documentType": "Permit Package",
-    "author": "Victor Huang"
+    "author": "Victor Huang",
+    "createdAt": "2023-04-07T11:12:10.920Z"
   },
   {
     "id": "document-017",
@@ -405,7 +421,8 @@
       "tradeFocus": "Electrical"
     },
     "documentType": "Architectural Drawing",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "createdAt": "2024-02-02T06:08:41.072Z"
   },
   {
     "id": "document-018",
@@ -429,7 +446,8 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Change Order",
-    "author": "Miguel Alvarez"
+    "author": "Miguel Alvarez",
+    "createdAt": "2023-05-10T09:26:26.619Z"
   },
   {
     "id": "document-019",
@@ -453,7 +471,8 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Specification Sheet",
-    "author": "Aaron Patel"
+    "author": "Aaron Patel",
+    "createdAt": "2023-10-29T16:27:18.489Z"
   },
   {
     "id": "document-020",
@@ -477,7 +496,8 @@
       "tradeFocus": "Structural"
     },
     "documentType": "Permit Package",
-    "author": "Sofia Brooks"
+    "author": "Sofia Brooks",
+    "createdAt": "2023-10-16T20:07:13.038Z"
   },
   {
     "id": "clientinvoice-001",
@@ -544,7 +564,8 @@
         "lineItemTotal": 2014,
         "lineItemType": "Subcontractor"
       }
-    ]
+    ],
+    "createdAt": "2023-02-06T02:17:05.656Z"
   },
   {
     "id": "clientinvoice-002",
@@ -591,7 +612,8 @@
         "lineItemTotal": 11852,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2024-01-01T14:11:31.444Z"
   },
   {
     "id": "clientinvoice-003",
@@ -638,7 +660,8 @@
         "lineItemTotal": 19750,
         "lineItemType": "Other"
       }
-    ]
+    ],
+    "createdAt": "2023-03-19T00:54:05.038Z"
   },
   {
     "id": "clientinvoice-004",
@@ -705,7 +728,8 @@
         "lineItemTotal": 7176,
         "lineItemType": "Other"
       }
-    ]
+    ],
+    "createdAt": "2023-09-19T11:52:58.884Z"
   },
   {
     "id": "clientinvoice-005",
@@ -762,7 +786,8 @@
         "lineItemTotal": 984,
         "lineItemType": "Labor"
       }
-    ]
+    ],
+    "createdAt": "2023-09-01T16:33:19.485Z"
   },
   {
     "id": "clientinvoice-006",
@@ -809,7 +834,8 @@
         "lineItemTotal": 3272,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2023-08-11T22:47:02.831Z"
   },
   {
     "id": "clientinvoice-007",
@@ -856,7 +882,8 @@
         "lineItemTotal": 573,
         "lineItemType": "Other"
       }
-    ]
+    ],
+    "createdAt": "2023-12-29T04:46:50.075Z"
   },
   {
     "id": "clientinvoice-008",
@@ -913,7 +940,8 @@
         "lineItemTotal": 1905,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2023-11-27T18:59:29.884Z"
   },
   {
     "id": "clientinvoice-009",
@@ -970,7 +998,8 @@
         "lineItemTotal": 12975,
         "lineItemType": "Material"
       }
-    ]
+    ],
+    "createdAt": "2023-08-12T17:18:05.607Z"
   },
   {
     "id": "clientinvoice-010",
@@ -1017,6 +1046,7 @@
         "lineItemTotal": 16746,
         "lineItemType": "Other"
       }
-    ]
+    ],
+    "createdAt": "2024-02-07T16:11:20.090Z"
   }
 ]
