@@ -15,5 +15,6 @@
   "collapseIrrelevantLineItems": true,
   "lineItemsCollapseThreshold": 5,
   "maxFacetValues": 5,
-  "recentSearchesDisplayLimit": 5
+  "recentSearchesDisplayLimit": 5,
+  "showInferredRelationships": true
 }

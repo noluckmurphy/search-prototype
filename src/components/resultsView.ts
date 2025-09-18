@@ -12,7 +12,6 @@ import {
   isOrganizationRecord,
   isPersonRecord,
 } from '../types';
-import { settingsStore } from '../state/settingsStore';
 
 // Client-side sorting functions
 function sortRecordsByMostRecent(records: SearchRecord[]): SearchRecord[] {
@@ -107,6 +106,8 @@ import { SearchStatus } from '../state/appState';
 import { findBestMatch, getContextSnippet, highlightText, highlightMonetaryValues, highlightHybrid, highlightMonetaryValuesWithPartialMatches } from '../utils/highlight';
 import { settingsStore, LineItemBehavior } from '../state/settingsStore';
 import { MIN_EFFECTIVE_QUERY_LENGTH, isQueryTooShort } from '../utils/query';
+import { getEntityRelationships, getEntitySmartActions, getRelatedEntities } from '../data/searchService';
+import { Relationship, SmartAction } from '../utils/relationshipEngine';
 
 // Helper function to detect if a query has monetary potential (for hybrid highlighting)
 function hasMonetaryPotential(query: string): boolean {
@@ -139,7 +140,6 @@ function getHighlightFunction(query: string, isMonetarySearch: boolean) {
   issuedDate: 'Issued',
   totalValue: 'Total',
   groupBy: 'Group by',
-  sortBy: 'Sort by',
   personType: 'Person Type',
   contactOrganization: 'Contact Organization',
   organizationType: 'Organization Type',
@@ -602,8 +602,9 @@ function renderGroups(
     const flatList = document.createElement('div');
     flatList.className = 'results-list';
     
-    sortedResponse.records.forEach((record) => {
-      flatList.append(renderResultCard(record, query, isMonetarySearch));
+    sortedResponse.records.forEach(async (record) => {
+      const card = await renderResultCard(record, query, isMonetarySearch);
+      flatList.append(card);
     });
     
     container.append(flatList);
@@ -626,15 +627,16 @@ function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, is
   const list = document.createElement('div');
   list.className = 'results-group__list';
 
-  group.items.forEach((item) => {
-    list.append(renderResultCard(item, query, isMonetarySearch));
+  group.items.forEach(async (item) => {
+    const card = await renderResultCard(item, query, isMonetarySearch);
+    list.append(card);
   });
 
   section.append(heading, list);
   return section;
 }
 
-function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement {
+async function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): Promise<HTMLElement> {
   const card = document.createElement('article');
   
   // Add document ID metadata for debugging
@@ -727,6 +729,35 @@ function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?:
     if (lineItemsBlock) {
       card.append(lineItemsBlock);
     }
+  }
+
+  // Add related items and smart actions
+  const settings = settingsStore.getState();
+  const includeInferred = settings.showInferredRelationships ?? true;
+  
+  try {
+    // Get related entities
+    const relatedEntities = await getRelatedEntities(item.id, {
+      includeInferred,
+      limit: 3
+    });
+
+    // Get smart actions
+    const smartActions = await getEntitySmartActions(item, includeInferred);
+
+    // Render related items if any exist
+    if (relatedEntities.length > 0) {
+      const relatedSection = renderRelatedItems(relatedEntities, item.id);
+      card.append(relatedSection);
+    }
+
+    // Render smart actions if any exist
+    if (smartActions.length > 0) {
+      const actionsSection = renderSmartActions(smartActions, item);
+      card.append(actionsSection);
+    }
+  } catch (error) {
+    console.warn('Error loading relationships for', item.id, ':', error);
   }
 
   return card;
@@ -1596,6 +1627,88 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
   }
 
   return tips;
+}
+
+/**
+ * Render related items section
+ */
+function renderRelatedItems(relatedEntities: SearchRecord[], sourceEntityId: string): HTMLElement {
+  const section = document.createElement('div');
+  section.className = 'result-card__related-items';
+
+  const header = document.createElement('h4');
+  header.className = 'related-items__header';
+  header.textContent = 'Related Items';
+
+  const itemsList = document.createElement('div');
+  itemsList.className = 'related-items__list';
+
+  relatedEntities.forEach(entity => {
+    const item = document.createElement('div');
+    item.className = 'related-item';
+    
+    // Add confidence class for styling
+    const confidence = getRelationshipConfidence(sourceEntityId, entity.id);
+    if (confidence) {
+      item.classList.add(`related-item--${confidence}`);
+    }
+
+    const title = document.createElement('span');
+    title.className = 'related-item__title';
+    title.textContent = entity.title;
+
+    const type = document.createElement('span');
+    type.className = 'related-item__type';
+    type.textContent = formatEntityType(entity.entityType);
+
+    item.append(title, type);
+    itemsList.append(item);
+  });
+
+  section.append(header, itemsList);
+  return section;
+}
+
+/**
+ * Render smart actions section
+ */
+function renderSmartActions(smartActions: SmartAction[], entity: SearchRecord): HTMLElement {
+  const section = document.createElement('div');
+  section.className = 'result-card__smart-actions';
+
+  const header = document.createElement('h4');
+  header.className = 'smart-actions__header';
+  header.textContent = 'Quick Actions';
+
+  const actionsList = document.createElement('div');
+  actionsList.className = 'smart-actions__list';
+
+  smartActions.forEach((action, index) => {
+    const actionElement = document.createElement('a');
+    actionElement.href = action.href;
+    actionElement.className = index === 0 ? 'smart-action smart-action--primary' : 'smart-action smart-action--secondary';
+    actionElement.textContent = action.label;
+    actionElement.title = action.description || action.label;
+    
+    // Add data attributes for future functionality
+    actionElement.setAttribute('data-action-id', action.id);
+    actionElement.setAttribute('data-entity-id', entity.id);
+    actionElement.setAttribute('data-entity-type', entity.entityType);
+
+    actionsList.append(actionElement);
+  });
+
+  section.append(header, actionsList);
+  return section;
+}
+
+/**
+ * Get relationship confidence for styling (simplified for now)
+ */
+function getRelationshipConfidence(sourceId: string, targetId: string): string | null {
+  // This is a simplified version - in a real implementation, you'd look up the actual relationship
+  // For now, we'll use a simple heuristic based on entity types
+  return 'explicit'; // Default to explicit for now
 }
 
 function renderFacetProTips(state: 'idle' | 'empty' | 'no-results'): string {

@@ -19,6 +19,7 @@ export interface SettingsState {
   lineItemsCollapseThreshold: number;
   maxFacetValues: number;
   recentSearchesDisplayLimit: number;
+  showInferredRelationships: boolean;
 }
 
 const STORAGE_KEY = 'search-prototype.settings';
@@ -34,6 +35,7 @@ function normalize(state: SettingsState): SettingsState {
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
     maxFacetValues: state.maxFacetValues ?? 5,
     recentSearchesDisplayLimit: state.recentSearchesDisplayLimit ?? 5,
+    showInferredRelationships: state.showInferredRelationships ?? true,
   };
 }
 

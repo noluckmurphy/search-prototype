@@ -26,6 +26,7 @@ import {
   numberToMonetary,
   areMonetaryValuesEqual
 } from '../utils/monetary';
+import { RelationshipEngine, Relationship, SmartAction } from '../utils/relationshipEngine';
 
 const GROUP_ORDER: SearchEntityType[] = [
   'Buildertrend',
@@ -58,6 +59,7 @@ const FACET_KEYS: FacetKey[] = [
 
 // Load corpus from multiple files
 let CORPUS: SearchRecord[] = [];
+let RELATIONSHIP_ENGINE: RelationshipEngine | null = null;
 
 async function loadCorpus(): Promise<SearchRecord[]> {
   if (CORPUS.length > 0) {
@@ -88,6 +90,10 @@ async function loadCorpus(): Promise<SearchRecord[]> {
     }
     
     CORPUS = allRecords.map((record) => normalizeRecord(record));
+    
+    // Initialize relationship engine
+    RELATIONSHIP_ENGINE = new RelationshipEngine(CORPUS);
+    
     return CORPUS;
   } catch (error) {
     console.error('Error loading corpus:', error);
@@ -1668,4 +1674,83 @@ export async function runSearch(
 export async function getCorpus(): Promise<SearchRecord[]> {
   const corpus = await loadCorpus();
   return [...corpus];
+}
+
+/**
+ * Get relationships for a specific entity
+ */
+export async function getEntityRelationships(
+  entityId: string, 
+  options?: {
+    type?: string;
+    confidence?: string;
+    includeInferred?: boolean;
+  }
+): Promise<Relationship[]> {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    return [];
+  }
+  
+  return RELATIONSHIP_ENGINE.getRelationships(entityId, {
+    type: options?.type as any,
+    confidence: options?.confidence as any,
+    includeInferred: options?.includeInferred
+  });
+}
+
+/**
+ * Get smart actions for a specific entity
+ */
+export async function getEntitySmartActions(
+  entity: SearchRecord,
+  includeInferred: boolean = true
+): Promise<SmartAction[]> {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    return [];
+  }
+  
+  return RELATIONSHIP_ENGINE.getSmartActions(entity, includeInferred);
+}
+
+/**
+ * Get related entities for a specific entity
+ */
+export async function getRelatedEntities(
+  entityId: string,
+  options?: {
+    type?: string;
+    confidence?: string;
+    includeInferred?: boolean;
+    limit?: number;
+  }
+): Promise<SearchRecord[]> {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    return [];
+  }
+  
+  return RELATIONSHIP_ENGINE.getRelatedEntities(entityId, {
+    type: options?.type as any,
+    confidence: options?.confidence as any,
+    includeInferred: options?.includeInferred,
+    limit: options?.limit
+  });
+}
+
+/**
+ * Get relationship engine statistics
+ */
+export async function getRelationshipStats(): Promise<{
+  total: number;
+  byType: Record<string, number>;
+  byConfidence: Record<string, number>;
+}> {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    return { total: 0, byType: {}, byConfidence: {} };
+  }
+  
+  return RELATIONSHIP_ENGINE.getStats();
 }
