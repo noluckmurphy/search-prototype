@@ -55,7 +55,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
   'Bill': [
     {
       id: 'pay-bill',
-      label: 'Pay Bill',
+      label: 'Pay bill',
       description: 'Process payment for this bill',
       href: '#',
       icon: 'credit-card',
@@ -65,7 +65,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-vendor-bills',
-      label: 'View All Bills from Vendor',
+      label: 'View all bills from vendor',
       description: 'See all bills from this vendor',
       href: '#',
       icon: 'list',
@@ -75,7 +75,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'contact-vendor',
-      label: 'Contact Vendor',
+      label: 'Contact vendor',
       description: 'Get in touch with the vendor',
       href: '#',
       icon: 'mail',
@@ -85,7 +85,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-payment-history',
-      label: 'View Payment History',
+      label: 'View payment history',
       description: 'See payment history for this vendor',
       href: '#',
       icon: 'history',
@@ -95,7 +95,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-project-bills',
-      label: 'View All Project Bills',
+      label: 'View all project bills',
       description: 'See all bills for this project',
       href: '#',
       icon: 'folder',
@@ -107,7 +107,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
   'Person': [
     {
       id: 'send-message',
-      label: 'Send Message',
+      label: 'Send message',
       description: 'Send a message to this person',
       href: '#',
       icon: 'message',
@@ -116,7 +116,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-all-activity',
-      label: 'View All Activity',
+      label: 'View all activity',
       description: 'See all activity with this person',
       href: '#',
       icon: 'activity',
@@ -125,7 +125,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-organization',
-      label: 'View Organization',
+      label: 'View organization',
       description: 'See organization details',
       href: '#',
       icon: 'building',
@@ -135,7 +135,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'schedule-meeting',
-      label: 'Schedule Meeting',
+      label: 'Schedule meeting',
       description: 'Schedule a meeting with this person',
       href: '#',
       icon: 'calendar',
@@ -144,7 +144,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-project-activity',
-      label: 'View Project Activity',
+      label: 'View project activity',
       description: 'See all activity for this project',
       href: '#',
       icon: 'folder',
@@ -156,7 +156,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
   'Organization': [
     {
       id: 'view-all-bills',
-      label: 'View All Bills',
+      label: 'View all bills',
       description: 'See all bills from this organization',
       href: '#',
       icon: 'list',
@@ -165,7 +165,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'payment-summary',
-      label: 'Payment Summary',
+      label: 'Payment summary',
       description: 'View payment summary for this vendor',
       href: '#',
       icon: 'dollar-sign',
@@ -174,7 +174,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'contact-primary-person',
-      label: 'Contact Primary Person',
+      label: 'Contact primary person',
       description: 'Get in touch with the primary contact',
       href: '#',
       icon: 'user',
@@ -184,7 +184,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'view-all-projects',
-      label: 'View All Projects',
+      label: 'View all projects',
       description: 'See all projects with this organization',
       href: '#',
       icon: 'folder',
@@ -193,7 +193,7 @@ export const SMART_ACTIONS: Record<string, SmartAction[]> = {
     },
     {
       id: 'performance-summary',
-      label: 'Performance Summary',
+      label: 'Performance summary',
       description: 'View vendor performance metrics',
       href: '#',
       icon: 'bar-chart',

@@ -317,9 +317,9 @@ function renderSummary(
         // Define sort options with labels
         const sortOptions = [
           { value: 'relevance', label: 'Relevance' },
-          { value: 'mostRecent', label: 'Most Recent' },
-          { value: 'dueFirst', label: 'Due First' },
-          { value: 'dueLast', label: 'Due Last' },
+          { value: 'mostRecent', label: 'Most recent' },
+          { value: 'dueFirst', label: 'Due first' },
+          { value: 'dueLast', label: 'Due last' },
         ];
         
         // Add options to select

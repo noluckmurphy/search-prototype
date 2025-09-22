@@ -3160,7 +3160,7 @@ var SMART_ACTIONS = {
   "Bill": [
     {
       id: "pay-bill",
-      label: "Pay Bill",
+      label: "Pay bill",
       description: "Process payment for this bill",
       href: "#",
       icon: "credit-card",
@@ -3170,7 +3170,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-vendor-bills",
-      label: "View All Bills from Vendor",
+      label: "View all bills from vendor",
       description: "See all bills from this vendor",
       href: "#",
       icon: "list",
@@ -3180,7 +3180,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "contact-vendor",
-      label: "Contact Vendor",
+      label: "Contact vendor",
       description: "Get in touch with the vendor",
       href: "#",
       icon: "mail",
@@ -3190,7 +3190,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-payment-history",
-      label: "View Payment History",
+      label: "View payment history",
       description: "See payment history for this vendor",
       href: "#",
       icon: "history",
@@ -3200,7 +3200,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-project-bills",
-      label: "View All Project Bills",
+      label: "View all project bills",
       description: "See all bills for this project",
       href: "#",
       icon: "folder",
@@ -3212,7 +3212,7 @@ var SMART_ACTIONS = {
   "Person": [
     {
       id: "send-message",
-      label: "Send Message",
+      label: "Send message",
       description: "Send a message to this person",
       href: "#",
       icon: "message",
@@ -3221,7 +3221,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-all-activity",
-      label: "View All Activity",
+      label: "View all activity",
       description: "See all activity with this person",
       href: "#",
       icon: "activity",
@@ -3230,7 +3230,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-organization",
-      label: "View Organization",
+      label: "View organization",
       description: "See organization details",
       href: "#",
       icon: "building",
@@ -3240,7 +3240,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "schedule-meeting",
-      label: "Schedule Meeting",
+      label: "Schedule meeting",
       description: "Schedule a meeting with this person",
       href: "#",
       icon: "calendar",
@@ -3249,7 +3249,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-project-activity",
-      label: "View Project Activity",
+      label: "View project activity",
       description: "See all activity for this project",
       href: "#",
       icon: "folder",
@@ -3261,7 +3261,7 @@ var SMART_ACTIONS = {
   "Organization": [
     {
       id: "view-all-bills",
-      label: "View All Bills",
+      label: "View all bills",
       description: "See all bills from this organization",
       href: "#",
       icon: "list",
@@ -3270,7 +3270,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "payment-summary",
-      label: "Payment Summary",
+      label: "Payment summary",
       description: "View payment summary for this vendor",
       href: "#",
       icon: "dollar-sign",
@@ -3279,7 +3279,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "contact-primary-person",
-      label: "Contact Primary Person",
+      label: "Contact primary person",
       description: "Get in touch with the primary contact",
       href: "#",
       icon: "user",
@@ -3289,7 +3289,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "view-all-projects",
-      label: "View All Projects",
+      label: "View all projects",
       description: "See all projects with this organization",
       href: "#",
       icon: "folder",
@@ -3298,7 +3298,7 @@ var SMART_ACTIONS = {
     },
     {
       id: "performance-summary",
-      label: "Performance Summary",
+      label: "Performance summary",
       description: "View vendor performance metrics",
       href: "#",
       icon: "bar-chart",
@@ -4948,9 +4948,9 @@ function renderSummary(target, status, response, query, errorMessage, sortBy, on
         sortSelect.className = "results-summary__sort-select";
         const sortOptions = [
           { value: "relevance", label: "Relevance" },
-          { value: "mostRecent", label: "Most Recent" },
-          { value: "dueFirst", label: "Due First" },
-          { value: "dueLast", label: "Due Last" }
+          { value: "mostRecent", label: "Most recent" },
+          { value: "dueFirst", label: "Due first" },
+          { value: "dueLast", label: "Due last" }
         ];
         sortOptions.forEach((option) => {
           const optionElement = document.createElement("option");
@@ -6172,7 +6172,7 @@ function createSettingsView() {
   const saveButton = document.createElement("button");
   saveButton.type = "submit";
   saveButton.className = "primary";
-  saveButton.textContent = "Save & Reload";
+  saveButton.textContent = "Save & reload";
   const resetButton = document.createElement("button");
   resetButton.type = "button";
   resetButton.className = "secondary";

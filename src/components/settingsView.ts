@@ -174,7 +174,7 @@ export function createSettingsView(): SettingsViewHandles {
   const saveButton = document.createElement('button');
   saveButton.type = 'submit';
   saveButton.className = 'primary';
-  saveButton.textContent = 'Save & Reload';
+  saveButton.textContent = 'Save & reload';
 
   const resetButton = document.createElement('button');
   resetButton.type = 'button';
