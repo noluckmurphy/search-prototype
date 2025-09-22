@@ -602,9 +602,14 @@ function renderGroups(
     const flatList = document.createElement('div');
     flatList.className = 'results-list';
     
-    sortedResponse.records.forEach(async (record) => {
+    // Use Promise.all to handle async rendering properly
+    Promise.all(sortedResponse.records.map(async (record) => {
       const card = await renderResultCard(record, query, isMonetarySearch);
-      flatList.append(card);
+      return { record, card };
+    })).then(results => {
+      results.forEach(({ card }) => {
+        flatList.append(card);
+      });
     });
     
     container.append(flatList);
@@ -627,9 +632,14 @@ function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, is
   const list = document.createElement('div');
   list.className = 'results-group__list';
 
-  group.items.forEach(async (item) => {
+  // Use Promise.all to handle async rendering properly
+  Promise.all(group.items.map(async (item) => {
     const card = await renderResultCard(item, query, isMonetarySearch);
-    list.append(card);
+    return { item, card };
+  })).then(results => {
+    results.forEach(({ card }) => {
+      list.append(card);
+    });
   });
 
   section.append(heading, list);

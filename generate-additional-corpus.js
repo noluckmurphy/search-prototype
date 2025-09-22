@@ -14,6 +14,17 @@ import {
   LINE_ITEM_TEMPLATES
 } from './corpus-generator.js';
 
+// Import the realistic names generator
+import {
+  generateProjectName,
+  generateClientName,
+  generateProjectManager,
+  generateLocation,
+  generateProjectTags,
+  generateProjectMetadata,
+  getRandomItem
+} from './realistic-names-generator.js';
+
 // Construction terms to work with
 const CONSTRUCTION_TERMS_EXTENDED = [
   ...CONSTRUCTION_TERMS,
@@ -76,10 +87,10 @@ function generateAdditionalCorpusParts() {
       const document = {
         id: docId,
         entityType: entityType,
-        title: `${entityType} ${docId} - Construction Project Phase ${partNum}`,
-        summary: `Detailed ${entityType.toLowerCase()} for construction project phase ${partNum} covering multiple trades and cost codes.`,
-        project: `Project Alpha-${partNum}`,
-        client: `Client ${partNum}-${i + 1}`,
+        title: `${entityType} ${docId} - ${generateProjectName()}`,
+        summary: `Detailed ${entityType.toLowerCase()} for ${generateProjectName()} covering multiple trades and cost codes.`,
+        project: generateProjectName(),
+        client: generateClientName(),
         status: ['Pending', 'Approved', 'In Review', 'Completed'][Math.floor(Math.random() * 4)],
         updatedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
         tags: ['Construction', 'Phase ' + partNum, 'Multi-trade'],

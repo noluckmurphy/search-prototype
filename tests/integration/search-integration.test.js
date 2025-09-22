@@ -5,6 +5,8 @@
 
 // Import the test framework
 import { TestFramework } from '../test-framework.js';
+import fs from 'fs';
+import path from 'path';
 
 // Integration test class that uses actual search service
 class SearchIntegrationTests {
@@ -49,15 +51,15 @@ class SearchIntegrationTests {
 
     try {
       // Load the index file to get metadata about the split files
-      const indexResponse = await fetch('./src/data/corpus-parts/index.json');
-      const indexData = await indexResponse.json();
+      const indexPath = path.resolve('./src/data/corpus-parts/index.json');
+      const indexData = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
       
       const allRecords = [];
       
       // Load each corpus part file
       for (const fileInfo of indexData.files) {
-        const response = await fetch(`./src/data/corpus-parts/${fileInfo.filename}`);
-        const partData = await response.json();
+        const filePath = path.resolve(`./src/data/corpus-parts/${fileInfo.filename}`);
+        const partData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         allRecords.push(...partData);
       }
       

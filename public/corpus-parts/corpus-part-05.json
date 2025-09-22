@@ -2,2452 +2,827 @@
   {
     "id": "document-041",
     "entityType": "Document",
-    "title": "Cedar Point – Roofing Installation Specifications",
-    "summary": "Roofing installation specifications covering shingle installation, flashing, and weatherproofing requirements.",
-    "project": "Cedar Point",
-    "client": "Nancy & Robert Davis",
+    "title": "Document document-041 - Highway 26 Expansion",
+    "summary": "Detailed document for Highway 26 Expansion covering multiple trades and cost codes.",
+    "project": "Highway 26 Expansion",
+    "client": "Portland Parks & Recreation",
     "status": "Approved",
-    "updatedAt": "2024-04-25T14:10:00.000Z",
+    "updatedAt": "2025-06-25T17:50:07.599Z",
+    "createdAt": "2025-08-19T17:30:10.113Z",
     "tags": [
-      "Roofing",
-      "Installation",
-      "Weatherproofing"
+      "Construction",
+      "Portland",
+      "General Construction",
+      "Residential Construction"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "Amanda Taylor",
-      "location": "Tampa, FL",
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Brandon Anderson",
+      "location": "Springfield, OR",
       "revision": "R2",
-      "tradeFocus": "Roofing"
-    },
-    "documentType": "Specification Sheet",
-    "author": "Christopher Wilson",
-    "lineItems": [
-      {
-        "lineItemId": "document-041-item-1",
-        "lineItemTitle": "Concrete repair and patching - 16 sq ft",
-        "lineItemDescription": "Other for concrete repair and patching - 16 sq ft on Building core areas",
-        "lineItemQuantity": 16,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 65,
-        "lineItemTotal": 1040,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-041-item-2",
-        "lineItemTitle": "Deck boards installation - 7 sq ft",
-        "lineItemDescription": "Labor for deck boards installation - 7 sq ft on Building core areas",
-        "lineItemQuantity": 7,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 132,
-        "lineItemTotal": 924,
-        "lineItemType": "Labor",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-041-item-3",
-        "lineItemTitle": "Concrete foundation pour - 19 cubic yards",
-        "lineItemDescription": "Subcontractor for concrete foundation pour - 19 cubic yards on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 158,
-        "lineItemTotal": 3002,
-        "lineItemType": "Subcontractor",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-03-29T00:48:30.810Z"
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "9 months",
+      "budget": "$1,384,156",
+      "squareFootage": 36926,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-042",
     "entityType": "Document",
-    "title": "Sycamore Springs – Siding Installation Guide",
-    "summary": "Siding installation guide covering vinyl, wood, and fiber cement siding installation procedures and weatherproofing.",
-    "project": "Sycamore Springs",
-    "client": "Carol & Michael Brown",
-    "status": "In Review",
-    "updatedAt": "2024-04-30T12:45:00.000Z",
+    "title": "Document document-042 - Downtown Gateway",
+    "summary": "Detailed document for Downtown Gateway covering multiple trades and cost codes.",
+    "project": "Downtown Gateway",
+    "client": "Salem Health",
+    "status": "Completed",
+    "updatedAt": "2024-10-10T22:18:53.181Z",
+    "createdAt": "2024-12-19T18:17:56.422Z",
     "tags": [
-      "Siding",
-      "Installation",
-      "Exterior"
+      "Construction",
+      "Residential Construction",
+      "Insulation & Weatherproofing"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "Jennifer Martinez",
-      "location": "Richmond, VA",
-      "revision": "R1",
-      "tradeFocus": "Siding"
-    },
-    "documentType": "Installation Guide",
-    "author": "David Kim",
-    "lineItems": [
-      {
-        "lineItemId": "document-042-item-1",
-        "lineItemTitle": "Demo and removal - 2 hours",
-        "lineItemDescription": "Material for demo and removal - 2 hours on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "closets",
-        "lineItemUnitPrice": 511,
-        "lineItemTotal": 1022,
-        "lineItemType": "Material",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demo work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-042-item-2",
-        "lineItemTitle": "Deck framing and structure - 10 sq ft",
-        "lineItemDescription": "Subcontractor for deck framing and structure - 10 sq ft on Building core areas",
-        "lineItemQuantity": 10,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 43,
-        "lineItemTotal": 430,
-        "lineItemType": "Subcontractor",
-        "costCode": "3010",
-        "costCodeName": "3010 - Framing work",
-        "costCodeCategory": "3000-3999",
-        "costCodeCategoryName": "3000 - 3999 Rough Structure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-042-item-3",
-        "lineItemTitle": "Deck framing and structure - 6 sq ft",
-        "lineItemDescription": "Subcontractor for deck framing and structure - 6 sq ft on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1674,
-        "lineItemTotal": 10044,
-        "lineItemType": "Subcontractor",
-        "costCode": "3010",
-        "costCodeName": "3010 - Framing work",
-        "costCodeCategory": "3000-3999",
-        "costCodeCategoryName": "3000 - 3999 Rough Structure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-04-24T18:53:39.938Z"
+      "projectPhase": "Completion",
+      "projectManager": "Maria Rodriguez",
+      "location": "Ashland, OR",
+      "revision": "R3",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "6 months",
+      "budget": "$4,923,400",
+      "squareFootage": 11160,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-043",
     "entityType": "Document",
-    "title": "Poplar Ridge – Gutters Installation Schedule",
-    "summary": "Gutters installation schedule covering aluminum and copper gutter installation, downspout placement, and drainage requirements.",
-    "project": "Poplar Ridge",
-    "client": "Sharon & James Wilson",
-    "status": "Draft",
-    "updatedAt": "2024-05-05T09:30:00.000Z",
+    "title": "Document document-043 - Riverside Manor",
+    "summary": "Detailed document for Riverside Manor covering multiple trades and cost codes.",
+    "project": "Riverside Manor",
+    "client": "Beaverton School District",
+    "status": "Pending",
+    "updatedAt": "2025-09-13T15:37:00.208Z",
+    "createdAt": "2025-01-20T19:07:23.386Z",
     "tags": [
-      "Gutters",
-      "Drainage",
-      "Installation"
+      "Construction",
+      "Roofing & Siding",
+      "Flooring & Finishes"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "Thomas Anderson",
-      "location": "Louisville, KY",
-      "revision": "R1",
-      "tradeFocus": "Gutters"
-    },
-    "documentType": "Schedule",
-    "author": "Sarah Foster",
-    "lineItems": [
-      {
-        "lineItemId": "document-043-item-1",
-        "lineItemTitle": "Carpet cleaning and maintenance - 19 sq ft",
-        "lineItemDescription": "Material for carpet cleaning and maintenance - 19 sq ft on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 598,
-        "lineItemTotal": 11362,
-        "lineItemType": "Material",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-043-item-2",
-        "lineItemTitle": "Bathroom cabinets - 2 units",
-        "lineItemDescription": "Labor for bathroom cabinets - 2 units on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 2976,
-        "lineItemTotal": 5952,
-        "lineItemType": "Labor",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-043-item-3",
-        "lineItemTitle": "Deck construction - 19 sq ft",
-        "lineItemDescription": "Subcontractor for deck construction - 19 sq ft on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 4,
-        "lineItemTotal": 76,
-        "lineItemType": "Subcontractor",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-04-13T12:55:42.157Z"
+      "projectPhase": "Planning",
+      "projectManager": "Christopher Brown",
+      "location": "Hillsboro, OR",
+      "revision": "R4",
+      "tradeFocus": "General",
+      "estimatedDuration": "4 months",
+      "budget": "$699,069",
+      "squareFootage": 28647,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-044",
     "entityType": "Document",
-    "title": "Birchwood Manor – Garage Door Installation",
-    "summary": "Garage door installation specifications covering automatic opener installation, safety features, and weatherproofing requirements.",
-    "project": "Birchwood Manor",
-    "client": "Linda & Richard Garcia",
-    "status": "Approved",
-    "updatedAt": "2024-05-10T16:20:00.000Z",
+    "title": "Document document-044 - Water Treatment Plant",
+    "summary": "Detailed document for Water Treatment Plant covering multiple trades and cost codes.",
+    "project": "Water Treatment Plant",
+    "client": "North Clackamas School District",
+    "status": "In Review",
+    "updatedAt": "2025-03-06T10:30:06.165Z",
+    "createdAt": "2024-12-09T17:12:22.535Z",
     "tags": [
-      "Garage",
-      "Doors",
-      "Installation"
+      "Construction",
+      "Commercial Construction",
+      "Cabinetry & Millwork"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "Rachel Lee",
-      "location": "Memphis, TN",
-      "revision": "R3",
-      "tradeFocus": "Garage"
-    },
-    "documentType": "Installation Guide",
-    "author": "Michael Rodriguez",
-    "lineItems": [
-      {
-        "lineItemId": "document-044-item-1",
-        "lineItemTitle": "Concrete stamping and texturing - 11 sq ft",
-        "lineItemDescription": "Equipment for concrete stamping and texturing - 11 sq ft on Building core areas",
-        "lineItemQuantity": 11,
-        "lineItemQuantityUnitOfMeasure": "linear feet",
-        "lineItemUnitPrice": 26,
-        "lineItemTotal": 286,
-        "lineItemType": "Equipment",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-07T21:41:10.249Z"
+      "projectPhase": "Design",
+      "projectManager": "James Wilson",
+      "location": "Cornelius, OR",
+      "revision": "R4",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "5 months",
+      "budget": "$698,761",
+      "squareFootage": 37491,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-045",
     "entityType": "Document",
-    "title": "Oakwood Estates – Driveway Installation Plan",
-    "summary": "Driveway installation plan covering concrete, asphalt, and paver installation procedures and drainage considerations.",
-    "project": "Oakwood Estates",
-    "client": "Donna & William Thompson",
+    "title": "Document document-045 - Cedar Ridge Development",
+    "summary": "Detailed document for Cedar Ridge Development covering multiple trades and cost codes.",
+    "project": "Cedar Ridge Development",
+    "client": "Centennial School District",
     "status": "In Review",
-    "updatedAt": "2024-05-15T11:15:00.000Z",
+    "updatedAt": "2025-08-22T01:30:31.306Z",
+    "createdAt": "2025-08-22T04:39:49.473Z",
     "tags": [
-      "Driveway",
-      "Concrete",
-      "Installation"
+      "Construction",
+      "Mixed-Use",
+      "Appliances & Equipment",
+      "Flooring & Finishes"
     ],
     "metadata": {
-      "projectPhase": "Sitework",
-      "projectManager": "Kevin Park",
-      "location": "Birmingham, AL",
-      "revision": "R2",
-      "tradeFocus": "Concrete"
-    },
-    "documentType": "Installation Plan",
-    "author": "Emily Chen",
-    "lineItems": [
-      {
-        "lineItemId": "document-045-item-1",
-        "lineItemTitle": "Bathroom electrical work - 22 bathrooms",
-        "lineItemDescription": "Subcontractor for bathroom electrical work - 22 bathrooms on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 166,
-        "lineItemTotal": 3652,
-        "lineItemType": "Subcontractor",
-        "costCode": "5170",
-        "costCodeName": "5170 - Electrical work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-045-item-2",
-        "lineItemTitle": "Cabinet doors and drawers - 23 pieces",
-        "lineItemDescription": "Equipment for cabinet doors and drawers - 23 pieces on Building core areas",
-        "lineItemQuantity": 23,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 253,
-        "lineItemTotal": 5819,
-        "lineItemType": "Equipment",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-045-item-3",
-        "lineItemTitle": "Interior demolition - 3 sq ft",
-        "lineItemDescription": "Equipment for interior demolition - 3 sq ft on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "closets",
-        "lineItemUnitPrice": 240,
-        "lineItemTotal": 720,
-        "lineItemType": "Equipment",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-045-item-4",
-        "lineItemTitle": "Exterior demolition - 7 sq ft",
-        "lineItemDescription": "Other for exterior demolition - 7 sq ft on Building core areas",
-        "lineItemQuantity": 7,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 71,
-        "lineItemTotal": 497,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-04-16T03:32:42.355Z"
+      "projectPhase": "Closeout",
+      "projectManager": "Rachel Miller",
+      "location": "Salem, OR",
+      "revision": "R1",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "6 months",
+      "budget": "$2,855,971",
+      "squareFootage": 38356,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-046",
     "entityType": "Document",
-    "title": "Pine Ridge Homes – Basement Waterproofing",
-    "summary": "Basement waterproofing specifications covering interior and exterior waterproofing systems, drainage, and moisture control.",
-    "project": "Pine Ridge Homes",
-    "client": "Patricia & Robert Johnson",
+    "title": "Document document-046 - Arts Quarter",
+    "summary": "Detailed document for Arts Quarter covering multiple trades and cost codes.",
+    "project": "Arts Quarter",
+    "client": "McDonald's Corporation",
     "status": "Approved",
-    "updatedAt": "2024-05-20T13:30:00.000Z",
+    "updatedAt": "2024-11-26T19:23:02.104Z",
+    "createdAt": "2025-06-04T22:45:48.423Z",
     "tags": [
-      "Basement",
-      "Waterproofing",
-      "Drainage"
+      "Construction",
+      "Insulation & Weatherproofing",
+      "Electrical Systems"
     ],
     "metadata": {
-      "projectPhase": "Foundation",
-      "projectManager": "Lisa Taylor",
-      "location": "Indianapolis, IN",
-      "revision": "R2",
-      "tradeFocus": "Waterproofing"
-    },
-    "documentType": "Specification Sheet",
-    "author": "Christopher Martinez",
-    "lineItems": [
-      {
-        "lineItemId": "document-046-item-1",
-        "lineItemTitle": "Carpet removal and disposal - 24 sq ft",
-        "lineItemDescription": "Material for carpet removal and disposal - 24 sq ft on Building core areas",
-        "lineItemQuantity": 24,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 5,
-        "lineItemTotal": 120,
-        "lineItemType": "Material",
-        "costCode": "5020",
-        "costCodeName": "5020 - Carpet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-02T09:13:06.114Z"
+      "projectPhase": "Closeout",
+      "projectManager": "Tyler Martin",
+      "location": "Springfield, OR",
+      "revision": "R4",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "3 months",
+      "budget": "$5,252,411",
+      "squareFootage": 27572,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-047",
     "entityType": "Document",
-    "title": "Maple Grove Development – Deck Construction Guide",
-    "summary": "Deck construction guide covering structural requirements, material selection, and safety compliance standards.",
-    "project": "Maple Grove Development",
-    "client": "Deborah & Steven Anderson",
+    "title": "Document document-047 - Theater Renovation",
+    "summary": "Detailed document for Theater Renovation covering multiple trades and cost codes.",
+    "project": "Theater Renovation",
+    "client": "Sarah & David Chen",
     "status": "In Review",
-    "updatedAt": "2024-05-25T10:45:00.000Z",
+    "updatedAt": "2025-05-20T03:16:43.683Z",
+    "createdAt": "2025-02-11T12:10:34.353Z",
     "tags": [
-      "Deck",
       "Construction",
-      "Structural"
+      "Renovation",
+      "Commercial Construction",
+      "Landscaping & Hardscaping"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "David Wilson",
-      "location": "Columbus, OH",
-      "revision": "R1",
-      "tradeFocus": "Framing"
-    },
-    "documentType": "Construction Guide",
-    "author": "Amanda Kim",
-    "lineItems": [
-      {
-        "lineItemId": "document-047-item-1",
-        "lineItemTitle": "Cabinet refinishing - 4 units",
-        "lineItemDescription": "Subcontractor for cabinet refinishing - 4 units on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "linear feet",
-        "lineItemUnitPrice": 4,
-        "lineItemTotal": 16,
-        "lineItemType": "Subcontractor",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-047-item-2",
-        "lineItemTitle": "Custom cabinet work - 14 units",
-        "lineItemDescription": "Subcontractor for custom cabinet work - 14 units on Building core areas",
-        "lineItemQuantity": 14,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 2,
-        "lineItemTotal": 28,
-        "lineItemType": "Subcontractor",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-23T00:12:08.491Z"
+      "projectPhase": "Completion",
+      "projectManager": "Rachel Miller",
+      "location": "Washougal, WA",
+      "revision": "R4",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "4 months",
+      "budget": "$2,862,858",
+      "squareFootage": 15134,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-048",
     "entityType": "Document",
-    "title": "Cedar Valley Subdivision – Fence Installation Schedule",
-    "summary": "Fence installation schedule covering privacy, decorative, and security fence installation phases and material requirements.",
-    "project": "Cedar Valley Subdivision",
-    "client": "Janet & Michael Davis",
-    "status": "Draft",
-    "updatedAt": "2024-05-30T15:20:00.000Z",
+    "title": "Document document-048 - Community Center",
+    "summary": "Detailed document for Community Center covering multiple trades and cost codes.",
+    "project": "Community Center",
+    "client": "Portland Public Schools",
+    "status": "In Review",
+    "updatedAt": "2025-06-30T07:35:42.406Z",
+    "createdAt": "2025-01-13T09:48:48.675Z",
     "tags": [
-      "Fence",
-      "Installation",
-      "Security"
+      "Construction",
+      "Portland",
+      "Lighting & Fixtures",
+      "Flooring & Finishes"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Rachel Foster",
-      "location": "Detroit, MI",
-      "revision": "R1",
-      "tradeFocus": "Fencing"
-    },
-    "documentType": "Schedule",
-    "author": "Thomas Rodriguez",
-    "lineItems": [
-      {
-        "lineItemId": "document-048-item-1",
-        "lineItemTitle": "Demolition cleanup - 2 hours",
-        "lineItemDescription": "Subcontractor for demolition cleanup - 2 hours on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 70,
-        "lineItemTotal": 140,
-        "lineItemType": "Subcontractor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-048-item-2",
-        "lineItemTitle": "Concrete repair and patching - 23 sq ft",
-        "lineItemDescription": "Material for concrete repair and patching - 23 sq ft on Building core areas",
-        "lineItemQuantity": 23,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 3398,
-        "lineItemTotal": 78154,
-        "lineItemType": "Material",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-048-item-3",
-        "lineItemTitle": "Concrete finishing work - 22 sq ft",
-        "lineItemDescription": "Material for concrete finishing work - 22 sq ft on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 2082,
-        "lineItemTotal": 45804,
-        "lineItemType": "Material",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-30T13:53:26.315Z"
+      "projectPhase": "Finishing",
+      "projectManager": "Samantha Taylor",
+      "location": "North Plains, OR",
+      "revision": "R2",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "6 months",
+      "budget": "$4,396,892",
+      "squareFootage": 43119,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-049",
     "entityType": "Document",
-    "title": "Birchwood Manor – Patio Installation Specifications",
-    "summary": "Patio installation specifications covering concrete, stone, and paver patio construction procedures and drainage requirements.",
-    "project": "Birchwood Manor",
-    "client": "Sandra & James White",
-    "status": "Approved",
-    "updatedAt": "2024-06-05T12:10:00.000Z",
+    "title": "Document document-049 - Urban Village",
+    "summary": "Detailed document for Urban Village covering multiple trades and cost codes.",
+    "project": "Urban Village",
+    "client": "Tigard-Tualatin School District",
+    "status": "Completed",
+    "updatedAt": "2024-10-04T13:08:11.824Z",
+    "createdAt": "2025-06-13T22:07:47.360Z",
     "tags": [
-      "Patio",
-      "Concrete",
-      "Installation"
+      "Construction",
+      "Commercial Construction",
+      "Flooring & Finishes"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Jennifer Lee",
-      "location": "Buffalo, NY",
-      "revision": "R3",
-      "tradeFocus": "Concrete"
-    },
-    "documentType": "Specification Sheet",
-    "author": "Michael Chen",
-    "lineItems": [
-      {
-        "lineItemId": "document-049-item-1",
-        "lineItemTitle": "Exterior demolition - 22 sq ft",
-        "lineItemDescription": "Subcontractor for exterior demolition - 22 sq ft on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "closets",
-        "lineItemUnitPrice": 510,
-        "lineItemTotal": 11220,
-        "lineItemType": "Subcontractor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-049-item-2",
-        "lineItemTitle": "Concrete slab installation - 22 sq ft",
-        "lineItemDescription": "Material for concrete slab installation - 22 sq ft on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 30,
-        "lineItemTotal": 660,
-        "lineItemType": "Material",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-049-item-3",
-        "lineItemTitle": "Demolition debris disposal - 1 cubic yards",
-        "lineItemDescription": "Subcontractor for demolition debris disposal - 1 cubic yards on Building core areas",
-        "lineItemQuantity": 1,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 104,
-        "lineItemTotal": 104,
-        "lineItemType": "Subcontractor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-049-item-4",
-        "lineItemTitle": "Concrete sealing and waterproofing - 8 sq ft",
-        "lineItemDescription": "Other for concrete sealing and waterproofing - 8 sq ft on Building core areas",
-        "lineItemQuantity": 8,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 527,
-        "lineItemTotal": 4216,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-03T00:39:41.534Z"
+      "projectPhase": "Planning",
+      "projectManager": "Nicole Jackson",
+      "location": "Cornelius, OR",
+      "revision": "R1",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "7 months",
+      "budget": "$1,108,430",
+      "squareFootage": 8697,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-050",
     "entityType": "Document",
-    "title": "Elm Street Residences – Retaining Wall Construction",
-    "summary": "Retaining wall construction specifications covering concrete, stone, and block wall construction procedures and drainage systems.",
-    "project": "Elm Street Residences",
-    "client": "Cynthia & Richard Brown",
-    "status": "In Review",
-    "updatedAt": "2024-06-10T09:35:00.000Z",
+    "title": "Document document-050 - Corporate Headquarters",
+    "summary": "Detailed document for Corporate Headquarters covering multiple trades and cost codes.",
+    "project": "Corporate Headquarters",
+    "client": "Kayla & Jordan Harris",
+    "status": "Completed",
+    "updatedAt": "2024-12-11T11:49:50.796Z",
+    "createdAt": "2025-04-25T18:00:06.168Z",
     "tags": [
-      "Retaining Wall",
       "Construction",
-      "Drainage"
+      "Industrial Construction",
+      "HVAC & Controls"
     ],
     "metadata": {
-      "projectPhase": "Sitework",
-      "projectManager": "Kevin Anderson",
-      "location": "Rochester, NY",
+      "projectPhase": "Finishing",
+      "projectManager": "Brandon Anderson",
+      "location": "Beaverton, OR",
       "revision": "R2",
-      "tradeFocus": "Concrete"
-    },
-    "documentType": "Construction Guide",
-    "author": "Sarah Wilson",
-    "lineItems": [
-      {
-        "lineItemId": "document-050-item-1",
-        "lineItemTitle": "Deck framing and structure - 7 sq ft",
-        "lineItemDescription": "Material for deck framing and structure - 7 sq ft on Building core areas",
-        "lineItemQuantity": 7,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 1609,
-        "lineItemTotal": 11263,
-        "lineItemType": "Material",
-        "costCode": "3010",
-        "costCodeName": "3010 - Framing work",
-        "costCodeCategory": "3000-3999",
-        "costCodeCategoryName": "3000 - 3999 Rough Structure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-050-item-2",
-        "lineItemTitle": "Concrete repair and patching - 19 sq ft",
-        "lineItemDescription": "Other for concrete repair and patching - 19 sq ft on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 5,
-        "lineItemTotal": 95,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-050-item-3",
-        "lineItemTitle": "Deck boards installation - 17 sq ft",
-        "lineItemDescription": "Subcontractor for deck boards installation - 17 sq ft on Building core areas",
-        "lineItemQuantity": 17,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 28,
-        "lineItemTotal": 476,
-        "lineItemType": "Subcontractor",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-31T12:56:16.401Z"
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "11 months",
+      "budget": "$972,709",
+      "squareFootage": 19893,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-051",
     "entityType": "Document",
-    "title": "Willowbrook Commons – Septic System Installation",
-    "summary": "Septic system installation specifications covering tank placement, drain field installation, and permit requirements.",
-    "project": "Willowbrook Commons",
-    "client": "Brenda & Donald Miller",
-    "status": "Approved",
-    "updatedAt": "2024-06-15T14:25:00.000Z",
+    "title": "Document document-051 - Tech Campus Expansion",
+    "summary": "Detailed document for Tech Campus Expansion covering multiple trades and cost codes.",
+    "project": "Tech Campus Expansion",
+    "client": "Salem Health",
+    "status": "Pending",
+    "updatedAt": "2025-06-10T06:27:03.075Z",
+    "createdAt": "2025-06-20T13:10:43.947Z",
     "tags": [
-      "Septic",
-      "Installation",
-      "Permits"
+      "Construction",
+      "HVAC & Controls",
+      "General Construction"
     ],
     "metadata": {
-      "projectPhase": "Sitework",
-      "projectManager": "Lisa Johnson",
-      "location": "Hartford, CT",
-      "revision": "R2",
-      "tradeFocus": "Plumbing"
-    },
-    "documentType": "Installation Guide",
-    "author": "Christopher Taylor",
-    "lineItems": [
-      {
-        "lineItemId": "document-051-item-1",
-        "lineItemTitle": "Demolition debris disposal - 4 cubic yards",
-        "lineItemDescription": "Subcontractor for demolition debris disposal - 4 cubic yards on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 1062,
-        "lineItemTotal": 4248,
-        "lineItemType": "Subcontractor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-051-item-2",
-        "lineItemTitle": "Bathroom fixtures installation - 10 units",
-        "lineItemDescription": "Other for bathroom fixtures installation - 10 units on Building core areas",
-        "lineItemQuantity": 10,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 350,
-        "lineItemTotal": 3500,
-        "lineItemType": "Other",
-        "costCode": "5180",
-        "costCodeName": "5180 - Construction work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-051-item-3",
-        "lineItemTitle": "Carpet padding installation - 20 sq ft",
-        "lineItemDescription": "Subcontractor for carpet padding installation - 20 sq ft on Building core areas",
-        "lineItemQuantity": 20,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1391,
-        "lineItemTotal": 27820,
-        "lineItemType": "Subcontractor",
-        "costCode": "5020",
-        "costCodeName": "5020 - Carpet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-22T11:24:56.719Z"
+      "projectPhase": "Design",
+      "projectManager": "Andrew Thomas",
+      "location": "Gaston, OR",
+      "revision": "R3",
+      "tradeFocus": "General",
+      "estimatedDuration": "13 months",
+      "budget": "$2,954,676",
+      "squareFootage": 33952,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-052",
     "entityType": "Document",
-    "title": "Sycamore Heights – Well Installation Specifications",
-    "summary": "Well installation specifications covering drilling requirements, pump installation, and water quality testing procedures.",
-    "project": "Sycamore Heights",
-    "client": "Pamela & Ronald Garcia",
-    "status": "In Review",
-    "updatedAt": "2024-06-20T11:50:00.000Z",
+    "title": "Document document-052 - Mountain View Apartments",
+    "summary": "Detailed document for Mountain View Apartments covering multiple trades and cost codes.",
+    "project": "Mountain View Apartments",
+    "client": "Portland Construction Group",
+    "status": "Approved",
+    "updatedAt": "2024-10-17T08:27:48.602Z",
+    "createdAt": "2025-02-05T10:36:47.658Z",
     "tags": [
-      "Well",
-      "Installation",
-      "Water"
+      "Construction",
+      "Residential",
+      "Portland",
+      "Demolition & Excavation",
+      "Painting & Staining"
     ],
     "metadata": {
-      "projectPhase": "Sitework",
-      "projectManager": "David Martinez",
-      "location": "Providence, RI",
-      "revision": "R1",
-      "tradeFocus": "Plumbing"
-    },
-    "documentType": "Specification Sheet",
-    "author": "Amanda Foster",
-    "lineItems": [
-      {
-        "lineItemId": "document-052-item-1",
-        "lineItemTitle": "Bathroom renovation - 22 bathrooms",
-        "lineItemDescription": "Labor for bathroom renovation - 22 bathrooms on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 21,
-        "lineItemTotal": 462,
-        "lineItemType": "Labor",
-        "costCode": "4020",
-        "costCodeName": "4020 - Construction work",
-        "costCodeCategory": "4000-4999",
-        "costCodeCategoryName": "4000 - 4999 Full Enclosure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-052-item-2",
-        "lineItemTitle": "Bathroom ventilation installation - 19 units",
-        "lineItemDescription": "Material for bathroom ventilation installation - 19 units on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 6,
-        "lineItemTotal": 114,
-        "lineItemType": "Material",
-        "costCode": "5160",
-        "costCodeName": "5160 - Construction work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-052-item-3",
-        "lineItemTitle": "Bathroom renovation - 1 bathrooms",
-        "lineItemDescription": "Other for bathroom renovation - 1 bathrooms on Building core areas",
-        "lineItemQuantity": 1,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 71,
-        "lineItemTotal": 71,
-        "lineItemType": "Other",
-        "costCode": "3090",
-        "costCodeName": "3090 - Construction work",
-        "costCodeCategory": "3000-3999",
-        "costCodeCategoryName": "3000 - 3999 Rough Structure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-05-21T17:57:43.962Z"
+      "projectPhase": "Closeout",
+      "projectManager": "Stephanie Harris",
+      "location": "Clackamas, OR",
+      "revision": "R3",
+      "tradeFocus": "General",
+      "estimatedDuration": "12 months",
+      "budget": "$2,421,398",
+      "squareFootage": 21573,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-053",
     "entityType": "Document",
-    "title": "Poplar Grove – Solar Panel Installation Plan",
-    "summary": "Solar panel installation plan covering roof mounting, electrical connections, and grid-tie system requirements.",
-    "project": "Poplar Grove",
-    "client": "Joyce & Gary Thompson",
-    "status": "Draft",
-    "updatedAt": "2024-06-25T16:15:00.000Z",
+    "title": "Document document-053 - Parking Garage",
+    "summary": "Detailed document for Parking Garage covering multiple trades and cost codes.",
+    "project": "Parking Garage",
+    "client": "Cascade Construction Partners",
+    "status": "In Review",
+    "updatedAt": "2024-11-06T22:52:29.277Z",
+    "createdAt": "2025-06-30T17:37:54.446Z",
     "tags": [
-      "Solar",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Insulation & Weatherproofing",
+      "Windows & Doors"
     ],
     "metadata": {
-      "projectPhase": "Exterior Finishes",
-      "projectManager": "Rachel Kim",
-      "location": "Burlington, VT",
-      "revision": "R1",
-      "tradeFocus": "Solar"
-    },
-    "documentType": "Installation Plan",
-    "author": "Thomas Wilson",
-    "lineItems": [
-      {
-        "lineItemId": "document-053-item-1",
-        "lineItemTitle": "Demo and removal - 21 hours",
-        "lineItemDescription": "Other for demo and removal - 21 hours on Building core areas",
-        "lineItemQuantity": 21,
-        "lineItemQuantityUnitOfMeasure": "permits",
-        "lineItemUnitPrice": 168,
-        "lineItemTotal": 3528,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demo work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-053-item-2",
-        "lineItemTitle": "Demolition work - 11 sq ft",
-        "lineItemDescription": "Other for demolition work - 11 sq ft on Building core areas",
-        "lineItemQuantity": 11,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 802,
-        "lineItemTotal": 8822,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-08T20:11:33.411Z"
+      "projectPhase": "Closeout",
+      "projectManager": "Ashley Thompson",
+      "location": "West Linn, OR",
+      "revision": "R2",
+      "tradeFocus": "General",
+      "estimatedDuration": "10 months",
+      "budget": "$4,292,223",
+      "squareFootage": 34203,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-054",
     "entityType": "Document",
-    "title": "Ashwood Village – Generator Installation Guide",
-    "summary": "Generator installation guide covering standby generator placement, electrical connections, and fuel system requirements.",
-    "project": "Ashwood Village",
-    "client": "Virginia & Edward White",
-    "status": "Approved",
-    "updatedAt": "2024-06-30T10:40:00.000Z",
+    "title": "Document document-054 - Bridge Replacement",
+    "summary": "Detailed document for Bridge Replacement covering multiple trades and cost codes.",
+    "project": "Bridge Replacement",
+    "client": "Reliable Construction Co",
+    "status": "Completed",
+    "updatedAt": "2024-12-06T12:45:49.472Z",
+    "createdAt": "2024-10-17T04:34:43.567Z",
     "tags": [
-      "Generator",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Cabinetry & Millwork",
+      "Insulation & Weatherproofing"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "Jennifer Rodriguez",
-      "location": "Montpelier, VT",
+      "projectPhase": "Construction",
+      "projectManager": "Emily Jackson",
+      "location": "Tualatin, OR",
       "revision": "R3",
-      "tradeFocus": "Electrical"
-    },
-    "documentType": "Installation Guide",
-    "author": "Michael Lee",
-    "lineItems": [
-      {
-        "lineItemId": "document-054-item-1",
-        "lineItemTitle": "Kitchen cabinets installation - 23 linear feet",
-        "lineItemDescription": "Material for kitchen cabinets installation - 23 linear feet on Building core areas",
-        "lineItemQuantity": 23,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 77,
-        "lineItemTotal": 1771,
-        "lineItemType": "Material",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-054-item-2",
-        "lineItemTitle": "Demo and removal - 5 hours",
-        "lineItemDescription": "Other for demo and removal - 5 hours on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 706,
-        "lineItemTotal": 3530,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demo work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-14T12:03:29.751Z"
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "7 months",
+      "budget": "$606,939",
+      "squareFootage": 21440,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-055",
     "entityType": "Document",
-    "title": "Hickory Ridge – Security System Installation",
-    "summary": "Security system installation specifications covering alarm systems, cameras, and smart home integration requirements.",
-    "project": "Hickory Ridge",
-    "client": "Marie & Frank Anderson",
+    "title": "Document document-055 - Transit-Oriented Development",
+    "summary": "Detailed document for Transit-Oriented Development covering multiple trades and cost codes.",
+    "project": "Transit-Oriented Development",
+    "client": "Gresham-Barlow School District",
     "status": "In Review",
-    "updatedAt": "2024-07-05T13:20:00.000Z",
+    "updatedAt": "2025-04-05T22:23:38.386Z",
+    "createdAt": "2024-10-19T20:47:53.437Z",
     "tags": [
-      "Security",
-      "Installation",
-      "Smart Home"
+      "Construction",
+      "Mixed-Use",
+      "General Construction",
+      "Industrial Construction"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "Kevin Chen",
-      "location": "Concord, NH",
-      "revision": "R2",
-      "tradeFocus": "Security"
-    },
-    "documentType": "Installation Guide",
-    "author": "Sarah Martinez",
-    "lineItems": [
-      {
-        "lineItemId": "document-055-item-1",
-        "lineItemTitle": "Deck boards installation - 24 sq ft",
-        "lineItemDescription": "Labor for deck boards installation - 24 sq ft on Building core areas",
-        "lineItemQuantity": 24,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 52,
-        "lineItemTotal": 1248,
-        "lineItemType": "Labor",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-19T08:23:52.031Z"
+      "projectPhase": "Closeout",
+      "projectManager": "Michael Thompson",
+      "location": "Dayton, OR",
+      "revision": "R1",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "4 months",
+      "budget": "$1,851,928",
+      "squareFootage": 8747,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-056",
     "entityType": "Document",
-    "title": "Dogwood Lane – Smart Home Integration",
-    "summary": "Smart home integration specifications covering home automation systems, device connectivity, and control interfaces.",
-    "project": "Dogwood Lane",
-    "client": "Gloria & Raymond Davis",
+    "title": "Document document-056 - Riverside Mixed-Use",
+    "summary": "Detailed document for Riverside Mixed-Use covering multiple trades and cost codes.",
+    "project": "Riverside Mixed-Use",
+    "client": "Beaverton School District",
     "status": "Approved",
-    "updatedAt": "2024-07-10T15:30:00.000Z",
+    "updatedAt": "2025-01-24T23:15:52.782Z",
+    "createdAt": "2025-06-29T06:20:57.885Z",
     "tags": [
-      "Smart Home",
-      "Automation",
-      "Integration"
+      "Construction",
+      "Mixed-Use",
+      "Lighting & Fixtures",
+      "Residential Construction"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "David Foster",
-      "location": "Augusta, ME",
-      "revision": "R2",
-      "tradeFocus": "Smart Home"
-    },
-    "documentType": "Integration Guide",
-    "author": "Amanda Rodriguez",
-    "lineItems": [
-      {
-        "lineItemId": "document-056-item-1",
-        "lineItemTitle": "Concrete stamping and texturing - 25 sq ft",
-        "lineItemDescription": "Labor for concrete stamping and texturing - 25 sq ft on Building core areas",
-        "lineItemQuantity": 25,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 810,
-        "lineItemTotal": 20250,
-        "lineItemType": "Labor",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-20T00:42:30.328Z"
+      "projectPhase": "Design",
+      "projectManager": "Jennifer Martinez",
+      "location": "Sherwood, OR",
+      "revision": "R1",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "12 months",
+      "budget": "$1,370,396",
+      "squareFootage": 14850,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-057",
     "entityType": "Document",
-    "title": "Magnolia Court – Home Theater Installation",
-    "summary": "Home theater installation specifications covering audio-visual equipment, wiring, and acoustic treatment requirements.",
-    "project": "Magnolia Court",
-    "client": "Cheryl & Wayne Brown",
-    "status": "In Review",
-    "updatedAt": "2024-07-15T12:45:00.000Z",
+    "title": "Document document-057 - Harbor View Condos",
+    "summary": "Detailed document for Harbor View Condos covering multiple trades and cost codes.",
+    "project": "Harbor View Condos",
+    "client": "Samantha & Kevin Taylor",
+    "status": "Approved",
+    "updatedAt": "2025-01-08T05:03:07.557Z",
+    "createdAt": "2025-05-18T16:00:53.641Z",
     "tags": [
-      "Home Theater",
-      "Audio",
-      "Installation"
+      "Construction",
+      "Residential",
+      "General Construction",
+      "Insulation & Weatherproofing"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "Thomas Kim",
-      "location": "Annapolis, MD",
-      "revision": "R1",
-      "tradeFocus": "Audio"
-    },
-    "documentType": "Installation Guide",
-    "author": "Christopher Wilson",
-    "lineItems": [
-      {
-        "lineItemId": "document-057-item-1",
-        "lineItemTitle": "Cabinet doors and drawers - 11 pieces",
-        "lineItemDescription": "Labor for cabinet doors and drawers - 11 pieces on Building core areas",
-        "lineItemQuantity": 11,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 103,
-        "lineItemTotal": 1133,
-        "lineItemType": "Labor",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-057-item-2",
-        "lineItemTitle": "Cabinet hardware installation - 5 pieces",
-        "lineItemDescription": "Subcontractor for cabinet hardware installation - 5 pieces on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 162,
-        "lineItemTotal": 810,
-        "lineItemType": "Subcontractor",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-057-item-3",
-        "lineItemTitle": "Exterior demolition - 9 sq ft",
-        "lineItemDescription": "Material for exterior demolition - 9 sq ft on Building core areas",
-        "lineItemQuantity": 9,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 86,
-        "lineItemTotal": 774,
-        "lineItemType": "Material",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-057-item-4",
-        "lineItemTitle": "Cabinet doors and drawers - 5 pieces",
-        "lineItemDescription": "Equipment for cabinet doors and drawers - 5 pieces on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 580,
-        "lineItemTotal": 2900,
-        "lineItemType": "Equipment",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-07-07T08:47:45.660Z"
+      "projectPhase": "Design",
+      "projectManager": "Lauren Harris",
+      "location": "Battle Ground, WA",
+      "revision": "R4",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "9 months",
+      "budget": "$5,315,525",
+      "squareFootage": 54411,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-058",
     "entityType": "Document",
-    "title": "Redwood Estates – Wine Cellar Construction",
-    "summary": "Wine cellar construction specifications covering climate control, storage systems, and ventilation requirements.",
-    "project": "Redwood Estates",
-    "client": "Diane & Gregory Miller",
-    "status": "Draft",
-    "updatedAt": "2024-07-20T09:15:00.000Z",
+    "title": "Document document-058 - Transit-Oriented Development",
+    "summary": "Detailed document for Transit-Oriented Development covering multiple trades and cost codes.",
+    "project": "Transit-Oriented Development",
+    "client": "Evergreen Builders Network",
+    "status": "Approved",
+    "updatedAt": "2025-08-27T00:25:37.082Z",
+    "createdAt": "2025-02-25T23:13:39.044Z",
     "tags": [
-      "Wine Cellar",
-      "Climate Control",
-      "Construction"
+      "Construction",
+      "Mixed-Use",
+      "Roofing & Siding",
+      "General Construction"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "Rachel Taylor",
-      "location": "Dover, DE",
-      "revision": "R1",
-      "tradeFocus": "HVAC"
-    },
-    "documentType": "Construction Guide",
-    "author": "Michael Martinez",
-    "lineItems": [
-      {
-        "lineItemId": "document-058-item-1",
-        "lineItemTitle": "Concrete finishing work - 8 sq ft",
-        "lineItemDescription": "Subcontractor for concrete finishing work - 8 sq ft on Building core areas",
-        "lineItemQuantity": 8,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 116,
-        "lineItemTotal": 928,
-        "lineItemType": "Subcontractor",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-058-item-2",
-        "lineItemTitle": "Cabinet countertop installation - 6 linear feet",
-        "lineItemDescription": "Subcontractor for cabinet countertop installation - 6 linear feet on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 30,
-        "lineItemTotal": 180,
-        "lineItemType": "Subcontractor",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-07-16T00:00:40.035Z"
+      "projectPhase": "Finishing",
+      "projectManager": "Lisa Wang",
+      "location": "Hillsboro, OR",
+      "revision": "R3",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "8 months",
+      "budget": "$607,549",
+      "squareFootage": 14795,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-059",
     "entityType": "Document",
-    "title": "Cypress Gardens – Sauna Installation",
-    "summary": "Sauna installation specifications covering electrical requirements, ventilation, and safety compliance standards.",
-    "project": "Cypress Gardens",
-    "client": "Janice & Harold Garcia",
+    "title": "Document document-059 - Restaurant Buildout",
+    "summary": "Detailed document for Restaurant Buildout covering multiple trades and cost codes.",
+    "project": "Restaurant Buildout",
+    "client": "Portland Housing Bureau",
     "status": "Approved",
-    "updatedAt": "2024-07-25T14:20:00.000Z",
+    "updatedAt": "2025-03-01T06:46:27.174Z",
+    "createdAt": "2025-06-02T16:36:57.863Z",
     "tags": [
-      "Sauna",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Portland",
+      "Roofing & Siding",
+      "Electrical Systems"
     ],
     "metadata": {
-      "projectPhase": "Finishes",
-      "projectManager": "Jennifer Lee",
-      "location": "Tallahassee, FL",
-      "revision": "R3",
-      "tradeFocus": "Electrical"
-    },
-    "documentType": "Installation Guide",
-    "author": "David Chen",
-    "lineItems": [
-      {
-        "lineItemId": "document-059-item-1",
-        "lineItemTitle": "Concrete delivery and placement - 10 cubic yards",
-        "lineItemDescription": "Material for concrete delivery and placement - 10 cubic yards on Building core areas",
-        "lineItemQuantity": 10,
-        "lineItemQuantityUnitOfMeasure": "hours",
-        "lineItemUnitPrice": 48,
-        "lineItemTotal": 480,
-        "lineItemType": "Material",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-06-26T15:58:28.252Z"
+      "projectPhase": "Completion",
+      "projectManager": "Brandon Anderson",
+      "location": "North Plains, OR",
+      "revision": "R1",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "12 months",
+      "budget": "$5,414,949",
+      "squareFootage": 26923,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-060",
     "entityType": "Document",
-    "title": "Juniper Hills – Pool Installation Plan",
-    "summary": "Pool installation plan covering excavation, plumbing, electrical, and safety barrier requirements.",
-    "project": "Juniper Hills",
-    "client": "Martha & Albert Thompson",
-    "status": "In Review",
-    "updatedAt": "2024-07-30T11:35:00.000Z",
+    "title": "Document document-060 - Shopping Center Renovation",
+    "summary": "Detailed document for Shopping Center Renovation covering multiple trades and cost codes.",
+    "project": "Shopping Center Renovation",
+    "client": "David Douglas School District",
+    "status": "Pending",
+    "updatedAt": "2024-12-21T10:49:24.346Z",
+    "createdAt": "2025-04-23T21:33:12.952Z",
     "tags": [
-      "Pool",
-      "Installation",
-      "Safety"
+      "Construction",
+      "Renovation",
+      "Residential Construction",
+      "General Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Kevin Anderson",
-      "location": "Atlanta, GA",
+      "projectPhase": "Construction",
+      "projectManager": "Rachel Miller",
+      "location": "Lake Oswego, OR",
       "revision": "R2",
-      "tradeFocus": "Pool"
-    },
-    "documentType": "Installation Plan",
-    "author": "Sarah Foster",
-    "lineItems": [
-      {
-        "lineItemId": "document-060-item-1",
-        "lineItemTitle": "Cabinet doors and drawers - 17 pieces",
-        "lineItemDescription": "Labor for cabinet doors and drawers - 17 pieces on Building core areas",
-        "lineItemQuantity": 17,
-        "lineItemQuantityUnitOfMeasure": "sq ft",
-        "lineItemUnitPrice": 8,
-        "lineItemTotal": 136,
-        "lineItemType": "Labor"
-      }
-    ],
-    "createdAt": "2024-07-05T23:56:31.740Z"
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "5 months",
+      "budget": "$2,588,567",
+      "squareFootage": 36749,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-061",
     "entityType": "Document",
-    "title": "Spruce Valley – Hot Tub Installation",
-    "summary": "Hot tub installation specifications covering electrical requirements, plumbing connections, and safety compliance standards.",
-    "project": "Spruce Valley",
-    "client": "Frances & Eugene White",
-    "status": "Approved",
-    "updatedAt": "2024-08-05T16:50:00.000Z",
+    "title": "Document document-061 - Power Substation",
+    "summary": "Detailed document for Power Substation covering multiple trades and cost codes.",
+    "project": "Power Substation",
+    "client": "Rebecca & Connor Martinez",
+    "status": "Pending",
+    "updatedAt": "2025-03-05T12:49:09.568Z",
+    "createdAt": "2024-10-12T10:10:03.017Z",
     "tags": [
-      "Hot Tub",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Roofing & Siding",
+      "Cabinetry & Millwork"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Lisa Rodriguez",
-      "location": "Baton Rouge, LA",
+      "projectPhase": "Finishing",
+      "projectManager": "Nicole Jackson",
+      "location": "Medford, OR",
       "revision": "R2",
-      "tradeFocus": "Electrical"
-    },
-    "documentType": "Installation Guide",
-    "author": "Christopher Kim",
-    "lineItems": [
-      {
-        "lineItemId": "document-061-item-1",
-        "lineItemTitle": "Concrete stamping and texturing - 23 sq ft",
-        "lineItemDescription": "Other for concrete stamping and texturing - 23 sq ft on Building core areas",
-        "lineItemQuantity": 23,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 521,
-        "lineItemTotal": 11983,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-061-item-2",
-        "lineItemTitle": "Demo and removal - 4 hours",
-        "lineItemDescription": "Other for demo and removal - 4 hours on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 709,
-        "lineItemTotal": 2836,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demo work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-07-08T10:02:15.563Z"
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "9 months",
+      "budget": "$1,320,369",
+      "squareFootage": 20138,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-062",
     "entityType": "Document",
-    "title": "Fir Grove – Outdoor Kitchen Construction",
-    "summary": "Outdoor kitchen construction specifications covering gas line installation, countertop materials, and weatherproofing requirements.",
-    "project": "Fir Grove",
-    "client": "Evelyn & Arthur Anderson",
-    "status": "In Review",
-    "updatedAt": "2024-08-10T13:25:00.000Z",
+    "title": "Document document-062 - Maple Grove Subdivision",
+    "summary": "Detailed document for Maple Grove Subdivision covering multiple trades and cost codes.",
+    "project": "Maple Grove Subdivision",
+    "client": "Superior Builders Inc",
+    "status": "Pending",
+    "updatedAt": "2025-04-23T11:12:20.714Z",
+    "createdAt": "2025-02-18T18:52:50.445Z",
     "tags": [
-      "Outdoor Kitchen",
       "Construction",
-      "Gas"
+      "Insulation & Weatherproofing",
+      "Industrial Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "David Wilson",
-      "location": "Jackson, MS",
-      "revision": "R1",
-      "tradeFocus": "Plumbing"
-    },
-    "documentType": "Construction Guide",
-    "author": "Amanda Taylor",
-    "lineItems": [
-      {
-        "lineItemId": "document-062-item-1",
-        "lineItemTitle": "Bathroom cabinets - 14 units",
-        "lineItemDescription": "Other for bathroom cabinets - 14 units on Building core areas",
-        "lineItemQuantity": 14,
-        "lineItemQuantityUnitOfMeasure": "dollars",
-        "lineItemUnitPrice": 2,
-        "lineItemTotal": 28,
-        "lineItemType": "Other",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-062-item-2",
-        "lineItemTitle": "Concrete sealing and waterproofing - 10 sq ft",
-        "lineItemDescription": "Other for concrete sealing and waterproofing - 10 sq ft on Building core areas",
-        "lineItemQuantity": 10,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1093,
-        "lineItemTotal": 10930,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-08-04T01:39:21.664Z"
+      "projectPhase": "Planning",
+      "projectManager": "Lisa Wang",
+      "location": "Sherwood, OR",
+      "revision": "R4",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "4 months",
+      "budget": "$5,078,441",
+      "squareFootage": 17510,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-063",
     "entityType": "Document",
-    "title": "Pinecone Ridge – Fire Pit Installation",
-    "summary": "Fire pit installation specifications covering gas and wood-burning options, safety requirements, and permit compliance.",
-    "project": "Pinecone Ridge",
-    "client": "Alice & Walter Davis",
-    "status": "Draft",
-    "updatedAt": "2024-08-15T10:40:00.000Z",
+    "title": "Document document-063 - Library Renovation",
+    "summary": "Detailed document for Library Renovation covering multiple trades and cost codes.",
+    "project": "Library Renovation",
+    "client": "Nike Inc",
+    "status": "Completed",
+    "updatedAt": "2025-06-16T12:09:20.518Z",
+    "createdAt": "2025-05-23T03:47:38.562Z",
     "tags": [
-      "Fire Pit",
-      "Installation",
-      "Safety"
+      "Construction",
+      "Renovation",
+      "Industrial Construction",
+      "Insulation & Weatherproofing"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Thomas Martinez",
-      "location": "Little Rock, AR",
-      "revision": "R1",
-      "tradeFocus": "Gas"
-    },
-    "documentType": "Installation Guide",
-    "author": "Michael Foster",
-    "lineItems": [
-      {
-        "lineItemId": "document-063-item-1",
-        "lineItemTitle": "Kitchen cabinets installation - 2 linear feet",
-        "lineItemDescription": "Equipment for kitchen cabinets installation - 2 linear feet on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "linear feet",
-        "lineItemUnitPrice": 18,
-        "lineItemTotal": 36,
-        "lineItemType": "Equipment",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-063-item-2",
-        "lineItemTitle": "Demo and removal - 19 hours",
-        "lineItemDescription": "Equipment for demo and removal - 19 hours on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 55,
-        "lineItemTotal": 1045,
-        "lineItemType": "Equipment",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demo work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-063-item-3",
-        "lineItemTitle": "Concrete slab installation - 4 sq ft",
-        "lineItemDescription": "Equipment for concrete slab installation - 4 sq ft on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "permits",
-        "lineItemUnitPrice": 266,
-        "lineItemTotal": 1064,
-        "lineItemType": "Equipment",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-063-item-4",
-        "lineItemTitle": "Demolition debris disposal - 6 cubic yards",
-        "lineItemDescription": "Labor for demolition debris disposal - 6 cubic yards on Building core areas",
-        "lineItemQuantity": 6,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 66,
-        "lineItemTotal": 396,
-        "lineItemType": "Labor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-08-05T05:09:54.358Z"
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Justin White",
+      "location": "West Linn, OR",
+      "revision": "R2",
+      "tradeFocus": "Multi-trade",
+      "estimatedDuration": "6 months",
+      "budget": "$5,378,471",
+      "squareFootage": 40565,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-064",
     "entityType": "Document",
-    "title": "Hemlock Falls – Pergola Construction",
-    "summary": "Pergola construction specifications covering structural requirements, material selection, and anchoring systems.",
-    "project": "Hemlock Falls",
-    "client": "Ruth & Clarence Brown",
+    "title": "Document document-064 - Metro Office Complex",
+    "summary": "Detailed document for Metro Office Complex covering multiple trades and cost codes.",
+    "project": "Metro Office Complex",
+    "client": "Premier Development Corp",
     "status": "Approved",
-    "updatedAt": "2024-08-20T15:15:00.000Z",
+    "updatedAt": "2025-08-18T02:16:20.336Z",
+    "createdAt": "2024-12-13T10:38:13.553Z",
     "tags": [
-      "Pergola",
       "Construction",
-      "Structural"
+      "Commercial",
+      "Painting & Staining",
+      "Commercial Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Rachel Chen",
-      "location": "Oklahoma City, OK",
-      "revision": "R3",
-      "tradeFocus": "Framing"
-    },
-    "documentType": "Construction Guide",
-    "author": "Kevin Lee",
-    "lineItems": [
-      {
-        "lineItemId": "document-064-item-1",
-        "lineItemTitle": "Deck staining and sealing - 24 sq ft",
-        "lineItemDescription": "Material for deck staining and sealing - 24 sq ft on Building core areas",
-        "lineItemQuantity": 24,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1462,
-        "lineItemTotal": 35088,
-        "lineItemType": "Material",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-064-item-2",
-        "lineItemTitle": "Concrete foundation pour - 4 cubic yards",
-        "lineItemDescription": "Other for concrete foundation pour - 4 cubic yards on Building core areas",
-        "lineItemQuantity": 4,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 258,
-        "lineItemTotal": 1032,
-        "lineItemType": "Other",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-07-22T14:33:45.956Z"
+      "projectPhase": "Completion",
+      "projectManager": "Maria Rodriguez",
+      "location": "Portland, OR",
+      "revision": "R1",
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "10 months",
+      "budget": "$2,463,888",
+      "squareFootage": 53475,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-065",
     "entityType": "Document",
-    "title": "Cedar Point – Gazebo Installation Plan",
-    "summary": "Gazebo installation plan covering foundation requirements, assembly procedures, and electrical connections for lighting.",
-    "project": "Cedar Point",
-    "client": "Betty & Roy Miller",
-    "status": "In Review",
-    "updatedAt": "2024-08-25T12:30:00.000Z",
+    "title": "Document document-065 - Museum Addition",
+    "summary": "Detailed document for Museum Addition covering multiple trades and cost codes.",
+    "project": "Museum Addition",
+    "client": "Hillsboro School District",
+    "status": "Completed",
+    "updatedAt": "2024-11-06T03:17:27.668Z",
+    "createdAt": "2025-07-02T17:37:28.891Z",
     "tags": [
-      "Gazebo",
-      "Installation",
-      "Foundation"
+      "Construction",
+      "Industrial Construction",
+      "Concrete & Foundation"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Jennifer Anderson",
-      "location": "Des Moines, IA",
+      "projectPhase": "Pre-Construction",
+      "projectManager": "Ryan Garcia",
+      "location": "Milwaukie, OR",
       "revision": "R2",
-      "tradeFocus": "Framing"
-    },
-    "documentType": "Installation Plan",
-    "author": "David Rodriguez",
-    "lineItems": [
-      {
-        "lineItemId": "document-065-item-1",
-        "lineItemTitle": "Kitchen cabinets installation - 20 linear feet",
-        "lineItemDescription": "Material for kitchen cabinets installation - 20 linear feet on Building core areas",
-        "lineItemQuantity": 20,
-        "lineItemQuantityUnitOfMeasure": "dollars",
-        "lineItemUnitPrice": 1,
-        "lineItemTotal": 20,
-        "lineItemType": "Material"
-      }
-    ],
-    "createdAt": "2024-07-30T07:29:50.933Z"
+      "tradeFocus": "Specialized",
+      "estimatedDuration": "3 months",
+      "budget": "$4,780,411",
+      "squareFootage": 11934,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-066",
     "entityType": "Document",
-    "title": "Sycamore Springs – Water Feature Installation",
-    "summary": "Water feature installation specifications covering fountain systems, pump installation, and electrical requirements.",
-    "project": "Sycamore Springs",
-    "client": "Helen & Carl Thompson",
-    "status": "Approved",
-    "updatedAt": "2024-08-30T14:45:00.000Z",
+    "title": "Document document-066 - Birchwood Commons",
+    "summary": "Detailed document for Birchwood Commons covering multiple trades and cost codes.",
+    "project": "Birchwood Commons",
+    "client": "Metro Regional Government",
+    "status": "In Review",
+    "updatedAt": "2025-04-12T16:34:58.445Z",
+    "createdAt": "2025-04-19T19:48:13.167Z",
     "tags": [
-      "Water Feature",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Demolition & Excavation",
+      "Residential Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Lisa Wilson",
-      "location": "Pierre, SD",
-      "revision": "R2",
-      "tradeFocus": "Plumbing"
-    },
-    "documentType": "Installation Guide",
-    "author": "Christopher Martinez",
-    "lineItems": [
-      {
-        "lineItemId": "document-066-item-1",
-        "lineItemTitle": "Selective demolition - 18 sq ft",
-        "lineItemDescription": "Material for selective demolition - 18 sq ft on Building core areas",
-        "lineItemQuantity": 18,
-        "lineItemQuantityUnitOfMeasure": "pieces",
-        "lineItemUnitPrice": 86,
-        "lineItemTotal": 1548,
-        "lineItemType": "Material",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-066-item-2",
-        "lineItemTitle": "Cabinet doors and drawers - 20 pieces",
-        "lineItemDescription": "Material for cabinet doors and drawers - 20 pieces on Building core areas",
-        "lineItemQuantity": 20,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 2041,
-        "lineItemTotal": 40820,
-        "lineItemType": "Material",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-066-item-3",
-        "lineItemTitle": "Deck railing installation - 23 linear feet",
-        "lineItemDescription": "Subcontractor for deck railing installation - 23 linear feet on Building core areas",
-        "lineItemQuantity": 23,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 331,
-        "lineItemTotal": 7613,
-        "lineItemType": "Subcontractor",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-066-item-4",
-        "lineItemTitle": "Deck boards installation - 20 sq ft",
-        "lineItemDescription": "Other for deck boards installation - 20 sq ft on Building core areas",
-        "lineItemQuantity": 20,
-        "lineItemQuantityUnitOfMeasure": "cubic yards",
-        "lineItemUnitPrice": 29,
-        "lineItemTotal": 580,
-        "lineItemType": "Other",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-08-26T03:18:03.145Z"
+      "projectPhase": "Finishing",
+      "projectManager": "Robert Garcia",
+      "location": "Camas, WA",
+      "revision": "R3",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "11 months",
+      "budget": "$1,012,172",
+      "squareFootage": 31166,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-067",
     "entityType": "Document",
-    "title": "Poplar Ridge – Sprinkler System Installation",
-    "summary": "Sprinkler system installation specifications covering zone layout, controller installation, and water pressure requirements.",
-    "project": "Poplar Ridge",
-    "client": "Dorothy & Ralph Garcia",
+    "title": "Document document-067 - Shopping Center Renovation",
+    "summary": "Detailed document for Shopping Center Renovation covering multiple trades and cost codes.",
+    "project": "Shopping Center Renovation",
+    "client": "Hillsboro School District",
     "status": "In Review",
-    "updatedAt": "2024-09-05T11:20:00.000Z",
+    "updatedAt": "2025-07-25T12:05:31.754Z",
+    "createdAt": "2025-07-02T14:09:14.910Z",
     "tags": [
-      "Sprinkler",
-      "Irrigation",
-      "Installation"
+      "Construction",
+      "Renovation",
+      "Concrete & Foundation",
+      "HVAC & Controls"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Thomas Foster",
-      "location": "Bismarck, ND",
-      "revision": "R1",
-      "tradeFocus": "Plumbing"
-    },
-    "documentType": "Installation Guide",
-    "author": "Amanda Kim",
-    "lineItems": [
-      {
-        "lineItemId": "document-067-item-1",
-        "lineItemTitle": "cabinets work",
-        "lineItemDescription": "Other for cabinets work on Building core areas",
-        "lineItemQuantity": 8,
-        "lineItemQuantityUnitOfMeasure": "dollars",
-        "lineItemUnitPrice": 1,
-        "lineItemTotal": 8,
-        "lineItemType": "Other",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-09-02T19:38:11.079Z"
+      "projectPhase": "Construction",
+      "projectManager": "Brandon Anderson",
+      "location": "Battle Ground, WA",
+      "revision": "R4",
+      "tradeFocus": "General",
+      "estimatedDuration": "9 months",
+      "budget": "$573,369",
+      "squareFootage": 20032,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-068",
     "entityType": "Document",
-    "title": "Birchwood Manor – Outdoor Lighting Plan",
-    "summary": "Outdoor lighting installation plan covering landscape lighting, security lighting, and electrical connections.",
-    "project": "Birchwood Manor",
-    "client": "Lois & Howard White",
-    "status": "Draft",
-    "updatedAt": "2024-09-10T16:35:00.000Z",
+    "title": "Document document-068 - Downtown Gateway",
+    "summary": "Detailed document for Downtown Gateway covering multiple trades and cost codes.",
+    "project": "Downtown Gateway",
+    "client": "Jennifer & Michael Thompson",
+    "status": "Pending",
+    "updatedAt": "2025-08-31T20:09:30.226Z",
+    "createdAt": "2025-03-05T22:46:39.405Z",
     "tags": [
-      "Outdoor Lighting",
-      "Installation",
-      "Electrical"
+      "Construction",
+      "Roofing & Siding",
+      "General Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Rachel Taylor",
-      "location": "Helena, MT",
-      "revision": "R1",
-      "tradeFocus": "Electrical"
-    },
-    "documentType": "Installation Plan",
-    "author": "Michael Chen",
-    "lineItems": [
-      {
-        "lineItemId": "document-068-item-1",
-        "lineItemTitle": "Cabinet refinishing - 3 units",
-        "lineItemDescription": "Material for cabinet refinishing - 3 units on Building core areas",
-        "lineItemQuantity": 3,
-        "lineItemQuantityUnitOfMeasure": "permits",
-        "lineItemUnitPrice": 156,
-        "lineItemTotal": 468,
-        "lineItemType": "Material",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-068-item-2",
-        "lineItemTitle": "Bathroom waterproofing - 11 sq ft",
-        "lineItemDescription": "Labor for bathroom waterproofing - 11 sq ft on Building core areas",
-        "lineItemQuantity": 11,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 115,
-        "lineItemTotal": 1265,
-        "lineItemType": "Labor",
-        "costCode": "4000",
-        "costCodeName": "4000 - Roofing work",
-        "costCodeCategory": "4000-4999",
-        "costCodeCategoryName": "4000 - 4999 Full Enclosure",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-068-item-3",
-        "lineItemTitle": "Exterior demolition - 22 sq ft",
-        "lineItemDescription": "Equipment for exterior demolition - 22 sq ft on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "permits",
-        "lineItemUnitPrice": 232,
-        "lineItemTotal": 5104,
-        "lineItemType": "Equipment",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-09-02T14:34:25.506Z"
+      "projectPhase": "Construction",
+      "projectManager": "Matthew White",
+      "location": "McMinnville, OR",
+      "revision": "R3",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "3 months",
+      "budget": "$5,337,393",
+      "squareFootage": 38975,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-069",
     "entityType": "Document",
-    "title": "Oakwood Estates – Compost System Installation",
-    "summary": "Compost system installation specifications covering bin placement, drainage requirements, and maintenance procedures.",
-    "project": "Oakwood Estates",
-    "client": "Norma & Eugene Anderson",
-    "status": "Approved",
-    "updatedAt": "2024-09-15T13:10:00.000Z",
+    "title": "Document document-069 - Tech Campus Expansion",
+    "summary": "Detailed document for Tech Campus Expansion covering multiple trades and cost codes.",
+    "project": "Tech Campus Expansion",
+    "client": "Kaiser Permanente",
+    "status": "In Review",
+    "updatedAt": "2024-11-28T17:52:40.475Z",
+    "createdAt": "2024-09-26T12:12:42.789Z",
     "tags": [
-      "Compost",
-      "Installation",
-      "Drainage"
+      "Construction",
+      "Demolition & Excavation",
+      "Residential Construction"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "David Rodriguez",
-      "location": "Cheyenne, WY",
-      "revision": "R3",
-      "tradeFocus": "Landscaping"
-    },
-    "documentType": "Installation Guide",
-    "author": "Sarah Wilson",
-    "lineItems": [
-      {
-        "lineItemId": "document-069-item-1",
-        "lineItemTitle": "Bathroom fixtures installation - 19 units",
-        "lineItemDescription": "Equipment for bathroom fixtures installation - 19 units on Building core areas",
-        "lineItemQuantity": 19,
-        "lineItemQuantityUnitOfMeasure": "ls",
-        "lineItemUnitPrice": 376,
-        "lineItemTotal": 7144,
-        "lineItemType": "Equipment",
-        "costCode": "5000",
-        "costCodeName": "5000 - Construction work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-069-item-2",
-        "lineItemTitle": "Bathroom cabinets - 5 units",
-        "lineItemDescription": "Material for bathroom cabinets - 5 units on Building core areas",
-        "lineItemQuantity": 5,
-        "lineItemQuantityUnitOfMeasure": "inspections",
-        "lineItemUnitPrice": 80,
-        "lineItemTotal": 400,
-        "lineItemType": "Material",
-        "costCode": "5100",
-        "costCodeName": "5100 - Cabinet work",
-        "costCodeCategory": "5000-5999",
-        "costCodeCategoryName": "5000 - 5999 Finishing Trades",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-069-item-3",
-        "lineItemTitle": "Deck construction - 15 sq ft",
-        "lineItemDescription": "Other for deck construction - 15 sq ft on Building core areas",
-        "lineItemQuantity": 15,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 57,
-        "lineItemTotal": 855,
-        "lineItemType": "Other",
-        "costCode": "6040",
-        "costCodeName": "6040 - Deck work",
-        "costCodeCategory": "6000-6999",
-        "costCodeCategoryName": "6000 - 6999 Completion and Inspection",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-08-19T06:32:54.816Z"
+      "projectPhase": "Completion",
+      "projectManager": "Matthew White",
+      "location": "Ridgefield, WA",
+      "revision": "R2",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "3 months",
+      "budget": "$2,043,036",
+      "squareFootage": 27186,
+      "buildingType": "Commercial"
+    }
   },
   {
     "id": "document-070",
     "entityType": "Document",
-    "title": "Pine Ridge Homes – Greenhouse Construction",
-    "summary": "Greenhouse construction specifications covering structural requirements, ventilation systems, and electrical connections.",
-    "project": "Pine Ridge Homes",
-    "client": "Phyllis & Stanley Davis",
-    "status": "In Review",
-    "updatedAt": "2024-09-20T10:55:00.000Z",
+    "title": "Document document-070 - Office Tower",
+    "summary": "Detailed document for Office Tower covering multiple trades and cost codes.",
+    "project": "Office Tower",
+    "client": "Amanda & James Wilson",
+    "status": "Pending",
+    "updatedAt": "2024-11-09T00:59:26.352Z",
+    "createdAt": "2025-04-08T17:32:46.907Z",
     "tags": [
-      "Greenhouse",
       "Construction",
-      "Ventilation"
+      "Commercial",
+      "Flooring & Finishes",
+      "Concrete & Foundation"
     ],
     "metadata": {
-      "projectPhase": "Landscaping",
-      "projectManager": "Jennifer Lee",
-      "location": "Denver, CO",
-      "revision": "R2",
-      "tradeFocus": "Framing"
-    },
-    "documentType": "Construction Guide",
-    "author": "Kevin Anderson",
-    "lineItems": [
-      {
-        "lineItemId": "document-070-item-1",
-        "lineItemTitle": "Concrete delivery and placement - 22 cubic yards",
-        "lineItemDescription": "Labor for concrete delivery and placement - 22 cubic yards on Building core areas",
-        "lineItemQuantity": 22,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1637,
-        "lineItemTotal": 36014,
-        "lineItemType": "Labor",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-070-item-2",
-        "lineItemTitle": "Demolition work - 2 sq ft",
-        "lineItemDescription": "Other for demolition work - 2 sq ft on Building core areas",
-        "lineItemQuantity": 2,
-        "lineItemQuantityUnitOfMeasure": "units",
-        "lineItemUnitPrice": 101,
-        "lineItemTotal": 202,
-        "lineItemType": "Other",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-070-item-3",
-        "lineItemTitle": "Interior demolition - 20 sq ft",
-        "lineItemDescription": "Labor for interior demolition - 20 sq ft on Building core areas",
-        "lineItemQuantity": 20,
-        "lineItemQuantityUnitOfMeasure": "loads",
-        "lineItemUnitPrice": 135,
-        "lineItemTotal": 2700,
-        "lineItemType": "Labor",
-        "costCode": "1180",
-        "costCodeName": "1180 - Demolition work",
-        "costCodeCategory": "1000-1999",
-        "costCodeCategoryName": "1000 - 1999 Preparation Preliminaries",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      },
-      {
-        "lineItemId": "document-070-item-4",
-        "lineItemTitle": "Concrete finishing work - 10 sq ft",
-        "lineItemDescription": "Equipment for concrete finishing work - 10 sq ft on Building core areas",
-        "lineItemQuantity": 10,
-        "lineItemQuantityUnitOfMeasure": "bathrooms",
-        "lineItemUnitPrice": 1175,
-        "lineItemTotal": 11750,
-        "lineItemType": "Equipment",
-        "costCode": "2060",
-        "costCodeName": "2060 - Concrete work",
-        "costCodeCategory": "2000-2999",
-        "costCodeCategoryName": "2000 - 2999 Excavation and Foundation",
-        "fieldMetadata": {
-          "lineItemTitle": "non-monetary",
-          "lineItemDescription": "non-monetary",
-          "lineItemQuantity": "non-monetary",
-          "lineItemQuantityUnitOfMeasure": "non-monetary",
-          "lineItemUnitPrice": "monetary",
-          "lineItemTotal": "monetary",
-          "lineItemType": "non-monetary"
-        }
-      }
-    ],
-    "createdAt": "2024-09-04T02:56:37.909Z"
+      "projectPhase": "Planning",
+      "projectManager": "Michelle Taylor",
+      "location": "Washougal, WA",
+      "revision": "R1",
+      "tradeFocus": "Single-trade",
+      "estimatedDuration": "6 months",
+      "budget": "$2,817,578",
+      "squareFootage": 29424,
+      "buildingType": "Commercial"
+    }
   }
 ]

@@ -91,8 +91,14 @@ async function loadCorpus(): Promise<SearchRecord[]> {
     
     CORPUS = allRecords.map((record) => normalizeRecord(record));
     
-    // Initialize relationship engine
-    RELATIONSHIP_ENGINE = new RelationshipEngine(CORPUS);
+    // Initialize relationship engine (with error handling)
+    try {
+      RELATIONSHIP_ENGINE = new RelationshipEngine(CORPUS);
+      console.log('✅ Relationship engine initialized with', CORPUS.length, 'records');
+    } catch (error) {
+      console.warn('⚠️ Failed to initialize relationship engine:', error);
+      RELATIONSHIP_ENGINE = null;
+    }
     
     return CORPUS;
   } catch (error) {
@@ -1689,14 +1695,20 @@ export async function getEntityRelationships(
 ): Promise<Relationship[]> {
   await loadCorpus();
   if (!RELATIONSHIP_ENGINE) {
+    console.warn('Relationship engine not available');
     return [];
   }
   
-  return RELATIONSHIP_ENGINE.getRelationships(entityId, {
-    type: options?.type as any,
-    confidence: options?.confidence as any,
-    includeInferred: options?.includeInferred
-  });
+  try {
+    return RELATIONSHIP_ENGINE.getRelationships(entityId, {
+      type: options?.type as any,
+      confidence: options?.confidence as any,
+      includeInferred: options?.includeInferred
+    });
+  } catch (error) {
+    console.warn('Error getting relationships for', entityId, ':', error);
+    return [];
+  }
 }
 
 /**
@@ -1708,10 +1720,16 @@ export async function getEntitySmartActions(
 ): Promise<SmartAction[]> {
   await loadCorpus();
   if (!RELATIONSHIP_ENGINE) {
+    console.warn('Relationship engine not available');
     return [];
   }
   
-  return RELATIONSHIP_ENGINE.getSmartActions(entity, includeInferred);
+  try {
+    return RELATIONSHIP_ENGINE.getSmartActions(entity, includeInferred);
+  } catch (error) {
+    console.warn('Error getting smart actions for', entity.id, ':', error);
+    return [];
+  }
 }
 
 /**
@@ -1728,15 +1746,21 @@ export async function getRelatedEntities(
 ): Promise<SearchRecord[]> {
   await loadCorpus();
   if (!RELATIONSHIP_ENGINE) {
+    console.warn('Relationship engine not available');
     return [];
   }
   
-  return RELATIONSHIP_ENGINE.getRelatedEntities(entityId, {
-    type: options?.type as any,
-    confidence: options?.confidence as any,
-    includeInferred: options?.includeInferred,
-    limit: options?.limit
-  });
+  try {
+    return RELATIONSHIP_ENGINE.getRelatedEntities(entityId, {
+      type: options?.type as any,
+      confidence: options?.confidence as any,
+      includeInferred: options?.includeInferred,
+      limit: options?.limit
+    });
+  } catch (error) {
+    console.warn('Error getting related entities for', entityId, ':', error);
+    return [];
+  }
 }
 
 /**

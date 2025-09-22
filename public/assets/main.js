@@ -2327,7 +2327,8 @@ var defaults_default = {
   collapseIrrelevantLineItems: true,
   lineItemsCollapseThreshold: 5,
   maxFacetValues: 5,
-  recentSearchesDisplayLimit: 5
+  recentSearchesDisplayLimit: 5,
+  showInferredRelationships: true
 };
 
 // src/state/store.ts
@@ -2362,7 +2363,8 @@ function normalize(state) {
     collapseIrrelevantLineItems: state.collapseIrrelevantLineItems ?? true,
     lineItemsCollapseThreshold: state.lineItemsCollapseThreshold ?? 5,
     maxFacetValues: state.maxFacetValues ?? 5,
-    recentSearchesDisplayLimit: state.recentSearchesDisplayLimit ?? 5
+    recentSearchesDisplayLimit: state.recentSearchesDisplayLimit ?? 5,
+    showInferredRelationships: state.showInferredRelationships ?? true
   };
 }
 function mergeSettings(base, overrides) {
@@ -3153,1680 +3155,499 @@ function escapeHtml2(value) {
   return div.innerHTML;
 }
 
-// src/components/resultsView.ts
-function sortRecordsByMostRecent(records) {
-  return [...records].sort((a, b) => {
-    const getMostRecentDate = (record) => {
-      const updatedDate = new Date(record.updatedAt);
-      let createdDate;
-      if (isFinancialRecord(record)) {
-        createdDate = new Date(record.issuedDate);
-      } else {
-        createdDate = new Date(record.createdAt);
-      }
-      return updatedDate > createdDate ? updatedDate : createdDate;
-    };
-    const dateA = getMostRecentDate(a);
-    const dateB = getMostRecentDate(b);
-    return dateB.getTime() - dateA.getTime();
-  });
-}
-function sortRecordsByDueFirst(records) {
-  return [...records].sort((a, b) => {
-    const getDueDate = (record) => {
-      if (isFinancialRecord(record) && record.dueDate) {
-        return new Date(record.dueDate);
-      }
-      return new Date(record.updatedAt);
-    };
-    const dueDateA = getDueDate(a);
-    const dueDateB = getDueDate(b);
-    return dueDateA.getTime() - dueDateB.getTime();
-  });
-}
-function sortRecordsByDueLast(records) {
-  return [...records].sort((a, b) => {
-    const getDueDate = (record) => {
-      if (isFinancialRecord(record) && record.dueDate) {
-        return new Date(record.dueDate);
-      }
-      return new Date(record.updatedAt);
-    };
-    const dueDateA = getDueDate(a);
-    const dueDateB = getDueDate(b);
-    return dueDateB.getTime() - dueDateA.getTime();
-  });
-}
-function sortRecords(records, sortBy) {
-  console.log("\u{1F504} Client-side sorting with sortBy:", sortBy, "for", records.length, "records");
-  switch (sortBy) {
-    case "mostRecent":
-      return sortRecordsByMostRecent(records);
-    case "dueFirst":
-      return sortRecordsByDueFirst(records);
-    case "dueLast":
-      return sortRecordsByDueLast(records);
-    case "relevance":
-    default:
-      return records;
-  }
-}
-function getHighlightFunction2(query, isMonetarySearch) {
-  if (isMonetarySearch) {
-    return highlightMonetaryValuesWithPartialMatches;
-  } else {
-    return highlightText;
-  }
-}
-var FACET_LABELS = {
-  entityType: "Type",
-  project: "Project",
-  status: "Status",
-  documentType: "Document Type",
-  client: "Client",
-  issuedDate: "Issued",
-  totalValue: "Total",
-  groupBy: "Group by",
-  sortBy: "Sort by",
-  personType: "Person Type",
-  contactOrganization: "Contact Organization",
-  organizationType: "Organization Type",
-  tradeFocus: "Trade Focus",
-  costCodeCategory: "Cost Code Category",
-  costCode: "Cost Code"
+// src/utils/relationshipEngine.ts
+var SMART_ACTIONS = {
+  "Bill": [
+    {
+      id: "pay-bill",
+      label: "Pay Bill",
+      description: "Process payment for this bill",
+      href: "#",
+      icon: "credit-card",
+      priority: 1,
+      relationshipType: "vendor",
+      entityTypes: ["Bill"]
+    },
+    {
+      id: "view-vendor-bills",
+      label: "View All Bills from Vendor",
+      description: "See all bills from this vendor",
+      href: "#",
+      icon: "list",
+      priority: 2,
+      relationshipType: "vendor",
+      entityTypes: ["Bill"]
+    },
+    {
+      id: "contact-vendor",
+      label: "Contact Vendor",
+      description: "Get in touch with the vendor",
+      href: "#",
+      icon: "mail",
+      priority: 3,
+      relationshipType: "vendor",
+      entityTypes: ["Bill"]
+    },
+    {
+      id: "view-payment-history",
+      label: "View Payment History",
+      description: "See payment history for this vendor",
+      href: "#",
+      icon: "history",
+      priority: 4,
+      relationshipType: "vendor",
+      entityTypes: ["Bill"]
+    },
+    {
+      id: "view-project-bills",
+      label: "View All Project Bills",
+      description: "See all bills for this project",
+      href: "#",
+      icon: "folder",
+      priority: 5,
+      relationshipType: "project",
+      entityTypes: ["Bill"]
+    }
+  ],
+  "Person": [
+    {
+      id: "send-message",
+      label: "Send Message",
+      description: "Send a message to this person",
+      href: "#",
+      icon: "message",
+      priority: 1,
+      entityTypes: ["Person"]
+    },
+    {
+      id: "view-all-activity",
+      label: "View All Activity",
+      description: "See all activity with this person",
+      href: "#",
+      icon: "activity",
+      priority: 2,
+      entityTypes: ["Person"]
+    },
+    {
+      id: "view-organization",
+      label: "View Organization",
+      description: "See organization details",
+      href: "#",
+      icon: "building",
+      priority: 3,
+      relationshipType: "associatedOrg",
+      entityTypes: ["Person"]
+    },
+    {
+      id: "schedule-meeting",
+      label: "Schedule Meeting",
+      description: "Schedule a meeting with this person",
+      href: "#",
+      icon: "calendar",
+      priority: 4,
+      entityTypes: ["Person"]
+    },
+    {
+      id: "view-project-activity",
+      label: "View Project Activity",
+      description: "See all activity for this project",
+      href: "#",
+      icon: "folder",
+      priority: 5,
+      relationshipType: "project",
+      entityTypes: ["Person"]
+    }
+  ],
+  "Organization": [
+    {
+      id: "view-all-bills",
+      label: "View All Bills",
+      description: "See all bills from this organization",
+      href: "#",
+      icon: "list",
+      priority: 1,
+      entityTypes: ["Organization"]
+    },
+    {
+      id: "payment-summary",
+      label: "Payment Summary",
+      description: "View payment summary for this vendor",
+      href: "#",
+      icon: "dollar-sign",
+      priority: 2,
+      entityTypes: ["Organization"]
+    },
+    {
+      id: "contact-primary-person",
+      label: "Contact Primary Person",
+      description: "Get in touch with the primary contact",
+      href: "#",
+      icon: "user",
+      priority: 3,
+      relationshipType: "primaryContact",
+      entityTypes: ["Organization"]
+    },
+    {
+      id: "view-all-projects",
+      label: "View All Projects",
+      description: "See all projects with this organization",
+      href: "#",
+      icon: "folder",
+      priority: 4,
+      entityTypes: ["Organization"]
+    },
+    {
+      id: "performance-summary",
+      label: "Performance Summary",
+      description: "View vendor performance metrics",
+      href: "#",
+      icon: "bar-chart",
+      priority: 5,
+      entityTypes: ["Organization"]
+    }
+  ]
 };
-function createResultsView(options) {
-  const container = document.createElement("section");
-  container.className = "results-view";
-  const header2 = document.createElement("header");
-  header2.className = "results-view__header";
-  header2.innerHTML = `
-    <div>
-      <h1>Search Results</h1>
-      <p class="results-view__summary" id="results-summary"></p>
-    </div>
-    <div class="results-view__actions">
-      <button type="button" class="clear-facets" hidden>Clear filters</button>
-    </div>
-  `;
-  const mainContent = document.createElement("div");
-  mainContent.className = "results-view__main";
-  const facetsContainer = document.createElement("aside");
-  facetsContainer.className = "results-view__facets";
-  const resultsContainer = document.createElement("div");
-  resultsContainer.className = "results-view__groups";
-  mainContent.append(facetsContainer, resultsContainer);
-  container.append(header2, mainContent);
-  const summaryEl = header2.querySelector("#results-summary");
-  const clearButton = header2.querySelector(".clear-facets");
-  clearButton.addEventListener("click", () => {
-    options.onClearFacets?.();
-  });
-  let previousContext = null;
-  const render = (context) => {
-    const { response, selections, sortBy, status, query, errorMessage, isMonetarySearch } = context;
-    const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.sortBy !== sortBy;
-    if (summaryChanged) {
-      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
-    }
-    const facetsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.selections !== selections;
-    if (facetsChanged) {
-      renderFacets(facetsContainer, status, response, selections, options);
-    }
-    const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch || previousContext.sortBy !== sortBy;
-    if (resultsChanged) {
-      requestAnimationFrame(() => {
-        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
-      });
-    }
-    const selectionsChanged = !previousContext || previousContext.selections !== selections;
-    if (selectionsChanged) {
-      const hasSelections = selections && Object.keys(selections).length > 0;
-      clearButton.hidden = !hasSelections;
-    }
-    previousContext = context;
-  };
-  return {
-    element: container,
-    render
-  };
-}
-function renderSummary(target, status, response, query, errorMessage, sortBy, onSortByChange) {
-  target.innerHTML = "";
-  switch (status) {
-    case "idle":
-      if (isQueryTooShort(query)) {
-        target.textContent = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.`;
-      } else {
-        target.textContent = "Type a query to explore results and filters.";
-      }
-      return;
-    case "loading":
-      target.textContent = query ? `Searching for "${query}"\u2026` : "Searching\u2026";
-      return;
-    case "error":
-      target.textContent = errorMessage ?? "Search failed. Try again.";
-      return;
-    case "ready":
-      if (!response) {
-        target.textContent = "No results.";
-        return;
-      }
-      const resultText = response.totalResults === 1 ? "result" : "results";
-      const shouldShowSort = response.totalResults > 1 && sortBy && onSortByChange;
-      if (shouldShowSort) {
-        const container = document.createElement("div");
-        container.className = "results-summary-with-sort";
-        const textSpan = document.createElement("span");
-        textSpan.textContent = `${response.totalResults} ${resultText} for "${response.query}" sorted by `;
-        const sortSelect = document.createElement("select");
-        sortSelect.className = "results-summary__sort-select";
-        const sortOptions = [
-          { value: "relevance", label: "Relevance" },
-          { value: "mostRecent", label: "Most Recent" },
-          { value: "dueFirst", label: "Due First" },
-          { value: "dueLast", label: "Due Last" }
-        ];
-        sortOptions.forEach((option) => {
-          const optionElement = document.createElement("option");
-          optionElement.value = option.value;
-          optionElement.textContent = option.label;
-          sortSelect.appendChild(optionElement);
-        });
-        sortSelect.value = sortBy;
-        sortSelect.addEventListener("change", () => {
-          const newSort = sortSelect.value;
-          console.log("\u{1F504} Sort By changed from", sortBy, "to", newSort);
-          if (newSort !== sortBy) {
-            console.log("\u{1F3AF} Calling onSortByChange for sortBy:", newSort);
-            onSortByChange(newSort);
-          }
-        });
-        container.append(textSpan, sortSelect);
-        target.appendChild(container);
-      } else {
-        target.textContent = `${response.totalResults} ${resultText} for "${response.query}".`;
-      }
-      return;
-    default:
-      target.textContent = "";
-  }
-}
-function renderFacets(container, status, response, selections, options) {
-  container.innerHTML = "";
-  if (status === "idle") {
-    container.classList.add("is-empty");
-    container.innerHTML = renderFacetProTips("idle");
-    return;
-  }
-  if (status === "loading") {
-    container.classList.add("is-empty");
-    container.textContent = "Calculating facets\u2026";
-    return;
-  }
-  if (status === "error") {
-    container.classList.add("is-empty");
-    container.textContent = "Facets unavailable while search is failing.";
-    return;
-  }
-  if (!response || !response.facets) {
-    container.classList.add("is-empty");
-    container.innerHTML = renderFacetProTips("empty");
-    return;
-  }
-  const facetsEntries = Object.entries(response.facets);
-  if (facetsEntries.length === 0) {
-    container.classList.add("is-empty");
-    container.innerHTML = renderFacetProTips("no-results");
-    return;
-  }
-  container.classList.remove("is-empty");
-  const settings = settingsStore.getState();
-  const maxFacetValues = settings.maxFacetValues;
-  facetsEntries.forEach(([key, values]) => {
-    const block = document.createElement("section");
-    block.className = "results-view__facet-block";
-    const heading = document.createElement("h3");
-    heading.textContent = FACET_LABELS[key] ?? key;
-    block.append(heading);
-    const list = document.createElement("ul");
-    list.className = "results-view__facet-list";
-    const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
-    const initialCount = shouldLimit ? maxFacetValues : values.length;
-    const hiddenCount = values.length - initialCount;
-    values.forEach((facet, index) => {
-      const listItem = document.createElement("li");
-      listItem.className = "results-view__facet-item";
-      if (shouldLimit && index >= initialCount) {
-        listItem.classList.add("facet-item--hidden");
-      }
-      const label = document.createElement("label");
-      label.className = "facet-checkbox";
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "facet-checkbox__input";
-      checkbox.dataset.key = key;
-      checkbox.dataset.value = facet.value;
-      const isSelected = selections[key]?.has(facet.value) ?? false;
-      checkbox.checked = isSelected;
-      const text = document.createElement("span");
-      text.className = "facet-checkbox__text";
-      if (key === "entityType") {
-        text.textContent = formatEntityType(facet.value);
-      } else {
-        text.textContent = facet.value;
-      }
-      const count = document.createElement("span");
-      count.className = "facet-checkbox__count";
-      count.textContent = String(facet.count);
-      label.append(checkbox, text, count);
-      listItem.append(label);
-      list.append(listItem);
-      checkbox.addEventListener("change", () => {
-        options.onFacetToggle(key, facet.value);
-      });
-    });
-    block.append(list);
-    if (shouldLimit && hiddenCount > 0) {
-      const toggleContainer = document.createElement("div");
-      toggleContainer.className = "facet-toggle-container";
-      const toggleButton = document.createElement("button");
-      toggleButton.type = "button";
-      toggleButton.className = "facet-toggle-button";
-      toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
-      toggleButton.dataset.facetKey = key;
-      toggleContainer.append(toggleButton);
-      block.append(toggleContainer);
-      toggleButton.addEventListener("click", () => {
-        const isExpanded = toggleButton.classList.contains("is-expanded");
-        const allItems = list.querySelectorAll(".results-view__facet-item");
-        if (isExpanded) {
-          allItems.forEach((item, index) => {
-            if (index >= initialCount) {
-              item.classList.add("facet-item--hidden");
-            }
-          });
-          toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
-          toggleButton.classList.remove("is-expanded");
-        } else {
-          allItems.forEach((item) => item.classList.remove("facet-item--hidden"));
-          toggleButton.textContent = "Show less";
-          toggleButton.classList.add("is-expanded");
-        }
-      });
-    }
-    container.append(block);
-  });
-}
-function renderGroups(container, status, response, query, errorMessage, isMonetarySearch, sortBy) {
-  container.innerHTML = "";
-  if (status === "idle") {
-    if (isQueryTooShort(query)) {
-      const message = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`;
-      container.innerHTML = renderProTipsState(message, "idle");
-      const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
-      if (facetsContainer2) {
-        facetsContainer2.style.display = "none";
-      }
-    } else {
-      container.innerHTML = renderProTipsState("", "empty");
-      const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
-      if (facetsContainer2) {
-        facetsContainer2.style.display = "none";
-      }
-    }
-    return;
-  }
-  if (status === "loading") {
-    container.innerHTML = '<p class="results-view__empty">Fetching results\u2026</p>';
-    return;
-  }
-  if (status === "error") {
-    container.innerHTML = `<p class="results-view__empty">${errorMessage ?? "Something went wrong while searching."}</p>`;
-    return;
-  }
-  if (!response || !response.fullGroups.length) {
-    container.innerHTML = renderProTipsState("No results found", "no-results", query);
-    const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
-    if (facetsContainer2) {
-      facetsContainer2.style.display = "none";
-    }
-    return;
-  }
-  const facetsContainer = container.closest(".results-view__main")?.querySelector(".results-view__facets");
-  if (facetsContainer) {
-    facetsContainer.style.display = "";
-  }
-  let sortedResponse = response;
-  if (sortBy && sortBy !== "relevance") {
-    console.log("\u{1F504} Applying client-side sorting:", sortBy);
-    const sortedRecords = sortRecords(response.records, sortBy);
-    sortedResponse = {
-      ...response,
-      records: sortedRecords,
-      // Also sort the groups if they exist
-      fullGroups: response.fullGroups.map((group) => ({
-        ...group,
-        items: sortRecords(group.items, sortBy)
-      })),
-      limitedGroups: response.limitedGroups.map((group) => ({
-        ...group,
-        items: sortRecords(group.items, sortBy)
-      }))
+var RelationshipEngine = class {
+  constructor(corpus) {
+    this.corpus = corpus;
+    this.relationships = [];
+    this.lookup = {
+      bySource: /* @__PURE__ */ new Map(),
+      byTarget: /* @__PURE__ */ new Map(),
+      byType: /* @__PURE__ */ new Map()
     };
+    this.buildRelationships();
   }
-  if (sortedResponse.isGrouped) {
-    sortedResponse.fullGroups.forEach((group) => {
-      container.append(renderGroup2(group, group.groupTitle, query, isMonetarySearch));
-    });
-  } else {
-    const flatList = document.createElement("div");
-    flatList.className = "results-list";
-    sortedResponse.records.forEach((record) => {
-      flatList.append(renderResultCard(record, query, isMonetarySearch));
-    });
-    container.append(flatList);
+  /**
+   * Build all relationships from the corpus
+   */
+  buildRelationships() {
+    this.relationships = [];
+    this.lookup = {
+      bySource: /* @__PURE__ */ new Map(),
+      byTarget: /* @__PURE__ */ new Map(),
+      byType: /* @__PURE__ */ new Map()
+    };
+    this.buildExplicitRelationships();
+    this.buildInferredRelationships();
+    this.buildTemporalRelationships();
+    this.buildLookupTables();
   }
-}
-function renderGroup2(group, groupTitle, query, isMonetarySearch) {
-  const section = document.createElement("section");
-  section.className = "results-group";
-  const heading = document.createElement("header");
-  heading.className = "results-group__header";
-  const title = groupTitle || formatEntityType(group.entityType, { plural: true });
-  heading.innerHTML = `
-    <h2>${title}</h2>
-    <span class="results-group__count">${group.items.length}</span>
-  `;
-  const list = document.createElement("div");
-  list.className = "results-group__list";
-  group.items.forEach((item) => {
-    list.append(renderResultCard(item, query, isMonetarySearch));
-  });
-  section.append(heading, list);
-  return section;
-}
-function renderResultCard(item, query, isMonetarySearch) {
-  const card = document.createElement("article");
-  card.setAttribute("data-document-id", item.id);
-  if (isBuildertrendRecord(item)) {
-    card.className = "result-card result-card--buildertrend";
-    card.setAttribute("data-url", item.url);
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Navigate to ${item.title}`);
-    card.addEventListener("click", () => {
-      console.log("Navigate to:", item.url);
-    });
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        console.log("Navigate to:", item.url);
-      }
-    });
-  } else {
-    card.className = "result-card";
-  }
-  const header2 = document.createElement("div");
-  header2.className = "result-card__header";
-  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-  const title = document.createElement("h3");
-  title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
-  if (isBuildertrendRecord(item)) {
-    const icon = document.createElement("i");
-    icon.className = "result-card__icon";
-    icon.setAttribute("data-lucide", item.icon);
-    header2.append(icon, title);
-    requestAnimationFrame(() => {
-      if (window.lucide) {
-        try {
-          window.lucide.createIcons();
-        } catch (error) {
-          console.warn("Error updating icons:", error);
-        }
-      }
-    });
-  } else {
-    header2.append(title);
-  }
-  const badge = document.createElement("span");
-  badge.className = "result-card__badge";
-  badge.textContent = formatEntityType(item.entityType);
-  header2.append(badge);
-  const summary = document.createElement("p");
-  summary.className = "result-card__summary";
-  summary.innerHTML = query && highlightFn ? highlightFn(item.summary, query) : item.summary;
-  const metaList = document.createElement("ul");
-  metaList.className = "result-card__meta";
-  metaList.append(...buildMetaItems(item, query, isMonetarySearch));
-  card.append(header2, summary, metaList);
-  if (query) {
-    const match = findBestMatch(item, query);
-    if (match && match.field !== "title" && match.field !== "summary" && !match.field.startsWith("lineItem")) {
-      const context = document.createElement("div");
-      context.className = "search-context";
-      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValuesWithPartialMatches(match.content, query) : getContextSnippet(match, 120, query);
-      context.innerHTML = `<strong>Matched in ${getFieldLabel(match.field)}:</strong> ${highlightedSnippet}`;
-      card.append(context);
-    }
-  }
-  if (isFinancialRecord(item)) {
-    const lineItemsBlock = renderLineItems(item, query, isMonetarySearch);
-    if (lineItemsBlock) {
-      card.append(lineItemsBlock);
-    }
-  }
-  return card;
-}
-function buildMetaItems(item, query, isMonetarySearch) {
-  const metas = [];
-  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-  const highlightValue = (value) => highlightFn ? highlightFn(value, query) : value;
-  const pushMeta = (label, value) => {
-    if (!value) {
-      return;
-    }
-    const entry = document.createElement("li");
-    entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
-    metas.push(entry);
-  };
-  if (isBuildertrendRecord(item)) {
-    pushMeta("Navigate To", item.path);
-    pushMeta("Description", item.description);
-    return metas;
-  }
-  pushMeta("Project", item.project);
-  pushMeta("Status", item.status);
-  if (item.entityType === "Document") {
-    const doc = item;
-    pushMeta("Type", doc.documentType);
-    pushMeta("Updated", formatDate(item.updatedAt));
-    return metas;
-  }
-  if (isFinancialRecord(item)) {
-    pushMeta("Issued", formatDate(item.issuedDate));
-    if (item.dueDate) {
-      pushMeta("Due", formatDate(item.dueDate));
-    }
-    pushMeta("Total", formatCurrency(item.totalValue));
-    return metas;
-  }
-  if (isPersonRecord(item)) {
-    pushMeta("Person Type", item.personType);
-    pushMeta("Role", item.jobTitle);
-    pushMeta("Organization", item.associatedOrganization);
-    pushMeta("Location", item.location);
-    pushMeta("Email", item.email);
-    pushMeta("Phone", item.phone);
-    pushMeta("Trade Focus", item.tradeFocus ?? void 0);
-    return metas;
-  }
-  if (isOrganizationRecord(item)) {
-    pushMeta("Business Type", item.organizationType);
-    pushMeta("Trade", item.tradeFocus);
-    pushMeta("Service Area", item.serviceArea);
-    pushMeta("Primary Contact", item.primaryContact);
-    pushMeta("Phone", item.phone);
-    pushMeta("Email", item.email);
-    pushMeta("Website", item.website ?? void 0);
-    return metas;
-  }
-  return metas;
-}
-function hasLineItemMatches(item, query, isMonetarySearch) {
-  if (!query || !isFinancialRecord(item)) return false;
-  const items = item.lineItems ?? [];
-  if (items.length === 0) return false;
-  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
-  return items.some((lineItem) => {
-    let searchableFields = [];
-    if (isMonetarySearch) {
-      const monetaryFields = [];
-      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
-    } else {
-      searchableFields = [
-        lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
-        lineItem.lineItemType,
-        lineItem.lineItemQuantity?.toString(),
-        lineItem.lineItemQuantityUnitOfMeasure,
-        formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal),
-        // Add cost code fields for matching
-        lineItem.costCode,
-        lineItem.costCodeName,
-        lineItem.costCodeCategory,
-        lineItem.costCodeCategoryName
-      ].filter((field) => field != null && field.trim() !== "");
-    }
-    return searchableFields.some((value) => {
-      if (!value) return false;
-      const highlighted = highlightFn(value, query);
-      return highlighted.includes("<mark");
-    });
-  });
-}
-function getMatchingLineItemIndices(item, query, isMonetarySearch) {
-  if (!query || !isFinancialRecord(item)) return [];
-  const items = item.lineItems ?? [];
-  if (items.length === 0) return [];
-  const matchingIndices = [];
-  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
-  items.forEach((lineItem, index) => {
-    let searchableFields = [];
-    if (isMonetarySearch) {
-      const monetaryFields = [];
-      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
-      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
-      searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
-    } else {
-      searchableFields = [
-        lineItem.lineItemTitle,
-        lineItem.lineItemDescription,
-        lineItem.lineItemType,
-        lineItem.lineItemQuantity?.toString(),
-        lineItem.lineItemQuantityUnitOfMeasure,
-        formatCurrency(lineItem.lineItemUnitPrice),
-        formatCurrency(lineItem.lineItemTotal),
-        // Add cost code fields for matching
-        lineItem.costCode,
-        lineItem.costCodeName,
-        lineItem.costCodeCategory,
-        lineItem.costCodeCategoryName
-      ].filter((field) => field != null && field.trim() !== "");
-    }
-    const hasMatch = searchableFields.some((value) => {
-      if (!value) return false;
-      const highlighted = highlightFn(value, query);
-      return highlighted.includes("<mark");
-    });
-    if (hasMatch) {
-      matchingIndices.push(index);
-    }
-  });
-  return matchingIndices;
-}
-function groupMatchingLineItems(matchingIndices, collapseThreshold) {
-  if (matchingIndices.length === 0) return [];
-  const groups = [];
-  let currentGroup = {
-    startIndex: matchingIndices[0],
-    endIndex: matchingIndices[0],
-    indices: [matchingIndices[0]]
-  };
-  for (let i = 1; i < matchingIndices.length; i++) {
-    const currentIndex = matchingIndices[i];
-    const lastIndex = matchingIndices[i - 1];
-    if (currentIndex - lastIndex <= collapseThreshold) {
-      currentGroup.endIndex = currentIndex;
-      currentGroup.indices.push(currentIndex);
-    } else {
-      groups.push(currentGroup);
-      currentGroup = {
-        startIndex: currentIndex,
-        endIndex: currentIndex,
-        indices: [currentIndex]
-      };
-    }
-  }
-  groups.push(currentGroup);
-  return groups;
-}
-function calculateDisplayRanges(groups, contextCount, totalItems) {
-  if (groups.length === 0) return [];
-  const ranges = [];
-  for (let i = 0; i < groups.length; i++) {
-    const group = groups[i];
-    const start = Math.max(0, group.startIndex - contextCount);
-    const end = Math.min(totalItems - 1, group.endIndex + contextCount);
-    ranges.push({ start, end });
-    if (i < groups.length - 1) {
-      const nextGroup = groups[i + 1];
-      const gapStart = end + 1;
-      const gapEnd = Math.max(0, nextGroup.startIndex - contextCount) - 1;
-      if (gapStart <= gapEnd) {
-        ranges.push({ start: gapStart, end: gapEnd, isCollapsed: true });
-      }
-    }
-  }
-  return ranges;
-}
-function getContextCountFromBehavior(behavior) {
-  switch (behavior) {
-    case "show-matched-only":
-      return 0;
-    case "show-matched-with-context-1":
-      return 1;
-    case "show-matched-with-context-2":
-      return 2;
-    case "show-matched-with-context-3":
-      return 3;
-    case "show-matched-with-context-5":
-      return 5;
-    case "show-all-always":
-    case "hide-all-always":
-      return 0;
-    // Not used for these behaviors
-    default:
-      return 3;
-  }
-}
-function renderLineItems(item, query, isMonetarySearch) {
-  if (!isFinancialRecord(item)) {
-    return null;
-  }
-  const items = item.lineItems ?? [];
-  if (items.length === 0) {
-    return null;
-  }
-  const settings = settingsStore.getState();
-  const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
-  const behavior = settings.lineItemBehavior;
-  const shouldShowLineItems = behavior !== "hide-all-always";
-  const shouldShowAllItems = behavior === "show-all-always";
-  const contextCount = getContextCountFromBehavior(behavior);
-  const wrapper = document.createElement("div");
-  wrapper.className = "result-card__line-items";
-  const groupLineItemsByCostCode = (items2) => {
-    const groups = {};
-    items2.forEach((item2) => {
-      const categoryId = item2.costCodeCategory || "buildertrend-default";
-      const categoryName = item2.costCodeCategoryName || "Buildertrend Default";
-      if (!groups[categoryId]) {
-        groups[categoryId] = { categoryName, items: [] };
-      }
-      groups[categoryId].items.push(item2);
-    });
-    return groups;
-  };
-  const renderLineItemRow = (line, index) => {
-    const row = document.createElement("tr");
-    const unitPrice = formatCurrency(line.lineItemUnitPrice);
-    const total = formatCurrency(line.lineItemTotal);
-    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
-    const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-    const costCodeDisplay = line.costCodeName || line.costCode || "";
-    const shouldHighlightDescription = query && highlightFn && !isMonetarySearch;
-    const shouldHighlightCostCode = query && highlightFn && !isMonetarySearch;
-    const shouldHighlightType = query && highlightFn && !isMonetarySearch;
-    const shouldHighlightQuantity = query && highlightFn && !isMonetarySearch;
-    const shouldHighlightUnitPrice = query && highlightFn;
-    const shouldHighlightTotal = query && highlightFn;
-    row.innerHTML = `
-      <td class="line-item__description">${shouldHighlightDescription ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
-      ${costCodeDisplay ? `<td class="line-item__cost-code">${shouldHighlightCostCode ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ""}
-      <td class="line-item__type">${shouldHighlightType ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
-      <td class="line-item__quantity">${shouldHighlightQuantity ? highlightFn(quantity, query) : quantity}</td>
-      <td class="line-item__unit-price">${shouldHighlightUnitPrice ? highlightFn(unitPrice, query) : unitPrice}</td>
-      <td class="line-item__total">${shouldHighlightTotal ? highlightFn(total, query) : total}</td>
-    `;
-    return row;
-  };
-  const renderTableContent = (container, forceShowAll = false) => {
-    const targetContainer = container || wrapper;
-    const existingTable = targetContainer.querySelector(".line-items-table");
-    if (existingTable) {
-      existingTable.remove();
-    }
-    const table = document.createElement("table");
-    table.className = "line-items-table";
-    const hasCostCodes = items.some((item2) => item2.costCode || item2.costCodeName);
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-    headerRow.innerHTML = `
-      <th>Description</th>
-      ${hasCostCodes ? "<th>Cost Code</th>" : ""}
-      <th>Type</th>
-      <th>Quantity</th>
-      <th>Unit Price</th>
-      <th>Total</th>
-    `;
-    thead.append(headerRow);
-    table.append(thead);
-    const tbody = document.createElement("tbody");
-    if (hasCostCodes) {
-      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-      let itemsToShow = [];
-      if (forceShowAll || shouldShowAllItems) {
-        itemsToShow = items;
-      } else if (behavior === "hide-all-always") {
-        itemsToShow = [];
-      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
-        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
-        if (matchingIndices.length > 0) {
-          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
-            const groups2 = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
-            const displayRanges = calculateDisplayRanges(groups2, contextCount, items.length);
-            displayRanges.forEach((range) => {
-              if (!range.isCollapsed) {
-                for (let i = range.start; i <= range.end; i++) {
-                  itemsToShow.push(items[i]);
-                }
+  /**
+   * Build explicit relationships from entity metadata
+   */
+  buildExplicitRelationships() {
+    for (const entity of this.corpus) {
+      if (isFinancialRecord(entity) && entity.entityType === "Bill") {
+        const vendorName = entity.metadata?.vendor;
+        if (vendorName) {
+          const vendorOrg = this.findOrganizationByName(vendorName);
+          if (vendorOrg) {
+            this.addRelationship({
+              id: `bill-vendor-${entity.id}-${vendorOrg.id}`,
+              type: "vendor",
+              confidence: "explicit",
+              sourceEntityId: entity.id,
+              targetEntityId: vendorOrg.id,
+              targetEntityType: vendorOrg.entityType,
+              targetEntityTitle: vendorOrg.title,
+              metadata: {
+                sourceField: "metadata.vendor",
+                targetField: "title"
               }
             });
-          } else {
-            const minIndex = Math.min(...matchingIndices);
-            const maxIndex = Math.max(...matchingIndices);
-            const startIndex = Math.max(0, minIndex - contextCount);
-            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-            itemsToShow = items.slice(startIndex, endIndex);
           }
-        } else {
-          itemsToShow = [];
         }
-      } else {
-        itemsToShow = items;
       }
-      const groups = groupLineItemsByCostCode(itemsToShow);
-      const sortedCategories = Object.keys(groups).sort((a, b) => {
-        const getNumericOrder = (categoryId) => {
-          if (categoryId === "buildertrend-default") return 9999;
-          const match = categoryId.match(/(\d+)/);
-          return match ? parseInt(match[1]) : 9999;
-        };
-        return getNumericOrder(a) - getNumericOrder(b);
-      });
-      sortedCategories.forEach((categoryId) => {
-        const group = groups[categoryId];
-        const categoryRow = document.createElement("tr");
-        categoryRow.className = "line-item__category-header";
-        const colspan = hasCostCodes ? 6 : 5;
-        categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
-        tbody.append(categoryRow);
-        group.items.forEach((item2, index) => {
-          const row = renderLineItemRow(item2, index);
-          tbody.append(row);
-        });
-      });
-      if (itemsToShow.length < items.length) {
-        const showAllRow = document.createElement("tr");
-        showAllRow.className = "line-item__show-all";
-        const colspan = hasCostCodes ? 6 : 5;
-        showAllRow.innerHTML = `
-          <td colspan="${colspan}" class="line-item__show-all-content">
-            <button type="button" class="line-item__show-all-button">
-              Show all ${items.length} item${items.length === 1 ? "" : "s"}
-            </button>
-          </td>
-        `;
-        tbody.append(showAllRow);
-        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
-        showAllButton.addEventListener("click", () => {
-          renderTableContent(targetContainer, true);
-        });
-      }
-    } else {
-      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
-      let displayRanges = [];
-      let hiddenItems = [];
-      if (forceShowAll || shouldShowAllItems) {
-        displayRanges = [{ start: 0, end: items.length - 1 }];
-        hiddenItems = [];
-      } else if (behavior === "hide-all-always") {
-        displayRanges = [];
-        hiddenItems = items;
-      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
-        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
-        if (matchingIndices.length > 0) {
-          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
-            const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
-            displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
-            hiddenItems = [];
-            displayRanges.forEach((range) => {
-              if (range.isCollapsed) {
-                for (let i = range.start; i <= range.end; i++) {
-                  hiddenItems.push(items[i]);
-                }
+      if (isOrganizationRecord(entity)) {
+        const primaryContactName = entity.primaryContact;
+        if (primaryContactName) {
+          const contactPerson = this.findPersonByName(primaryContactName);
+          if (contactPerson) {
+            this.addRelationship({
+              id: `org-contact-${entity.id}-${contactPerson.id}`,
+              type: "primaryContact",
+              confidence: "explicit",
+              sourceEntityId: entity.id,
+              targetEntityId: contactPerson.id,
+              targetEntityType: contactPerson.entityType,
+              targetEntityTitle: contactPerson.title,
+              metadata: {
+                sourceField: "primaryContact",
+                targetField: "title"
               }
             });
-          } else {
-            const minIndex = Math.min(...matchingIndices);
-            const maxIndex = Math.max(...matchingIndices);
-            const startIndex = Math.max(0, minIndex - contextCount);
-            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
-            displayRanges = [{ start: startIndex, end: endIndex - 1 }];
-            hiddenItems = [
-              ...items.slice(0, startIndex),
-              ...items.slice(endIndex)
-            ];
           }
-        } else {
-          displayRanges = [];
-          hiddenItems = items;
         }
-      } else {
-        displayRanges = [{ start: 0, end: items.length - 1 }];
-        hiddenItems = [];
       }
-      const collapsedRows = [];
-      const collapsedContent = [];
-      displayRanges.forEach((range) => {
-        if (range.isCollapsed) {
-          const collapsedRow = document.createElement("tr");
-          collapsedRow.className = "line-item__collapsed";
-          const itemCount = range.end - range.start + 1;
-          const colspan = hasCostCodes ? 6 : 5;
-          collapsedRow.innerHTML = `
-            <td colspan="${colspan}" class="line-item__collapsed-content">
-              <span class="line-item__collapsed-text">...</span>
-              <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
-            </td>
-          `;
-          tbody.append(collapsedRow);
-          collapsedRows.push(collapsedRow);
-          const contentRows = [];
-          for (let i = range.start; i <= range.end; i++) {
-            const lineItemRow = renderLineItemRow(items[i], i);
-            lineItemRow.style.display = "none";
-            tbody.append(lineItemRow);
-            contentRows.push(lineItemRow);
+      if (isPersonRecord(entity)) {
+        const associatedOrgName = entity.associatedOrganization;
+        if (associatedOrgName) {
+          const associatedOrg = this.findOrganizationByName(associatedOrgName);
+          if (associatedOrg) {
+            this.addRelationship({
+              id: `person-org-${entity.id}-${associatedOrg.id}`,
+              type: "associatedOrg",
+              confidence: "explicit",
+              sourceEntityId: entity.id,
+              targetEntityId: associatedOrg.id,
+              targetEntityType: associatedOrg.entityType,
+              targetEntityTitle: associatedOrg.title,
+              metadata: {
+                sourceField: "associatedOrganization",
+                targetField: "title"
+              }
+            });
           }
-          collapsedContent.push(contentRows);
-          collapsedRow.addEventListener("click", () => {
-            const isExpanded = contentRows[0].style.display !== "none";
-            if (isExpanded) {
-              contentRows.forEach((row) => row.style.display = "none");
-              collapsedRow.innerHTML = `
-                <td colspan="${colspan}" class="line-item__collapsed-content">
-                  <span class="line-item__collapsed-text">...</span>
-                  <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
-                </td>
-              `;
-            } else {
-              contentRows.forEach((row) => row.style.display = "");
-              collapsedRow.innerHTML = `
-                <td colspan="${colspan}" class="line-item__collapsed-content">
-                  <span class="line-item__collapsed-text">\u2191</span>
-                  <span class="line-item__collapsed-count">Hide ${itemCount} item${itemCount === 1 ? "" : "s"}</span>
-                </td>
-              `;
+        }
+      }
+    }
+  }
+  /**
+   * Build inferred relationships from text content
+   */
+  buildInferredRelationships() {
+    for (const entity of this.corpus) {
+      const personNames = this.extractPersonNames(entity);
+      for (const personName of personNames) {
+        const person = this.findPersonByName(personName);
+        if (person && person.id !== entity.id) {
+          this.addRelationship({
+            id: `inferred-person-${entity.id}-${person.id}`,
+            type: "inferred",
+            confidence: "inferred",
+            sourceEntityId: entity.id,
+            targetEntityId: person.id,
+            targetEntityType: person.entityType,
+            targetEntityTitle: person.title,
+            metadata: {
+              sourceField: "text-content",
+              targetField: "title",
+              matchScore: 0.8
+              // Basic fuzzy matching score
             }
           });
-        } else {
-          for (let i = range.start; i <= range.end; i++) {
-            const row = renderLineItemRow(items[i], i);
-            tbody.append(row);
+        }
+      }
+      const orgNames = this.extractOrganizationNames(entity);
+      for (const orgName of orgNames) {
+        const org = this.findOrganizationByName(orgName);
+        if (org && org.id !== entity.id) {
+          this.addRelationship({
+            id: `inferred-org-${entity.id}-${org.id}`,
+            type: "inferred",
+            confidence: "inferred",
+            sourceEntityId: entity.id,
+            targetEntityId: org.id,
+            targetEntityType: org.entityType,
+            targetEntityTitle: org.title,
+            metadata: {
+              sourceField: "text-content",
+              targetField: "title",
+              matchScore: 0.8
+            }
+          });
+        }
+      }
+    }
+  }
+  /**
+   * Build temporal relationships (recent activity with same entities)
+   */
+  buildTemporalRelationships() {
+    const now = /* @__PURE__ */ new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1e3);
+    const projectGroups = /* @__PURE__ */ new Map();
+    const clientGroups = /* @__PURE__ */ new Map();
+    for (const entity of this.corpus) {
+      if (entity.project) {
+        if (!projectGroups.has(entity.project)) {
+          projectGroups.set(entity.project, []);
+        }
+        projectGroups.get(entity.project).push(entity);
+      }
+      if (entity.client) {
+        if (!clientGroups.has(entity.client)) {
+          clientGroups.set(entity.client, []);
+        }
+        clientGroups.get(entity.client).push(entity);
+      }
+    }
+    for (const [project, entities] of projectGroups) {
+      const recentEntities = entities.filter((e) => new Date(e.updatedAt) > thirtyDaysAgo);
+      if (recentEntities.length > 1) {
+        for (let i = 0; i < recentEntities.length; i++) {
+          for (let j = i + 1; j < recentEntities.length; j++) {
+            const entity1 = recentEntities[i];
+            const entity2 = recentEntities[j];
+            this.addRelationship({
+              id: `temporal-project-${entity1.id}-${entity2.id}`,
+              type: "temporal",
+              confidence: "weak",
+              sourceEntityId: entity1.id,
+              targetEntityId: entity2.id,
+              targetEntityType: entity2.entityType,
+              targetEntityTitle: entity2.title,
+              metadata: {
+                sourceField: "project",
+                targetField: "project",
+                lastInteraction: entity2.updatedAt
+              }
+            });
           }
         }
-      });
-      if (hiddenItems.length > 0) {
-        const showAllRow = document.createElement("tr");
-        showAllRow.className = "line-item__show-all";
-        const colspan = hasCostCodes ? 6 : 5;
-        showAllRow.innerHTML = `
-          <td colspan="${colspan}" class="line-item__show-all-content">
-            <button type="button" class="line-item__show-all-button">
-              Show all ${items.length} item${items.length === 1 ? "" : "s"}
-            </button>
-          </td>
-        `;
-        tbody.append(showAllRow);
-        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
-        showAllButton.addEventListener("click", () => {
-          renderTableContent(targetContainer, true);
-        });
       }
     }
-    table.append(tbody);
-    targetContainer.append(table);
-  };
-  if (behavior === "hide-all-always") {
-    const toggleLink = document.createElement("button");
-    toggleLink.className = "line-items-toggle";
-    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
-    toggleLink.type = "button";
-    const tableContainer = document.createElement("div");
-    tableContainer.style.display = "none";
-    toggleLink.addEventListener("click", () => {
-      if (tableContainer.style.display === "none") {
-        tableContainer.style.display = "block";
-        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
-        if (!tableContainer.querySelector(".line-items-table")) {
-          renderTableContent(tableContainer);
-        }
-      } else {
-        tableContainer.style.display = "none";
-        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
-      }
-    });
-    wrapper.append(toggleLink, tableContainer);
-    return wrapper;
   }
-  if ((behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context")) && !hasMatches) {
-    const toggleLink = document.createElement("button");
-    toggleLink.className = "line-items-toggle";
-    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
-    toggleLink.type = "button";
-    const tableContainer = document.createElement("div");
-    tableContainer.style.display = "none";
-    toggleLink.addEventListener("click", () => {
-      if (tableContainer.style.display === "none") {
-        tableContainer.style.display = "block";
-        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
-        if (!tableContainer.querySelector(".line-items-table")) {
-          renderTableContent(tableContainer);
-        }
-      } else {
-        tableContainer.style.display = "none";
-        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+  /**
+   * Build lookup tables for fast relationship queries
+   */
+  buildLookupTables() {
+    for (const relationship of this.relationships) {
+      if (!this.lookup.bySource.has(relationship.sourceEntityId)) {
+        this.lookup.bySource.set(relationship.sourceEntityId, []);
       }
-    });
-    wrapper.append(toggleLink, tableContainer);
-    return wrapper;
+      this.lookup.bySource.get(relationship.sourceEntityId).push(relationship);
+      if (!this.lookup.byTarget.has(relationship.targetEntityId)) {
+        this.lookup.byTarget.set(relationship.targetEntityId, []);
+      }
+      this.lookup.byTarget.get(relationship.targetEntityId).push(relationship);
+      if (!this.lookup.byType.has(relationship.type)) {
+        this.lookup.byType.set(relationship.type, []);
+      }
+      this.lookup.byType.get(relationship.type).push(relationship);
+    }
   }
-  renderTableContent();
-  return wrapper;
-}
-function getFieldLabel(field) {
-  const labels = {
-    title: "Title",
-    summary: "Summary",
-    project: "Project",
-    client: "Client",
-    status: "Status",
-    documentType: "Document Type",
-    author: "Author",
-    tags: "Tags"
-  };
-  if (field.startsWith("lineItem") && field.includes("_")) {
-    const [, index, type] = field.split("_");
-    const typeLabels = {
-      title: "Line Item Title",
-      description: "Line Item Description",
-      type: "Line Item Type"
+  /**
+   * Add a relationship to the engine
+   */
+  addRelationship(relationship) {
+    this.relationships.push(relationship);
+  }
+  /**
+   * Find organization by name (fuzzy matching)
+   */
+  findOrganizationByName(name) {
+    const normalizedName = name.toLowerCase().trim();
+    for (const entity of this.corpus) {
+      if (isOrganizationRecord(entity)) {
+        const entityName = entity.title.toLowerCase().trim();
+        if (entityName === normalizedName || entityName.includes(normalizedName) || normalizedName.includes(entityName)) {
+          return entity;
+        }
+      }
+    }
+    return null;
+  }
+  /**
+   * Find person by name (fuzzy matching)
+   */
+  findPersonByName(name) {
+    const normalizedName = name.toLowerCase().trim();
+    for (const entity of this.corpus) {
+      if (isPersonRecord(entity)) {
+        const entityName = entity.title.toLowerCase().trim();
+        if (entityName === normalizedName || entityName.includes(normalizedName) || normalizedName.includes(entityName)) {
+          return entity;
+        }
+      }
+    }
+    return null;
+  }
+  /**
+   * Extract person names from entity text content
+   */
+  extractPersonNames(entity) {
+    const names = [];
+    const text = `${entity.title} ${entity.summary}`.toLowerCase();
+    for (const person of this.corpus) {
+      if (isPersonRecord(person) && person.id !== entity.id) {
+        const personName = person.title.toLowerCase();
+        if (text.includes(personName)) {
+          names.push(person.title);
+        }
+      }
+    }
+    return names;
+  }
+  /**
+   * Extract organization names from entity text content
+   */
+  extractOrganizationNames(entity) {
+    const names = [];
+    const text = `${entity.title} ${entity.summary}`.toLowerCase();
+    for (const org of this.corpus) {
+      if (isOrganizationRecord(org) && org.id !== entity.id) {
+        const orgName = org.title.toLowerCase();
+        if (text.includes(orgName)) {
+          names.push(org.title);
+        }
+      }
+    }
+    return names;
+  }
+  /**
+   * Get relationships for a specific entity
+   */
+  getRelationships(entityId, options) {
+    const relationships = this.lookup.bySource.get(entityId) || [];
+    return relationships.filter((rel) => {
+      if (options?.type && rel.type !== options.type) return false;
+      if (options?.confidence && rel.confidence !== options.confidence) return false;
+      if (options?.includeInferred === false && rel.confidence === "inferred") return false;
+      return true;
+    });
+  }
+  /**
+   * Get smart actions for a specific entity
+   */
+  getSmartActions(entity, includeInferred = true) {
+    const entityType = entity.entityType;
+    const availableActions = SMART_ACTIONS[entityType] || [];
+    const relationships = this.getRelationships(entity.id, { includeInferred });
+    const applicableActions = availableActions.filter((action) => {
+      if (!action.relationshipType) return true;
+      return relationships.some((rel) => rel.type === action.relationshipType);
+    });
+    return applicableActions.sort((a, b) => a.priority - b.priority);
+  }
+  /**
+   * Get related entities for a specific entity
+   */
+  getRelatedEntities(entityId, options) {
+    const relationships = this.getRelationships(entityId, options);
+    const relatedEntities = [];
+    for (const rel of relationships) {
+      const entity = this.corpus.find((e) => e.id === rel.targetEntityId);
+      if (entity) {
+        relatedEntities.push(entity);
+      }
+    }
+    const uniqueEntities = relatedEntities.filter(
+      (entity, index, self) => index === self.findIndex((e) => e.id === entity.id)
+    );
+    return options?.limit ? uniqueEntities.slice(0, options.limit) : uniqueEntities;
+  }
+  /**
+   * Get all relationships (for debugging)
+   */
+  getAllRelationships() {
+    return [...this.relationships];
+  }
+  /**
+   * Get relationship statistics
+   */
+  getStats() {
+    const stats = {
+      total: this.relationships.length,
+      byType: {},
+      byConfidence: {}
     };
-    return typeLabels[type] || "Line Item";
-  }
-  if (field.startsWith("metadata_")) {
-    return "Metadata";
-  }
-  return labels[field] || field;
-}
-function renderProTipsState(message, state, query) {
-  const proTips = getProTips(state, query);
-  return `
-    <div class="pro-tips-state">
-      ${message ? `
-        <div class="pro-tips-state__header">
-          <h2 class="pro-tips-state__title">${message}</h2>
-        </div>
-      ` : ""}
-      <div class="pro-tips-state__content">
-        <div class="pro-tips">
-          <h3 class="pro-tips__title">Pro Tips & Tricks</h3>
-          <div class="pro-tips__grid">
-            ${proTips.map((tip) => `
-              <div class="pro-tip">
-                <div class="pro-tip__content">
-                  <h4 class="pro-tip__title">
-                    <span class="pro-tip__icon">${tip.icon}</span>
-                    ${tip.title}
-                  </h4>
-                  <p class="pro-tip__description">${tip.description}</p>
-                  <div class="pro-tip__examples">
-                    ${tip.examples.map((example) => `
-                      <code class="pro-tip__example">${example}</code>
-                    `).join("")}
-                  </div>
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-function getProTips(state, query) {
-  const tips = [];
-  tips.push({
-    icon: "\u{1F50D}",
-    title: "Basic Text Search",
-    description: "Search for any text in titles, summaries, projects, clients, and more.",
-    examples: ["kitchen renovation", "John Smith", "Project Alpha"]
-  });
-  tips.push({
-    icon: "\u{1F4B0}",
-    title: "Monetary Searches",
-    description: "Find invoices, bills, and receipts by exact amounts or ranges.",
-    examples: ["$1234.56", "$500-$1000", "1234.56", "1000 to 2000"]
-  });
-  tips.push({
-    icon: "\u{1F4CA}",
-    title: "Range Queries",
-    description: "Search for amounts within specific ranges using various formats.",
-    examples: ["$500-$1000", "1000 to 2000", "$50k-$100k"]
-  });
-  tips.push({
-    icon: "\u{1F4CB}",
-    title: "Entity Types",
-    description: "Search for specific types of records and documents.",
-    examples: ["invoices", "contracts", "people", "organizations"]
-  });
-  tips.push({
-    icon: "\u{1F3D7}\uFE0F",
-    title: "Project & Client Search",
-    description: "Find records related to specific projects or clients.",
-    examples: ["Project Alpha", "Smith Construction", "residential"]
-  });
-  tips.push({
-    icon: "\u{1F4C5}",
-    title: "Date-Based Search",
-    description: "Search for records by date ranges, recent activity, or time periods.",
-    examples: ["recent", "last month", "2024", "Q1 2024"]
-  });
-  tips.push({
-    icon: "\u26A1",
-    title: "Buildertrend Navigation",
-    description: "Use trigger queries to quickly navigate to specific Buildertrend sections.",
-    examples: ["schedule", "estimates", "change orders", "punch list"]
-  });
-  tips.push({
-    icon: "\u{1F4DD}",
-    title: "Line Item Details",
-    description: "Search within detailed line items of invoices and purchase orders.",
-    examples: ["lumber", "labor", "materials", "equipment"]
-  });
-  tips.push({
-    icon: "\u{1F4CA}",
-    title: "Status Filters",
-    description: "Find records by their current status or workflow stage.",
-    examples: ["pending", "approved", "paid", "overdue"]
-  });
-  tips.push({
-    icon: "\u{1F3AF}",
-    title: "Advanced Techniques",
-    description: "Combine multiple search terms and use facets to refine results.",
-    examples: ["kitchen AND renovation", "invoice AND pending", "Smith OR Johnson"]
-  });
-  if (state === "no-results" && query) {
-    tips.unshift({
-      icon: "\u{1F527}",
-      title: "No Results? Try These",
-      description: "Adjust your search strategy when no results are found.",
-      examples: [
-        "Use fewer keywords",
-        "Check spelling",
-        "Try broader terms",
-        "Use different formats"
-      ]
-    });
-  }
-  if (state === "idle") {
-    tips.unshift({
-      icon: "\u{1F680}",
-      title: "Get Started",
-      description: "Begin your search with any of these popular search types.",
-      examples: ["$5000", "kitchen", "Smith Construction", "recent invoices"]
-    });
-  }
-  return tips;
-}
-function renderFacetProTips(state) {
-  const facetTips = getFacetProTips(state);
-  return `
-    <div class="facet-pro-tips">
-      <h3 class="facet-pro-tips__title">Filter & Refine</h3>
-      <div class="facet-pro-tips__list">
-        ${facetTips.map((tip) => `
-          <div class="facet-pro-tip">
-            <div class="facet-pro-tip__icon">${tip.icon}</div>
-            <div class="facet-pro-tip__content">
-              <h4 class="facet-pro-tip__title">${tip.title}</h4>
-              <p class="facet-pro-tip__description">${tip.description}</p>
-            </div>
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `;
-}
-function getFacetProTips(state) {
-  const tips = [];
-  if (state === "idle") {
-    tips.push({
-      icon: "\u{1F50D}",
-      title: "Search First",
-      description: "Run a search to see filter options and refine your results."
-    });
-    tips.push({
-      icon: "\u26A1",
-      title: "Quick Filters",
-      description: "Use facets to narrow down results by type, project, status, and more."
-    });
-  } else {
-    tips.push({
-      icon: "\u{1F4CA}",
-      title: "Type Filters",
-      description: "Filter by Document, Invoice, Person, Organization, or Buildertrend records."
-    });
-    tips.push({
-      icon: "\u{1F3D7}\uFE0F",
-      title: "Project & Client",
-      description: "Narrow results to specific projects or clients."
-    });
-    tips.push({
-      icon: "\u{1F4B0}",
-      title: "Amount Ranges",
-      description: "Filter financial records by total value ranges."
-    });
-    tips.push({
-      icon: "\u{1F4C5}",
-      title: "Date Filters",
-      description: "Find records by issue date ranges (last week, month, year)."
-    });
-    tips.push({
-      icon: "\u{1F4CB}",
-      title: "Status Filters",
-      description: "Filter by record status like pending, approved, or paid."
-    });
-    tips.push({
-      icon: "\u{1F3AF}",
-      title: "Advanced Grouping",
-      description: "Group results by type, project, status, or client for better organization."
-    });
-  }
-  return tips;
-}
-
-// src/components/settingsView.ts
-function createSettingsView() {
-  const container = document.createElement("section");
-  container.className = "settings-view";
-  const heading = document.createElement("header");
-  heading.innerHTML = `
-    <h1>Prototype Settings</h1>
-    <p>Adjust prototype behaviors. Changes save to the browser local storage and reload the experience.</p>
-  `;
-  const form = document.createElement("form");
-  form.className = "settings-form";
-  const overallSection = document.createElement("fieldset");
-  overallSection.className = "settings-group";
-  overallSection.innerHTML = `
-    <legend>Overall</legend>
-  `;
-  const delayField = document.createElement("div");
-  delayField.className = "settings-field";
-  delayField.innerHTML = `
-    <label for="search-delay">Simulated search delay mean (ms)</label>
-  `;
-  const delayInput = document.createElement("input");
-  delayInput.id = "search-delay";
-  delayInput.type = "number";
-  delayInput.min = "0";
-  delayInput.step = "10";
-  delayField.append(delayInput);
-  overallSection.append(delayField);
-  const varianceField = document.createElement("div");
-  varianceField.className = "settings-field";
-  varianceField.innerHTML = `
-    <label for="search-delay-variance">Search delay variance (ms)</label>
-  `;
-  const varianceInput = document.createElement("input");
-  varianceInput.id = "search-delay-variance";
-  varianceInput.type = "number";
-  varianceInput.min = "0";
-  varianceInput.step = "1";
-  varianceField.append(varianceInput);
-  overallSection.append(varianceField);
-  const recentSearchesField = document.createElement("div");
-  recentSearchesField.className = "settings-field";
-  recentSearchesField.innerHTML = `
-    <label for="recent-searches-limit">Recent searches to display</label>
-  `;
-  const recentSearchesSelect = document.createElement("select");
-  recentSearchesSelect.id = "recent-searches-limit";
-  recentSearchesSelect.innerHTML = `
-    <option value="3">3 searches</option>
-    <option value="5">5 searches</option>
-    <option value="7">7 searches</option>
-    <option value="10">10 searches</option>
-    <option value="15">15 searches</option>
-  `;
-  recentSearchesField.append(recentSearchesSelect);
-  overallSection.append(recentSearchesField);
-  const resultsSection = document.createElement("fieldset");
-  resultsSection.className = "settings-group";
-  resultsSection.innerHTML = `
-    <legend>Full Results Page</legend>
-  `;
-  const lineItemBehaviorField = document.createElement("div");
-  lineItemBehaviorField.className = "settings-field";
-  lineItemBehaviorField.innerHTML = `
-    <label for="line-item-behavior">Line item behavior on results page</label>
-  `;
-  const lineItemBehaviorSelect = document.createElement("select");
-  lineItemBehaviorSelect.id = "line-item-behavior";
-  lineItemBehaviorSelect.innerHTML = `
-    <option value="show-matched-only">Show only matched line items</option>
-    <option value="show-matched-with-context-1">Show matched line items with 1 additional line of context before/after</option>
-    <option value="show-matched-with-context-2">Show matched line items with 2 additional lines of context before/after</option>
-    <option value="show-matched-with-context-3">Show matched line items with 3 additional lines of context before/after</option>
-    <option value="show-matched-with-context-5">Show matched line items with 5 additional lines of context before/after</option>
-    <option value="show-all-always">Always show all line items</option>
-    <option value="hide-all-always">Always hide all line items, including matched</option>
-  `;
-  lineItemBehaviorField.append(lineItemBehaviorSelect);
-  resultsSection.append(lineItemBehaviorField);
-  const collapseLineItemsField = document.createElement("div");
-  collapseLineItemsField.className = "settings-field settings-field--checkbox";
-  const collapseLineItemsCheckbox = document.createElement("input");
-  collapseLineItemsCheckbox.id = "collapse-irrelevant-line-items";
-  collapseLineItemsCheckbox.type = "checkbox";
-  const collapseLineItemsLabel = document.createElement("label");
-  collapseLineItemsLabel.htmlFor = "collapse-irrelevant-line-items";
-  collapseLineItemsLabel.textContent = 'Collapse irrelevant line items between results (shows "..." for large gaps between matches)';
-  collapseLineItemsField.append(collapseLineItemsCheckbox, collapseLineItemsLabel);
-  resultsSection.append(collapseLineItemsField);
-  const collapseThresholdField = document.createElement("div");
-  collapseThresholdField.className = "settings-field";
-  collapseThresholdField.innerHTML = `
-    <label for="line-items-collapse-threshold">Collapse threshold</label>
-  `;
-  const collapseThresholdSelect = document.createElement("select");
-  collapseThresholdSelect.id = "line-items-collapse-threshold";
-  collapseThresholdSelect.innerHTML = `
-    <option value="3">3 items</option>
-    <option value="5">5 items</option>
-    <option value="7">7 items</option>
-    <option value="10">10 items</option>
-  `;
-  collapseThresholdField.append(collapseThresholdSelect);
-  resultsSection.append(collapseThresholdField);
-  const maxFacetValuesField = document.createElement("div");
-  maxFacetValuesField.className = "settings-field";
-  maxFacetValuesField.innerHTML = `
-    <label for="max-facet-values">Max facet values to show</label>
-  `;
-  const maxFacetValuesSelect = document.createElement("select");
-  maxFacetValuesSelect.id = "max-facet-values";
-  maxFacetValuesSelect.innerHTML = `
-    <option value="3">3 values</option>
-    <option value="5">5 values</option>
-    <option value="7">7 values</option>
-    <option value="10">10 values</option>
-    <option value="15">15 values</option>
-    <option value="20">20 values</option>
-    <option value="0">Show all</option>
-  `;
-  maxFacetValuesField.append(maxFacetValuesSelect);
-  resultsSection.append(maxFacetValuesField);
-  const groupSection = document.createElement("fieldset");
-  groupSection.className = "settings-group";
-  groupSection.innerHTML = `
-    <legend>Mini results group sizes</legend>
-  `;
-  const groupFields = document.createElement("div");
-  groupFields.className = "settings-group__grid";
-  groupSection.append(groupFields);
-  const actions = document.createElement("div");
-  actions.className = "settings-actions";
-  const saveButton = document.createElement("button");
-  saveButton.type = "submit";
-  saveButton.className = "primary";
-  saveButton.textContent = "Save & Reload";
-  const resetButton = document.createElement("button");
-  resetButton.type = "button";
-  resetButton.className = "secondary";
-  resetButton.textContent = "Restore defaults";
-  actions.append(saveButton, resetButton);
-  form.append(overallSection, resultsSection, groupSection, actions);
-  container.append(heading, form);
-  const groupInputs = /* @__PURE__ */ new Map();
-  const renderGroupInputs = (groupLimits) => {
-    groupFields.innerHTML = "";
-    groupInputs.clear();
-    Object.entries(groupLimits).forEach(([key, value]) => {
-      const field = document.createElement("label");
-      field.className = "settings-field";
-      field.htmlFor = `group-${key}`;
-      const title = document.createElement("span");
-      title.textContent = formatEntityType(key, { plural: true });
-      const input = document.createElement("input");
-      input.type = "number";
-      input.min = "1";
-      input.step = "1";
-      input.id = `group-${key}`;
-      input.value = String(value);
-      field.append(title, input);
-      groupFields.append(field);
-      groupInputs.set(key, input);
-    });
-  };
-  const render = () => {
-    const state = settingsStore.getState();
-    delayInput.value = String(state.searchDelayMs);
-    varianceInput.value = String(state.searchDelayVarianceMs);
-    recentSearchesSelect.value = String(state.recentSearchesDisplayLimit);
-    lineItemBehaviorSelect.value = state.lineItemBehavior;
-    collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
-    collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
-    maxFacetValuesSelect.value = String(state.maxFacetValues);
-    renderGroupInputs(state.groupLimits);
-  };
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const nextDelay = Number.parseInt(delayInput.value, 10);
-    const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
-    const nextVariance = Number.parseInt(varianceInput.value, 10);
-    const resolvedVariance = Number.isFinite(nextVariance) && nextVariance >= 0 ? nextVariance : 10;
-    const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
-    const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
-    const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
-    const resolvedMaxFacetValues = Number.isFinite(maxFacetValues) && maxFacetValues >= 0 ? maxFacetValues : 5;
-    const recentSearchesLimit = Number.parseInt(recentSearchesSelect.value, 10);
-    const resolvedRecentSearchesLimit = Number.isFinite(recentSearchesLimit) && recentSearchesLimit >= 0 ? recentSearchesLimit : 5;
-    const groupLimits = {};
-    groupInputs.forEach((input, key) => {
-      const parsed = Number.parseInt(input.value, 10);
-      groupLimits[key] = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-    });
-    settingsStore.update({
-      searchDelayMs: resolvedDelay,
-      searchDelayVarianceMs: resolvedVariance,
-      lineItemBehavior: lineItemBehaviorSelect.value,
-      collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
-      lineItemsCollapseThreshold: resolvedCollapseThreshold,
-      maxFacetValues: resolvedMaxFacetValues,
-      recentSearchesDisplayLimit: resolvedRecentSearchesLimit,
-      groupLimits
-    });
-    window.location.reload();
-  });
-  resetButton.addEventListener("click", () => {
-    settingsStore.reset();
-    render();
-    window.location.reload();
-  });
-  render();
-  return {
-    element: container,
-    render
-  };
-}
-
-// src/components/skeletonComponents.ts
-function createSkeletonLine(options = {}) {
-  const { width = "100%", height = "1rem", className = "", animated = true } = options;
-  const line = document.createElement("div");
-  line.className = `skeleton-line ${animated ? "skeleton-animated" : ""} ${className}`.trim();
-  line.style.width = width;
-  line.style.height = height;
-  return line;
-}
-function createSkeletonRect(options = {}) {
-  const { width = "100%", height = "4rem", className = "", animated = true } = options;
-  const rect = document.createElement("div");
-  rect.className = `skeleton-rect ${animated ? "skeleton-animated" : ""} ${className}`.trim();
-  rect.style.width = width;
-  rect.style.height = height;
-  return rect;
-}
-function createSkeletonCircle(options = {}) {
-  const { width = "2rem", height = "2rem", className = "", animated = true } = options;
-  const circle = document.createElement("div");
-  circle.className = `skeleton-circle ${animated ? "skeleton-animated" : ""} ${className}`.trim();
-  circle.style.width = width;
-  circle.style.height = height;
-  return circle;
-}
-
-// src/components/homeSkeleton.ts
-function createHomeSkeleton() {
-  const container = document.createElement("div");
-  container.className = "skeleton-home";
-  const header2 = document.createElement("div");
-  header2.className = "skeleton-home__header";
-  const titleSection = document.createElement("div");
-  titleSection.className = "skeleton-home__title-section";
-  const projectTitle = createSkeletonLine({ width: "12rem", height: "1.5rem" });
-  const statusBadge = createSkeletonRect({ width: "4rem", height: "1.5rem", className: "skeleton-home__status-badge" });
-  titleSection.appendChild(projectTitle);
-  titleSection.appendChild(statusBadge);
-  header2.appendChild(titleSection);
-  const infoLines = document.createElement("div");
-  infoLines.className = "skeleton-home__info-lines";
-  const addressLine = createSkeletonLine({ width: "16rem", height: "1rem" });
-  const clockInLine = createSkeletonLine({ width: "14rem", height: "1rem" });
-  const actionLink = createSkeletonLine({ width: "8rem", height: "1rem", className: "skeleton-home__action-link" });
-  infoLines.appendChild(addressLine);
-  infoLines.appendChild(clockInLine);
-  infoLines.appendChild(actionLink);
-  header2.appendChild(infoLines);
-  const peopleSection = document.createElement("div");
-  peopleSection.className = "skeleton-home__people-section";
-  const clientsGroup = document.createElement("div");
-  clientsGroup.className = "skeleton-home__people-group";
-  const clientsLabel = createSkeletonLine({ width: "3rem", height: "1rem" });
-  const clientsAvatars = document.createElement("div");
-  clientsAvatars.className = "skeleton-home__people-avatars";
-  const clientAvatar = createSkeletonCircle({ width: "2.5rem", height: "2.5rem" });
-  clientsAvatars.appendChild(clientAvatar);
-  clientsGroup.appendChild(clientsLabel);
-  clientsGroup.appendChild(clientsAvatars);
-  peopleSection.appendChild(clientsGroup);
-  const managersGroup = document.createElement("div");
-  managersGroup.className = "skeleton-home__people-group";
-  const managersLabel = createSkeletonLine({ width: "6rem", height: "1rem" });
-  const managersAvatars = document.createElement("div");
-  managersAvatars.className = "skeleton-home__people-avatars";
-  const managerAvatar1 = createSkeletonCircle({ width: "2rem", height: "2rem" });
-  const managerAvatar2 = createSkeletonCircle({ width: "2rem", height: "2rem" });
-  managersAvatars.appendChild(managerAvatar1);
-  managersAvatars.appendChild(managerAvatar2);
-  managersGroup.appendChild(managersLabel);
-  managersGroup.appendChild(managersAvatars);
-  peopleSection.appendChild(managersGroup);
-  header2.appendChild(peopleSection);
-  container.appendChild(header2);
-  const mainContent = document.createElement("div");
-  mainContent.className = "skeleton-home__main-content";
-  const centralPanel = document.createElement("div");
-  centralPanel.className = "skeleton-home__central-panel";
-  const taskOverview = document.createElement("div");
-  taskOverview.className = "skeleton-home__task-overview";
-  const pastDueColumn = document.createElement("div");
-  pastDueColumn.className = "skeleton-home__task-column";
-  const pastDueHeader = createSkeletonLine({ width: "4rem", height: "1rem" });
-  pastDueColumn.appendChild(pastDueHeader);
-  taskOverview.appendChild(pastDueColumn);
-  const dueTodayColumn = document.createElement("div");
-  dueTodayColumn.className = "skeleton-home__task-column";
-  const dueTodayHeader = createSkeletonLine({ width: "5rem", height: "1rem" });
-  const thumbsUpIcon = createSkeletonRect({ width: "3rem", height: "3rem", className: "skeleton-home__task-icon" });
-  const motivationalMessage = createSkeletonLine({ width: "8rem", height: "1rem" });
-  dueTodayColumn.appendChild(dueTodayHeader);
-  dueTodayColumn.appendChild(thumbsUpIcon);
-  dueTodayColumn.appendChild(motivationalMessage);
-  taskOverview.appendChild(dueTodayColumn);
-  const actionItemsColumn = document.createElement("div");
-  actionItemsColumn.className = "skeleton-home__task-column";
-  const actionItemsHeader = createSkeletonLine({ width: "6rem", height: "1rem" });
-  actionItemsColumn.appendChild(actionItemsHeader);
-  taskOverview.appendChild(actionItemsColumn);
-  centralPanel.appendChild(taskOverview);
-  const activitySection = document.createElement("div");
-  activitySection.className = "skeleton-home__activity-section";
-  const activityHeader = document.createElement("div");
-  activityHeader.className = "skeleton-home__activity-header";
-  const activityTitle = createSkeletonLine({ width: "12rem", height: "1.25rem" });
-  const activityFilter = createSkeletonRect({ width: "3rem", height: "2rem", className: "skeleton-home__activity-filter" });
-  activityHeader.appendChild(activityTitle);
-  activityHeader.appendChild(activityFilter);
-  activitySection.appendChild(activityHeader);
-  const activityList = document.createElement("div");
-  activityList.className = "skeleton-home__activity-list";
-  const activityDate = createSkeletonLine({ width: "6rem", height: "1.25rem", className: "skeleton-home__activity-date" });
-  activityList.appendChild(activityDate);
-  const activityItems = document.createElement("div");
-  activityItems.className = "skeleton-home__activity-items";
-  for (let i = 0; i < 3; i++) {
-    const activityItem = document.createElement("div");
-    activityItem.className = "skeleton-home__activity-item";
-    const avatar = createSkeletonCircle({ width: "2rem", height: "2rem", className: "skeleton-home__activity-avatar" });
-    const content = document.createElement("div");
-    content.className = "skeleton-home__activity-content";
-    const primaryLine = createSkeletonLine({ width: "14rem", height: "1rem" });
-    const actionLine = createSkeletonLine({ width: "10rem", height: "0.875rem" });
-    if (i < 2) {
-      const detailLine = createSkeletonLine({ width: "8rem", height: "0.875rem" });
-      content.appendChild(detailLine);
+    for (const rel of this.relationships) {
+      stats.byType[rel.type] = (stats.byType[rel.type] || 0) + 1;
+      stats.byConfidence[rel.confidence] = (stats.byConfidence[rel.confidence] || 0) + 1;
     }
-    content.appendChild(primaryLine);
-    content.appendChild(actionLine);
-    activityItem.appendChild(avatar);
-    activityItem.appendChild(content);
-    activityItems.appendChild(activityItem);
-  }
-  activityList.appendChild(activityItems);
-  activitySection.appendChild(activityList);
-  centralPanel.appendChild(activitySection);
-  mainContent.appendChild(centralPanel);
-  const sidebar = document.createElement("div");
-  sidebar.className = "skeleton-home__sidebar";
-  const updatesSection = document.createElement("div");
-  updatesSection.className = "skeleton-home__updates-section";
-  const updatesMetric = createSkeletonRect({ width: "4rem", height: "4rem", className: "skeleton-home__updates-metric" });
-  const updatesDescription = createSkeletonLine({ width: "10rem", height: "1rem" });
-  const updatesActions = document.createElement("div");
-  updatesActions.className = "skeleton-home__updates-actions";
-  const clientUpdatesBtn = createSkeletonRect({ width: "5rem", height: "2rem" });
-  const dailyLogsBtn = createSkeletonRect({ width: "4rem", height: "2rem" });
-  updatesActions.appendChild(clientUpdatesBtn);
-  updatesActions.appendChild(dailyLogsBtn);
-  updatesSection.appendChild(updatesMetric);
-  updatesSection.appendChild(updatesDescription);
-  updatesSection.appendChild(updatesActions);
-  sidebar.appendChild(updatesSection);
-  const agendaSection = document.createElement("div");
-  agendaSection.className = "skeleton-home__agenda-section";
-  const agendaHeader = document.createElement("div");
-  agendaHeader.className = "skeleton-home__agenda-header";
-  const agendaTitle = createSkeletonLine({ width: "8rem", height: "1.25rem" });
-  const agendaLink = createSkeletonLine({ width: "6rem", height: "1rem", className: "skeleton-home__agenda-link" });
-  agendaHeader.appendChild(agendaTitle);
-  agendaHeader.appendChild(agendaLink);
-  agendaSection.appendChild(agendaHeader);
-  const agendaList = document.createElement("div");
-  agendaList.className = "skeleton-home__agenda-list";
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  for (let i = 0; i < days.length; i++) {
-    const agendaItem = document.createElement("div");
-    agendaItem.className = "skeleton-home__agenda-item";
-    const dateIndicator = createSkeletonRect({ width: "2rem", height: "2rem", className: "skeleton-home__agenda-date" });
-    const content = document.createElement("div");
-    content.className = "skeleton-home__agenda-content";
-    const dayLine = createSkeletonLine({ width: "4rem", height: "1rem" });
-    const dateLine = createSkeletonLine({ width: "3rem", height: "0.875rem" });
-    content.appendChild(dayLine);
-    content.appendChild(dateLine);
-    if (i >= 5) {
-      const nonWorkdayLine = createSkeletonLine({ width: "5rem", height: "0.75rem" });
-      content.appendChild(nonWorkdayLine);
-    }
-    agendaItem.appendChild(dateIndicator);
-    agendaItem.appendChild(content);
-    agendaList.appendChild(agendaItem);
-  }
-  agendaSection.appendChild(agendaList);
-  sidebar.appendChild(agendaSection);
-  mainContent.appendChild(sidebar);
-  container.appendChild(mainContent);
-  return container;
-}
-
-// src/state/appState.ts
-var initialState2 = {
-  route: "home",
-  searchQuery: "",
-  lastSubmittedQuery: "",
-  facetSelections: {},
-  sortBy: "relevance",
-  recentResponse: null,
-  searchStatus: "idle",
-  dialogOpen: false,
-  errorMessage: void 0
-};
-function cloneSelections(selections) {
-  const next = {};
-  for (const key of Object.keys(selections)) {
-    const values = selections[key];
-    if (values && values.size > 0) {
-      next[key] = new Set(values);
-    }
-  }
-  return next;
-}
-var store2 = createStore(initialState2);
-var appState = {
-  getState: store2.getState,
-  subscribe: store2.subscribe,
-  setRoute(route) {
-    store2.setState({ route });
-  },
-  setSearchQuery(searchQuery) {
-    store2.setState({ searchQuery });
-  },
-  setDialogOpen(dialogOpen) {
-    store2.setState({ dialogOpen });
-  },
-  setStatus(status, errorMessage) {
-    store2.setState({ searchStatus: status, errorMessage });
-  },
-  setResponse(response) {
-    store2.setState({ recentResponse: response });
-  },
-  setLastSubmittedQuery(query) {
-    store2.setState({ lastSubmittedQuery: query });
-  },
-  setSortBy(sortBy) {
-    console.log("\u{1F504} setSortBy called:", sortBy);
-    store2.setState({ sortBy });
-  },
-  clearFacets() {
-    store2.setState({ facetSelections: {} });
-  },
-  toggleFacet(key, value) {
-    console.log("\u{1F504} toggleFacet called:", { key, value });
-    store2.setState((prev) => {
-      const selections = cloneSelections(prev.facetSelections);
-      console.log("\u{1F504} Previous selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
-      if (key === "groupBy") {
-        if (selections[key]?.has(value)) {
-          console.log("\u{1F504} Deselecting", key, value);
-          delete selections[key];
-        } else {
-          console.log("\u{1F504} Selecting", key, value);
-          selections[key] = /* @__PURE__ */ new Set([value]);
-        }
-      } else {
-        const current = selections[key] ?? /* @__PURE__ */ new Set();
-        if (current.has(value)) {
-          current.delete(value);
-        } else {
-          current.add(value);
-        }
-        if (current.size === 0) {
-          delete selections[key];
-        } else {
-          selections[key] = current;
-        }
-      }
-      console.log("\u{1F504} New selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
-      return {
-        ...prev,
-        facetSelections: selections
-      };
-    });
-  },
-  replaceFacets(nextSelections) {
-    const clone = cloneSelections(nextSelections);
-    store2.setState({ facetSelections: clone });
-  },
-  reset() {
-    store2.setState(initialState2);
+    return stats;
   }
 };
 
@@ -4859,6 +3680,7 @@ var FACET_KEYS = [
   "groupBy"
 ];
 var CORPUS = [];
+var RELATIONSHIP_ENGINE = null;
 async function loadCorpus() {
   if (CORPUS.length > 0) {
     return CORPUS;
@@ -4880,6 +3702,13 @@ async function loadCorpus() {
       allRecords.push(...partData);
     }
     CORPUS = allRecords.map((record) => normalizeRecord(record));
+    try {
+      RELATIONSHIP_ENGINE = new RelationshipEngine(CORPUS);
+      console.log("\u2705 Relationship engine initialized with", CORPUS.length, "records");
+    } catch (error) {
+      console.warn("\u26A0\uFE0F Failed to initialize relationship engine:", error);
+      RELATIONSHIP_ENGINE = null;
+    }
     return CORPUS;
   } catch (error) {
     console.error("Error loading corpus:", error);
@@ -5918,6 +4747,1794 @@ async function runSearch(options, overrides) {
     isGrouped: !!isGrouped
   };
 }
+async function getEntitySmartActions(entity, includeInferred = true) {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    console.warn("Relationship engine not available");
+    return [];
+  }
+  try {
+    return RELATIONSHIP_ENGINE.getSmartActions(entity, includeInferred);
+  } catch (error) {
+    console.warn("Error getting smart actions for", entity.id, ":", error);
+    return [];
+  }
+}
+async function getRelatedEntities(entityId, options) {
+  await loadCorpus();
+  if (!RELATIONSHIP_ENGINE) {
+    console.warn("Relationship engine not available");
+    return [];
+  }
+  try {
+    return RELATIONSHIP_ENGINE.getRelatedEntities(entityId, {
+      type: options?.type,
+      confidence: options?.confidence,
+      includeInferred: options?.includeInferred,
+      limit: options?.limit
+    });
+  } catch (error) {
+    console.warn("Error getting related entities for", entityId, ":", error);
+    return [];
+  }
+}
+
+// src/components/resultsView.ts
+function sortRecordsByMostRecent(records) {
+  return [...records].sort((a, b) => {
+    const getMostRecentDate = (record) => {
+      const updatedDate = new Date(record.updatedAt);
+      let createdDate;
+      if (isFinancialRecord(record)) {
+        createdDate = new Date(record.issuedDate);
+      } else {
+        createdDate = new Date(record.createdAt);
+      }
+      return updatedDate > createdDate ? updatedDate : createdDate;
+    };
+    const dateA = getMostRecentDate(a);
+    const dateB = getMostRecentDate(b);
+    return dateB.getTime() - dateA.getTime();
+  });
+}
+function sortRecordsByDueFirst(records) {
+  return [...records].sort((a, b) => {
+    const getDueDate = (record) => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    return dueDateA.getTime() - dueDateB.getTime();
+  });
+}
+function sortRecordsByDueLast(records) {
+  return [...records].sort((a, b) => {
+    const getDueDate = (record) => {
+      if (isFinancialRecord(record) && record.dueDate) {
+        return new Date(record.dueDate);
+      }
+      return new Date(record.updatedAt);
+    };
+    const dueDateA = getDueDate(a);
+    const dueDateB = getDueDate(b);
+    return dueDateB.getTime() - dueDateA.getTime();
+  });
+}
+function sortRecords(records, sortBy) {
+  console.log("\u{1F504} Client-side sorting with sortBy:", sortBy, "for", records.length, "records");
+  switch (sortBy) {
+    case "mostRecent":
+      return sortRecordsByMostRecent(records);
+    case "dueFirst":
+      return sortRecordsByDueFirst(records);
+    case "dueLast":
+      return sortRecordsByDueLast(records);
+    case "relevance":
+    default:
+      return records;
+  }
+}
+function getHighlightFunction2(query, isMonetarySearch) {
+  if (isMonetarySearch) {
+    return highlightMonetaryValuesWithPartialMatches;
+  } else {
+    return highlightText;
+  }
+}
+var FACET_LABELS = {
+  entityType: "Type",
+  project: "Project",
+  status: "Status",
+  documentType: "Document Type",
+  client: "Client",
+  issuedDate: "Issued",
+  totalValue: "Total",
+  groupBy: "Group by",
+  personType: "Person Type",
+  contactOrganization: "Contact Organization",
+  organizationType: "Organization Type",
+  tradeFocus: "Trade Focus",
+  costCodeCategory: "Cost Code Category",
+  costCode: "Cost Code"
+};
+function createResultsView(options) {
+  const container = document.createElement("section");
+  container.className = "results-view";
+  const header2 = document.createElement("header");
+  header2.className = "results-view__header";
+  header2.innerHTML = `
+    <div>
+      <h1>Search Results</h1>
+      <p class="results-view__summary" id="results-summary"></p>
+    </div>
+    <div class="results-view__actions">
+      <button type="button" class="clear-facets" hidden>Clear filters</button>
+    </div>
+  `;
+  const mainContent = document.createElement("div");
+  mainContent.className = "results-view__main";
+  const facetsContainer = document.createElement("aside");
+  facetsContainer.className = "results-view__facets";
+  const resultsContainer = document.createElement("div");
+  resultsContainer.className = "results-view__groups";
+  mainContent.append(facetsContainer, resultsContainer);
+  container.append(header2, mainContent);
+  const summaryEl = header2.querySelector("#results-summary");
+  const clearButton = header2.querySelector(".clear-facets");
+  clearButton.addEventListener("click", () => {
+    options.onClearFacets?.();
+  });
+  let previousContext = null;
+  const render = (context) => {
+    const { response, selections, sortBy, status, query, errorMessage, isMonetarySearch } = context;
+    const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.sortBy !== sortBy;
+    if (summaryChanged) {
+      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
+    }
+    const facetsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.selections !== selections;
+    if (facetsChanged) {
+      renderFacets(facetsContainer, status, response, selections, options);
+    }
+    const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch || previousContext.sortBy !== sortBy;
+    if (resultsChanged) {
+      requestAnimationFrame(() => {
+        renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
+      });
+    }
+    const selectionsChanged = !previousContext || previousContext.selections !== selections;
+    if (selectionsChanged) {
+      const hasSelections = selections && Object.keys(selections).length > 0;
+      clearButton.hidden = !hasSelections;
+    }
+    previousContext = context;
+  };
+  return {
+    element: container,
+    render
+  };
+}
+function renderSummary(target, status, response, query, errorMessage, sortBy, onSortByChange) {
+  target.innerHTML = "";
+  switch (status) {
+    case "idle":
+      if (isQueryTooShort(query)) {
+        target.textContent = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see results.`;
+      } else {
+        target.textContent = "Type a query to explore results and filters.";
+      }
+      return;
+    case "loading":
+      target.textContent = query ? `Searching for "${query}"\u2026` : "Searching\u2026";
+      return;
+    case "error":
+      target.textContent = errorMessage ?? "Search failed. Try again.";
+      return;
+    case "ready":
+      if (!response) {
+        target.textContent = "No results.";
+        return;
+      }
+      const resultText = response.totalResults === 1 ? "result" : "results";
+      const shouldShowSort = response.totalResults > 1 && sortBy && onSortByChange;
+      if (shouldShowSort) {
+        const container = document.createElement("div");
+        container.className = "results-summary-with-sort";
+        const textSpan = document.createElement("span");
+        textSpan.textContent = `${response.totalResults} ${resultText} for "${response.query}" sorted by `;
+        const sortSelect = document.createElement("select");
+        sortSelect.className = "results-summary__sort-select";
+        const sortOptions = [
+          { value: "relevance", label: "Relevance" },
+          { value: "mostRecent", label: "Most Recent" },
+          { value: "dueFirst", label: "Due First" },
+          { value: "dueLast", label: "Due Last" }
+        ];
+        sortOptions.forEach((option) => {
+          const optionElement = document.createElement("option");
+          optionElement.value = option.value;
+          optionElement.textContent = option.label;
+          sortSelect.appendChild(optionElement);
+        });
+        sortSelect.value = sortBy;
+        sortSelect.addEventListener("change", () => {
+          const newSort = sortSelect.value;
+          console.log("\u{1F504} Sort By changed from", sortBy, "to", newSort);
+          if (newSort !== sortBy) {
+            console.log("\u{1F3AF} Calling onSortByChange for sortBy:", newSort);
+            onSortByChange(newSort);
+          }
+        });
+        container.append(textSpan, sortSelect);
+        target.appendChild(container);
+      } else {
+        target.textContent = `${response.totalResults} ${resultText} for "${response.query}".`;
+      }
+      return;
+    default:
+      target.textContent = "";
+  }
+}
+function renderFacets(container, status, response, selections, options) {
+  container.innerHTML = "";
+  if (status === "idle") {
+    container.classList.add("is-empty");
+    container.innerHTML = renderFacetProTips("idle");
+    return;
+  }
+  if (status === "loading") {
+    container.classList.add("is-empty");
+    container.textContent = "Calculating facets\u2026";
+    return;
+  }
+  if (status === "error") {
+    container.classList.add("is-empty");
+    container.textContent = "Facets unavailable while search is failing.";
+    return;
+  }
+  if (!response || !response.facets) {
+    container.classList.add("is-empty");
+    container.innerHTML = renderFacetProTips("empty");
+    return;
+  }
+  const facetsEntries = Object.entries(response.facets);
+  if (facetsEntries.length === 0) {
+    container.classList.add("is-empty");
+    container.innerHTML = renderFacetProTips("no-results");
+    return;
+  }
+  container.classList.remove("is-empty");
+  const settings = settingsStore.getState();
+  const maxFacetValues = settings.maxFacetValues;
+  facetsEntries.forEach(([key, values]) => {
+    const block = document.createElement("section");
+    block.className = "results-view__facet-block";
+    const heading = document.createElement("h3");
+    heading.textContent = FACET_LABELS[key] ?? key;
+    block.append(heading);
+    const list = document.createElement("ul");
+    list.className = "results-view__facet-list";
+    const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
+    const initialCount = shouldLimit ? maxFacetValues : values.length;
+    const hiddenCount = values.length - initialCount;
+    values.forEach((facet, index) => {
+      const listItem = document.createElement("li");
+      listItem.className = "results-view__facet-item";
+      if (shouldLimit && index >= initialCount) {
+        listItem.classList.add("facet-item--hidden");
+      }
+      const label = document.createElement("label");
+      label.className = "facet-checkbox";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "facet-checkbox__input";
+      checkbox.dataset.key = key;
+      checkbox.dataset.value = facet.value;
+      const isSelected = selections[key]?.has(facet.value) ?? false;
+      checkbox.checked = isSelected;
+      const text = document.createElement("span");
+      text.className = "facet-checkbox__text";
+      if (key === "entityType") {
+        text.textContent = formatEntityType(facet.value);
+      } else {
+        text.textContent = facet.value;
+      }
+      const count = document.createElement("span");
+      count.className = "facet-checkbox__count";
+      count.textContent = String(facet.count);
+      label.append(checkbox, text, count);
+      listItem.append(label);
+      list.append(listItem);
+      checkbox.addEventListener("change", () => {
+        options.onFacetToggle(key, facet.value);
+      });
+    });
+    block.append(list);
+    if (shouldLimit && hiddenCount > 0) {
+      const toggleContainer = document.createElement("div");
+      toggleContainer.className = "facet-toggle-container";
+      const toggleButton = document.createElement("button");
+      toggleButton.type = "button";
+      toggleButton.className = "facet-toggle-button";
+      toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
+      toggleButton.dataset.facetKey = key;
+      toggleContainer.append(toggleButton);
+      block.append(toggleContainer);
+      toggleButton.addEventListener("click", () => {
+        const isExpanded = toggleButton.classList.contains("is-expanded");
+        const allItems = list.querySelectorAll(".results-view__facet-item");
+        if (isExpanded) {
+          allItems.forEach((item, index) => {
+            if (index >= initialCount) {
+              item.classList.add("facet-item--hidden");
+            }
+          });
+          toggleButton.textContent = `Show ${hiddenCount} more${hiddenCount === 1 ? "" : "..."}`;
+          toggleButton.classList.remove("is-expanded");
+        } else {
+          allItems.forEach((item) => item.classList.remove("facet-item--hidden"));
+          toggleButton.textContent = "Show less";
+          toggleButton.classList.add("is-expanded");
+        }
+      });
+    }
+    container.append(block);
+  });
+}
+function renderGroups(container, status, response, query, errorMessage, isMonetarySearch, sortBy) {
+  container.innerHTML = "";
+  if (status === "idle") {
+    if (isQueryTooShort(query)) {
+      const message = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`;
+      container.innerHTML = renderProTipsState(message, "idle");
+      const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
+      if (facetsContainer2) {
+        facetsContainer2.style.display = "none";
+      }
+    } else {
+      container.innerHTML = renderProTipsState("", "empty");
+      const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
+      if (facetsContainer2) {
+        facetsContainer2.style.display = "none";
+      }
+    }
+    return;
+  }
+  if (status === "loading") {
+    container.innerHTML = '<p class="results-view__empty">Fetching results\u2026</p>';
+    return;
+  }
+  if (status === "error") {
+    container.innerHTML = `<p class="results-view__empty">${errorMessage ?? "Something went wrong while searching."}</p>`;
+    return;
+  }
+  if (!response || !response.fullGroups.length) {
+    container.innerHTML = renderProTipsState("No results found", "no-results", query);
+    const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
+    if (facetsContainer2) {
+      facetsContainer2.style.display = "none";
+    }
+    return;
+  }
+  const facetsContainer = container.closest(".results-view__main")?.querySelector(".results-view__facets");
+  if (facetsContainer) {
+    facetsContainer.style.display = "";
+  }
+  let sortedResponse = response;
+  if (sortBy && sortBy !== "relevance") {
+    console.log("\u{1F504} Applying client-side sorting:", sortBy);
+    const sortedRecords = sortRecords(response.records, sortBy);
+    sortedResponse = {
+      ...response,
+      records: sortedRecords,
+      // Also sort the groups if they exist
+      fullGroups: response.fullGroups.map((group) => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      })),
+      limitedGroups: response.limitedGroups.map((group) => ({
+        ...group,
+        items: sortRecords(group.items, sortBy)
+      }))
+    };
+  }
+  if (sortedResponse.isGrouped) {
+    sortedResponse.fullGroups.forEach((group) => {
+      container.append(renderGroup2(group, group.groupTitle, query, isMonetarySearch));
+    });
+  } else {
+    const flatList = document.createElement("div");
+    flatList.className = "results-list";
+    Promise.all(sortedResponse.records.map(async (record) => {
+      const card = await renderResultCard(record, query, isMonetarySearch);
+      return { record, card };
+    })).then((results) => {
+      results.forEach(({ card }) => {
+        flatList.append(card);
+      });
+    });
+    container.append(flatList);
+  }
+}
+function renderGroup2(group, groupTitle, query, isMonetarySearch) {
+  const section = document.createElement("section");
+  section.className = "results-group";
+  const heading = document.createElement("header");
+  heading.className = "results-group__header";
+  const title = groupTitle || formatEntityType(group.entityType, { plural: true });
+  heading.innerHTML = `
+    <h2>${title}</h2>
+    <span class="results-group__count">${group.items.length}</span>
+  `;
+  const list = document.createElement("div");
+  list.className = "results-group__list";
+  Promise.all(group.items.map(async (item) => {
+    const card = await renderResultCard(item, query, isMonetarySearch);
+    return { item, card };
+  })).then((results) => {
+    results.forEach(({ card }) => {
+      list.append(card);
+    });
+  });
+  section.append(heading, list);
+  return section;
+}
+async function renderResultCard(item, query, isMonetarySearch) {
+  const card = document.createElement("article");
+  card.setAttribute("data-document-id", item.id);
+  if (isBuildertrendRecord(item)) {
+    card.className = "result-card result-card--buildertrend";
+    card.setAttribute("data-url", item.url);
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Navigate to ${item.title}`);
+    card.addEventListener("click", () => {
+      console.log("Navigate to:", item.url);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        console.log("Navigate to:", item.url);
+      }
+    });
+  } else {
+    card.className = "result-card";
+  }
+  const header2 = document.createElement("div");
+  header2.className = "result-card__header";
+  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+  const title = document.createElement("h3");
+  title.innerHTML = query && highlightFn ? highlightFn(item.title, query) : item.title;
+  if (isBuildertrendRecord(item)) {
+    const icon = document.createElement("i");
+    icon.className = "result-card__icon";
+    icon.setAttribute("data-lucide", item.icon);
+    header2.append(icon, title);
+    requestAnimationFrame(() => {
+      if (window.lucide) {
+        try {
+          window.lucide.createIcons();
+        } catch (error) {
+          console.warn("Error updating icons:", error);
+        }
+      }
+    });
+  } else {
+    header2.append(title);
+  }
+  const badge = document.createElement("span");
+  badge.className = "result-card__badge";
+  badge.textContent = formatEntityType(item.entityType);
+  header2.append(badge);
+  const summary = document.createElement("p");
+  summary.className = "result-card__summary";
+  summary.innerHTML = query && highlightFn ? highlightFn(item.summary, query) : item.summary;
+  const metaList = document.createElement("ul");
+  metaList.className = "result-card__meta";
+  metaList.append(...buildMetaItems(item, query, isMonetarySearch));
+  card.append(header2, summary, metaList);
+  if (query) {
+    const match = findBestMatch(item, query);
+    if (match && match.field !== "title" && match.field !== "summary" && !match.field.startsWith("lineItem")) {
+      const context = document.createElement("div");
+      context.className = "search-context";
+      const highlightedSnippet = isMonetarySearch ? highlightMonetaryValuesWithPartialMatches(match.content, query) : getContextSnippet(match, 120, query);
+      context.innerHTML = `<strong>Matched in ${getFieldLabel(match.field)}:</strong> ${highlightedSnippet}`;
+      card.append(context);
+    }
+  }
+  if (isFinancialRecord(item)) {
+    const lineItemsBlock = renderLineItems(item, query, isMonetarySearch);
+    if (lineItemsBlock) {
+      card.append(lineItemsBlock);
+    }
+  }
+  const settings = settingsStore.getState();
+  const includeInferred = settings.showInferredRelationships ?? true;
+  try {
+    const relatedEntities = await getRelatedEntities(item.id, {
+      includeInferred,
+      limit: 3
+    });
+    const smartActions = await getEntitySmartActions(item, includeInferred);
+    if (relatedEntities.length > 0) {
+      const relatedSection = renderRelatedItems(relatedEntities, item.id);
+      card.append(relatedSection);
+    }
+    if (smartActions.length > 0) {
+      const actionsSection = renderSmartActions(smartActions, item);
+      card.append(actionsSection);
+    }
+  } catch (error) {
+    console.warn("Error loading relationships for", item.id, ":", error);
+  }
+  return card;
+}
+function buildMetaItems(item, query, isMonetarySearch) {
+  const metas = [];
+  const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+  const highlightValue = (value) => highlightFn ? highlightFn(value, query) : value;
+  const pushMeta = (label, value) => {
+    if (!value) {
+      return;
+    }
+    const entry = document.createElement("li");
+    entry.innerHTML = `<span>${label}</span><strong>${highlightValue(value)}</strong>`;
+    metas.push(entry);
+  };
+  if (isBuildertrendRecord(item)) {
+    pushMeta("Navigate To", item.path);
+    pushMeta("Description", item.description);
+    return metas;
+  }
+  pushMeta("Project", item.project);
+  pushMeta("Status", item.status);
+  if (item.entityType === "Document") {
+    const doc = item;
+    pushMeta("Type", doc.documentType);
+    pushMeta("Updated", formatDate(item.updatedAt));
+    return metas;
+  }
+  if (isFinancialRecord(item)) {
+    pushMeta("Issued", formatDate(item.issuedDate));
+    if (item.dueDate) {
+      pushMeta("Due", formatDate(item.dueDate));
+    }
+    pushMeta("Total", formatCurrency(item.totalValue));
+    return metas;
+  }
+  if (isPersonRecord(item)) {
+    pushMeta("Person Type", item.personType);
+    pushMeta("Role", item.jobTitle);
+    pushMeta("Organization", item.associatedOrganization);
+    pushMeta("Location", item.location);
+    pushMeta("Email", item.email);
+    pushMeta("Phone", item.phone);
+    pushMeta("Trade Focus", item.tradeFocus ?? void 0);
+    return metas;
+  }
+  if (isOrganizationRecord(item)) {
+    pushMeta("Business Type", item.organizationType);
+    pushMeta("Trade", item.tradeFocus);
+    pushMeta("Service Area", item.serviceArea);
+    pushMeta("Primary Contact", item.primaryContact);
+    pushMeta("Phone", item.phone);
+    pushMeta("Email", item.email);
+    pushMeta("Website", item.website ?? void 0);
+    return metas;
+  }
+  return metas;
+}
+function hasLineItemMatches(item, query, isMonetarySearch) {
+  if (!query || !isFinancialRecord(item)) return false;
+  const items = item.lineItems ?? [];
+  if (items.length === 0) return false;
+  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
+  return items.some((lineItem) => {
+    let searchableFields = [];
+    if (isMonetarySearch) {
+      const monetaryFields = [];
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
+      searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
+    } else {
+      searchableFields = [
+        lineItem.lineItemTitle,
+        lineItem.lineItemDescription,
+        lineItem.lineItemType,
+        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantityUnitOfMeasure,
+        formatCurrency(lineItem.lineItemUnitPrice),
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field) => field != null && field.trim() !== "");
+    }
+    return searchableFields.some((value) => {
+      if (!value) return false;
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes("<mark");
+    });
+  });
+}
+function getMatchingLineItemIndices(item, query, isMonetarySearch) {
+  if (!query || !isFinancialRecord(item)) return [];
+  const items = item.lineItems ?? [];
+  if (items.length === 0) return [];
+  const matchingIndices = [];
+  const highlightFn = getHighlightFunction2(query, isMonetarySearch || false);
+  items.forEach((lineItem, index) => {
+    let searchableFields = [];
+    if (isMonetarySearch) {
+      const monetaryFields = [];
+      monetaryFields.push(formatCurrency(lineItem.lineItemUnitPrice));
+      monetaryFields.push(formatCurrency(lineItem.lineItemTotal));
+      searchableFields = monetaryFields.filter((field) => field && field.trim() !== "");
+    } else {
+      searchableFields = [
+        lineItem.lineItemTitle,
+        lineItem.lineItemDescription,
+        lineItem.lineItemType,
+        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantityUnitOfMeasure,
+        formatCurrency(lineItem.lineItemUnitPrice),
+        formatCurrency(lineItem.lineItemTotal),
+        // Add cost code fields for matching
+        lineItem.costCode,
+        lineItem.costCodeName,
+        lineItem.costCodeCategory,
+        lineItem.costCodeCategoryName
+      ].filter((field) => field != null && field.trim() !== "");
+    }
+    const hasMatch = searchableFields.some((value) => {
+      if (!value) return false;
+      const highlighted = highlightFn(value, query);
+      return highlighted.includes("<mark");
+    });
+    if (hasMatch) {
+      matchingIndices.push(index);
+    }
+  });
+  return matchingIndices;
+}
+function groupMatchingLineItems(matchingIndices, collapseThreshold) {
+  if (matchingIndices.length === 0) return [];
+  const groups = [];
+  let currentGroup = {
+    startIndex: matchingIndices[0],
+    endIndex: matchingIndices[0],
+    indices: [matchingIndices[0]]
+  };
+  for (let i = 1; i < matchingIndices.length; i++) {
+    const currentIndex = matchingIndices[i];
+    const lastIndex = matchingIndices[i - 1];
+    if (currentIndex - lastIndex <= collapseThreshold) {
+      currentGroup.endIndex = currentIndex;
+      currentGroup.indices.push(currentIndex);
+    } else {
+      groups.push(currentGroup);
+      currentGroup = {
+        startIndex: currentIndex,
+        endIndex: currentIndex,
+        indices: [currentIndex]
+      };
+    }
+  }
+  groups.push(currentGroup);
+  return groups;
+}
+function calculateDisplayRanges(groups, contextCount, totalItems) {
+  if (groups.length === 0) return [];
+  const ranges = [];
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    const start = Math.max(0, group.startIndex - contextCount);
+    const end = Math.min(totalItems - 1, group.endIndex + contextCount);
+    ranges.push({ start, end });
+    if (i < groups.length - 1) {
+      const nextGroup = groups[i + 1];
+      const gapStart = end + 1;
+      const gapEnd = Math.max(0, nextGroup.startIndex - contextCount) - 1;
+      if (gapStart <= gapEnd) {
+        ranges.push({ start: gapStart, end: gapEnd, isCollapsed: true });
+      }
+    }
+  }
+  return ranges;
+}
+function getContextCountFromBehavior(behavior) {
+  switch (behavior) {
+    case "show-matched-only":
+      return 0;
+    case "show-matched-with-context-1":
+      return 1;
+    case "show-matched-with-context-2":
+      return 2;
+    case "show-matched-with-context-3":
+      return 3;
+    case "show-matched-with-context-5":
+      return 5;
+    case "show-all-always":
+    case "hide-all-always":
+      return 0;
+    // Not used for these behaviors
+    default:
+      return 3;
+  }
+}
+function renderLineItems(item, query, isMonetarySearch) {
+  if (!isFinancialRecord(item)) {
+    return null;
+  }
+  const items = item.lineItems ?? [];
+  if (items.length === 0) {
+    return null;
+  }
+  const settings = settingsStore.getState();
+  const hasMatches = hasLineItemMatches(item, query, isMonetarySearch);
+  const behavior = settings.lineItemBehavior;
+  const shouldShowLineItems = behavior !== "hide-all-always";
+  const shouldShowAllItems = behavior === "show-all-always";
+  const contextCount = getContextCountFromBehavior(behavior);
+  const wrapper = document.createElement("div");
+  wrapper.className = "result-card__line-items";
+  const groupLineItemsByCostCode = (items2) => {
+    const groups = {};
+    items2.forEach((item2) => {
+      const categoryId = item2.costCodeCategory || "buildertrend-default";
+      const categoryName = item2.costCodeCategoryName || "Buildertrend Default";
+      if (!groups[categoryId]) {
+        groups[categoryId] = { categoryName, items: [] };
+      }
+      groups[categoryId].items.push(item2);
+    });
+    return groups;
+  };
+  const renderLineItemRow = (line, index) => {
+    const row = document.createElement("tr");
+    const unitPrice = formatCurrency(line.lineItemUnitPrice);
+    const total = formatCurrency(line.lineItemTotal);
+    const quantity = `${line.lineItemQuantity} ${line.lineItemQuantityUnitOfMeasure}`;
+    const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+    const costCodeDisplay = line.costCodeName || line.costCode || "";
+    const shouldHighlightDescription = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightCostCode = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightType = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightQuantity = query && highlightFn && !isMonetarySearch;
+    const shouldHighlightUnitPrice = query && highlightFn;
+    const shouldHighlightTotal = query && highlightFn;
+    row.innerHTML = `
+      <td class="line-item__description">${shouldHighlightDescription ? highlightFn(line.lineItemTitle, query) : line.lineItemTitle}</td>
+      ${costCodeDisplay ? `<td class="line-item__cost-code">${shouldHighlightCostCode ? highlightFn(costCodeDisplay, query) : costCodeDisplay}</td>` : ""}
+      <td class="line-item__type">${shouldHighlightType ? highlightFn(line.lineItemType, query) : line.lineItemType}</td>
+      <td class="line-item__quantity">${shouldHighlightQuantity ? highlightFn(quantity, query) : quantity}</td>
+      <td class="line-item__unit-price">${shouldHighlightUnitPrice ? highlightFn(unitPrice, query) : unitPrice}</td>
+      <td class="line-item__total">${shouldHighlightTotal ? highlightFn(total, query) : total}</td>
+    `;
+    return row;
+  };
+  const renderTableContent = (container, forceShowAll = false) => {
+    const targetContainer = container || wrapper;
+    const existingTable = targetContainer.querySelector(".line-items-table");
+    if (existingTable) {
+      existingTable.remove();
+    }
+    const table = document.createElement("table");
+    table.className = "line-items-table";
+    const hasCostCodes = items.some((item2) => item2.costCode || item2.costCodeName);
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+      <th>Description</th>
+      ${hasCostCodes ? "<th>Cost Code</th>" : ""}
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total</th>
+    `;
+    thead.append(headerRow);
+    table.append(thead);
+    const tbody = document.createElement("tbody");
+    if (hasCostCodes) {
+      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+      let itemsToShow = [];
+      if (forceShowAll || shouldShowAllItems) {
+        itemsToShow = items;
+      } else if (behavior === "hide-all-always") {
+        itemsToShow = [];
+      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
+        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            const groups2 = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            const displayRanges = calculateDisplayRanges(groups2, contextCount, items.length);
+            displayRanges.forEach((range) => {
+              if (!range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  itemsToShow.push(items[i]);
+                }
+              }
+            });
+          } else {
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            itemsToShow = items.slice(startIndex, endIndex);
+          }
+        } else {
+          itemsToShow = [];
+        }
+      } else {
+        itemsToShow = items;
+      }
+      const groups = groupLineItemsByCostCode(itemsToShow);
+      const sortedCategories = Object.keys(groups).sort((a, b) => {
+        const getNumericOrder = (categoryId) => {
+          if (categoryId === "buildertrend-default") return 9999;
+          const match = categoryId.match(/(\d+)/);
+          return match ? parseInt(match[1]) : 9999;
+        };
+        return getNumericOrder(a) - getNumericOrder(b);
+      });
+      sortedCategories.forEach((categoryId) => {
+        const group = groups[categoryId];
+        const categoryRow = document.createElement("tr");
+        categoryRow.className = "line-item__category-header";
+        const colspan = hasCostCodes ? 6 : 5;
+        categoryRow.innerHTML = `<td colspan="${colspan}" class="line-item__category-title">${group.categoryName}</td>`;
+        tbody.append(categoryRow);
+        group.items.forEach((item2, index) => {
+          const row = renderLineItemRow(item2, index);
+          tbody.append(row);
+        });
+      });
+      if (itemsToShow.length < items.length) {
+        const showAllRow = document.createElement("tr");
+        showAllRow.className = "line-item__show-all";
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? "" : "s"}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
+        showAllButton.addEventListener("click", () => {
+          renderTableContent(targetContainer, true);
+        });
+      }
+    } else {
+      const highlightFn = query ? getHighlightFunction2(query, isMonetarySearch || false) : null;
+      let displayRanges = [];
+      let hiddenItems = [];
+      if (forceShowAll || shouldShowAllItems) {
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      } else if (behavior === "hide-all-always") {
+        displayRanges = [];
+        hiddenItems = items;
+      } else if (hasMatches && (behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context"))) {
+        const matchingIndices = getMatchingLineItemIndices(item, query, isMonetarySearch);
+        if (matchingIndices.length > 0) {
+          if (settings.collapseIrrelevantLineItems && matchingIndices.length > 1) {
+            const groups = groupMatchingLineItems(matchingIndices, settings.lineItemsCollapseThreshold);
+            displayRanges = calculateDisplayRanges(groups, contextCount, items.length);
+            hiddenItems = [];
+            displayRanges.forEach((range) => {
+              if (range.isCollapsed) {
+                for (let i = range.start; i <= range.end; i++) {
+                  hiddenItems.push(items[i]);
+                }
+              }
+            });
+          } else {
+            const minIndex = Math.min(...matchingIndices);
+            const maxIndex = Math.max(...matchingIndices);
+            const startIndex = Math.max(0, minIndex - contextCount);
+            const endIndex = Math.min(items.length, maxIndex + contextCount + 1);
+            displayRanges = [{ start: startIndex, end: endIndex - 1 }];
+            hiddenItems = [
+              ...items.slice(0, startIndex),
+              ...items.slice(endIndex)
+            ];
+          }
+        } else {
+          displayRanges = [];
+          hiddenItems = items;
+        }
+      } else {
+        displayRanges = [{ start: 0, end: items.length - 1 }];
+        hiddenItems = [];
+      }
+      const collapsedRows = [];
+      const collapsedContent = [];
+      displayRanges.forEach((range) => {
+        if (range.isCollapsed) {
+          const collapsedRow = document.createElement("tr");
+          collapsedRow.className = "line-item__collapsed";
+          const itemCount = range.end - range.start + 1;
+          const colspan = hasCostCodes ? 6 : 5;
+          collapsedRow.innerHTML = `
+            <td colspan="${colspan}" class="line-item__collapsed-content">
+              <span class="line-item__collapsed-text">...</span>
+              <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+            </td>
+          `;
+          tbody.append(collapsedRow);
+          collapsedRows.push(collapsedRow);
+          const contentRows = [];
+          for (let i = range.start; i <= range.end; i++) {
+            const lineItemRow = renderLineItemRow(items[i], i);
+            lineItemRow.style.display = "none";
+            tbody.append(lineItemRow);
+            contentRows.push(lineItemRow);
+          }
+          collapsedContent.push(contentRows);
+          collapsedRow.addEventListener("click", () => {
+            const isExpanded = contentRows[0].style.display !== "none";
+            if (isExpanded) {
+              contentRows.forEach((row) => row.style.display = "none");
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">...</span>
+                  <span class="line-item__collapsed-count">${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+                </td>
+              `;
+            } else {
+              contentRows.forEach((row) => row.style.display = "");
+              collapsedRow.innerHTML = `
+                <td colspan="${colspan}" class="line-item__collapsed-content">
+                  <span class="line-item__collapsed-text">\u2191</span>
+                  <span class="line-item__collapsed-count">Hide ${itemCount} item${itemCount === 1 ? "" : "s"}</span>
+                </td>
+              `;
+            }
+          });
+        } else {
+          for (let i = range.start; i <= range.end; i++) {
+            const row = renderLineItemRow(items[i], i);
+            tbody.append(row);
+          }
+        }
+      });
+      if (hiddenItems.length > 0) {
+        const showAllRow = document.createElement("tr");
+        showAllRow.className = "line-item__show-all";
+        const colspan = hasCostCodes ? 6 : 5;
+        showAllRow.innerHTML = `
+          <td colspan="${colspan}" class="line-item__show-all-content">
+            <button type="button" class="line-item__show-all-button">
+              Show all ${items.length} item${items.length === 1 ? "" : "s"}
+            </button>
+          </td>
+        `;
+        tbody.append(showAllRow);
+        const showAllButton = showAllRow.querySelector(".line-item__show-all-button");
+        showAllButton.addEventListener("click", () => {
+          renderTableContent(targetContainer, true);
+        });
+      }
+    }
+    table.append(tbody);
+    targetContainer.append(table);
+  };
+  if (behavior === "hide-all-always") {
+    const toggleLink = document.createElement("button");
+    toggleLink.className = "line-items-toggle";
+    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+    toggleLink.type = "button";
+    const tableContainer = document.createElement("div");
+    tableContainer.style.display = "none";
+    toggleLink.addEventListener("click", () => {
+      if (tableContainer.style.display === "none") {
+        tableContainer.style.display = "block";
+        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
+        if (!tableContainer.querySelector(".line-items-table")) {
+          renderTableContent(tableContainer);
+        }
+      } else {
+        tableContainer.style.display = "none";
+        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+      }
+    });
+    wrapper.append(toggleLink, tableContainer);
+    return wrapper;
+  }
+  if ((behavior === "show-matched-only" || behavior.startsWith("show-matched-with-context")) && !hasMatches) {
+    const toggleLink = document.createElement("button");
+    toggleLink.className = "line-items-toggle";
+    toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+    toggleLink.type = "button";
+    const tableContainer = document.createElement("div");
+    tableContainer.style.display = "none";
+    toggleLink.addEventListener("click", () => {
+      if (tableContainer.style.display === "none") {
+        tableContainer.style.display = "block";
+        toggleLink.textContent = `Hide line item${items.length === 1 ? "" : "s"}`;
+        if (!tableContainer.querySelector(".line-items-table")) {
+          renderTableContent(tableContainer);
+        }
+      } else {
+        tableContainer.style.display = "none";
+        toggleLink.textContent = `Show line item${items.length === 1 ? "" : "s"} (${items.length})`;
+      }
+    });
+    wrapper.append(toggleLink, tableContainer);
+    return wrapper;
+  }
+  renderTableContent();
+  return wrapper;
+}
+function getFieldLabel(field) {
+  const labels = {
+    title: "Title",
+    summary: "Summary",
+    project: "Project",
+    client: "Client",
+    status: "Status",
+    documentType: "Document Type",
+    author: "Author",
+    tags: "Tags"
+  };
+  if (field.startsWith("lineItem") && field.includes("_")) {
+    const [, index, type] = field.split("_");
+    const typeLabels = {
+      title: "Line Item Title",
+      description: "Line Item Description",
+      type: "Line Item Type"
+    };
+    return typeLabels[type] || "Line Item";
+  }
+  if (field.startsWith("metadata_")) {
+    return "Metadata";
+  }
+  return labels[field] || field;
+}
+function renderProTipsState(message, state, query) {
+  const proTips = getProTips(state, query);
+  return `
+    <div class="pro-tips-state">
+      ${message ? `
+        <div class="pro-tips-state__header">
+          <h2 class="pro-tips-state__title">${message}</h2>
+        </div>
+      ` : ""}
+      <div class="pro-tips-state__content">
+        <div class="pro-tips">
+          <h3 class="pro-tips__title">Pro Tips & Tricks</h3>
+          <div class="pro-tips__grid">
+            ${proTips.map((tip) => `
+              <div class="pro-tip">
+                <div class="pro-tip__content">
+                  <h4 class="pro-tip__title">
+                    <span class="pro-tip__icon">${tip.icon}</span>
+                    ${tip.title}
+                  </h4>
+                  <p class="pro-tip__description">${tip.description}</p>
+                  <div class="pro-tip__examples">
+                    ${tip.examples.map((example) => `
+                      <code class="pro-tip__example">${example}</code>
+                    `).join("")}
+                  </div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function getProTips(state, query) {
+  const tips = [];
+  tips.push({
+    icon: "\u{1F50D}",
+    title: "Basic Text Search",
+    description: "Search for any text in titles, summaries, projects, clients, and more.",
+    examples: ["kitchen renovation", "John Smith", "Project Alpha"]
+  });
+  tips.push({
+    icon: "\u{1F4B0}",
+    title: "Monetary Searches",
+    description: "Find invoices, bills, and receipts by exact amounts or ranges.",
+    examples: ["$1234.56", "$500-$1000", "1234.56", "1000 to 2000"]
+  });
+  tips.push({
+    icon: "\u{1F4CA}",
+    title: "Range Queries",
+    description: "Search for amounts within specific ranges using various formats.",
+    examples: ["$500-$1000", "1000 to 2000", "$50k-$100k"]
+  });
+  tips.push({
+    icon: "\u{1F4CB}",
+    title: "Entity Types",
+    description: "Search for specific types of records and documents.",
+    examples: ["invoices", "contracts", "people", "organizations"]
+  });
+  tips.push({
+    icon: "\u{1F3D7}\uFE0F",
+    title: "Project & Client Search",
+    description: "Find records related to specific projects or clients.",
+    examples: ["Project Alpha", "Smith Construction", "residential"]
+  });
+  tips.push({
+    icon: "\u{1F4C5}",
+    title: "Date-Based Search",
+    description: "Search for records by date ranges, recent activity, or time periods.",
+    examples: ["recent", "last month", "2024", "Q1 2024"]
+  });
+  tips.push({
+    icon: "\u26A1",
+    title: "Buildertrend Navigation",
+    description: "Use trigger queries to quickly navigate to specific Buildertrend sections.",
+    examples: ["schedule", "estimates", "change orders", "punch list"]
+  });
+  tips.push({
+    icon: "\u{1F4DD}",
+    title: "Line Item Details",
+    description: "Search within detailed line items of invoices and purchase orders.",
+    examples: ["lumber", "labor", "materials", "equipment"]
+  });
+  tips.push({
+    icon: "\u{1F4CA}",
+    title: "Status Filters",
+    description: "Find records by their current status or workflow stage.",
+    examples: ["pending", "approved", "paid", "overdue"]
+  });
+  tips.push({
+    icon: "\u{1F3AF}",
+    title: "Advanced Techniques",
+    description: "Combine multiple search terms and use facets to refine results.",
+    examples: ["kitchen AND renovation", "invoice AND pending", "Smith OR Johnson"]
+  });
+  if (state === "no-results" && query) {
+    tips.unshift({
+      icon: "\u{1F527}",
+      title: "No Results? Try These",
+      description: "Adjust your search strategy when no results are found.",
+      examples: [
+        "Use fewer keywords",
+        "Check spelling",
+        "Try broader terms",
+        "Use different formats"
+      ]
+    });
+  }
+  if (state === "idle") {
+    tips.unshift({
+      icon: "\u{1F680}",
+      title: "Get Started",
+      description: "Begin your search with any of these popular search types.",
+      examples: ["$5000", "kitchen", "Smith Construction", "recent invoices"]
+    });
+  }
+  return tips;
+}
+function renderRelatedItems(relatedEntities, sourceEntityId) {
+  const section = document.createElement("div");
+  section.className = "result-card__related-items";
+  const header2 = document.createElement("h4");
+  header2.className = "related-items__header";
+  header2.textContent = "Related Items";
+  const itemsList = document.createElement("div");
+  itemsList.className = "related-items__list";
+  relatedEntities.forEach((entity) => {
+    const item = document.createElement("div");
+    item.className = "related-item";
+    const confidence = getRelationshipConfidence(sourceEntityId, entity.id);
+    if (confidence) {
+      item.classList.add(`related-item--${confidence}`);
+    }
+    const title = document.createElement("span");
+    title.className = "related-item__title";
+    title.textContent = entity.title;
+    const type = document.createElement("span");
+    type.className = "related-item__type";
+    type.textContent = formatEntityType(entity.entityType);
+    item.append(title, type);
+    itemsList.append(item);
+  });
+  section.append(header2, itemsList);
+  return section;
+}
+function renderSmartActions(smartActions, entity) {
+  const section = document.createElement("div");
+  section.className = "result-card__smart-actions";
+  const header2 = document.createElement("h4");
+  header2.className = "smart-actions__header";
+  header2.textContent = "Quick Actions";
+  const actionsList = document.createElement("div");
+  actionsList.className = "smart-actions__list";
+  smartActions.forEach((action, index) => {
+    const actionElement = document.createElement("a");
+    actionElement.href = action.href;
+    actionElement.className = index === 0 ? "smart-action smart-action--primary" : "smart-action smart-action--secondary";
+    actionElement.textContent = action.label;
+    actionElement.title = action.description || action.label;
+    actionElement.setAttribute("data-action-id", action.id);
+    actionElement.setAttribute("data-entity-id", entity.id);
+    actionElement.setAttribute("data-entity-type", entity.entityType);
+    actionsList.append(actionElement);
+  });
+  section.append(header2, actionsList);
+  return section;
+}
+function getRelationshipConfidence(sourceId, targetId) {
+  return "explicit";
+}
+function renderFacetProTips(state) {
+  const facetTips = getFacetProTips(state);
+  return `
+    <div class="facet-pro-tips">
+      <h3 class="facet-pro-tips__title">Filter & Refine</h3>
+      <div class="facet-pro-tips__list">
+        ${facetTips.map((tip) => `
+          <div class="facet-pro-tip">
+            <div class="facet-pro-tip__icon">${tip.icon}</div>
+            <div class="facet-pro-tip__content">
+              <h4 class="facet-pro-tip__title">${tip.title}</h4>
+              <p class="facet-pro-tip__description">${tip.description}</p>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+function getFacetProTips(state) {
+  const tips = [];
+  if (state === "idle") {
+    tips.push({
+      icon: "\u{1F50D}",
+      title: "Search First",
+      description: "Run a search to see filter options and refine your results."
+    });
+    tips.push({
+      icon: "\u26A1",
+      title: "Quick Filters",
+      description: "Use facets to narrow down results by type, project, status, and more."
+    });
+  } else {
+    tips.push({
+      icon: "\u{1F4CA}",
+      title: "Type Filters",
+      description: "Filter by Document, Invoice, Person, Organization, or Buildertrend records."
+    });
+    tips.push({
+      icon: "\u{1F3D7}\uFE0F",
+      title: "Project & Client",
+      description: "Narrow results to specific projects or clients."
+    });
+    tips.push({
+      icon: "\u{1F4B0}",
+      title: "Amount Ranges",
+      description: "Filter financial records by total value ranges."
+    });
+    tips.push({
+      icon: "\u{1F4C5}",
+      title: "Date Filters",
+      description: "Find records by issue date ranges (last week, month, year)."
+    });
+    tips.push({
+      icon: "\u{1F4CB}",
+      title: "Status Filters",
+      description: "Filter by record status like pending, approved, or paid."
+    });
+    tips.push({
+      icon: "\u{1F3AF}",
+      title: "Advanced Grouping",
+      description: "Group results by type, project, status, or client for better organization."
+    });
+  }
+  return tips;
+}
+
+// src/components/settingsView.ts
+function createSettingsView() {
+  const container = document.createElement("section");
+  container.className = "settings-view";
+  const heading = document.createElement("header");
+  heading.innerHTML = `
+    <h1>Prototype Settings</h1>
+    <p>Adjust prototype behaviors. Changes save to the browser local storage and reload the experience.</p>
+  `;
+  const form = document.createElement("form");
+  form.className = "settings-form";
+  const overallSection = document.createElement("fieldset");
+  overallSection.className = "settings-group";
+  overallSection.innerHTML = `
+    <legend>Overall</legend>
+  `;
+  const delayField = document.createElement("div");
+  delayField.className = "settings-field";
+  delayField.innerHTML = `
+    <label for="search-delay">Simulated search delay mean (ms)</label>
+  `;
+  const delayInput = document.createElement("input");
+  delayInput.id = "search-delay";
+  delayInput.type = "number";
+  delayInput.min = "0";
+  delayInput.step = "10";
+  delayField.append(delayInput);
+  overallSection.append(delayField);
+  const varianceField = document.createElement("div");
+  varianceField.className = "settings-field";
+  varianceField.innerHTML = `
+    <label for="search-delay-variance">Search delay variance (ms)</label>
+  `;
+  const varianceInput = document.createElement("input");
+  varianceInput.id = "search-delay-variance";
+  varianceInput.type = "number";
+  varianceInput.min = "0";
+  varianceInput.step = "1";
+  varianceField.append(varianceInput);
+  overallSection.append(varianceField);
+  const recentSearchesField = document.createElement("div");
+  recentSearchesField.className = "settings-field";
+  recentSearchesField.innerHTML = `
+    <label for="recent-searches-limit">Recent searches to display</label>
+  `;
+  const recentSearchesSelect = document.createElement("select");
+  recentSearchesSelect.id = "recent-searches-limit";
+  recentSearchesSelect.innerHTML = `
+    <option value="3">3 searches</option>
+    <option value="5">5 searches</option>
+    <option value="7">7 searches</option>
+    <option value="10">10 searches</option>
+    <option value="15">15 searches</option>
+  `;
+  recentSearchesField.append(recentSearchesSelect);
+  overallSection.append(recentSearchesField);
+  const resultsSection = document.createElement("fieldset");
+  resultsSection.className = "settings-group";
+  resultsSection.innerHTML = `
+    <legend>Full Results Page</legend>
+  `;
+  const lineItemBehaviorField = document.createElement("div");
+  lineItemBehaviorField.className = "settings-field";
+  lineItemBehaviorField.innerHTML = `
+    <label for="line-item-behavior">Line item behavior on results page</label>
+  `;
+  const lineItemBehaviorSelect = document.createElement("select");
+  lineItemBehaviorSelect.id = "line-item-behavior";
+  lineItemBehaviorSelect.innerHTML = `
+    <option value="show-matched-only">Show only matched line items</option>
+    <option value="show-matched-with-context-1">Show matched line items with 1 additional line of context before/after</option>
+    <option value="show-matched-with-context-2">Show matched line items with 2 additional lines of context before/after</option>
+    <option value="show-matched-with-context-3">Show matched line items with 3 additional lines of context before/after</option>
+    <option value="show-matched-with-context-5">Show matched line items with 5 additional lines of context before/after</option>
+    <option value="show-all-always">Always show all line items</option>
+    <option value="hide-all-always">Always hide all line items, including matched</option>
+  `;
+  lineItemBehaviorField.append(lineItemBehaviorSelect);
+  resultsSection.append(lineItemBehaviorField);
+  const collapseLineItemsField = document.createElement("div");
+  collapseLineItemsField.className = "settings-field settings-field--checkbox";
+  const collapseLineItemsCheckbox = document.createElement("input");
+  collapseLineItemsCheckbox.id = "collapse-irrelevant-line-items";
+  collapseLineItemsCheckbox.type = "checkbox";
+  const collapseLineItemsLabel = document.createElement("label");
+  collapseLineItemsLabel.htmlFor = "collapse-irrelevant-line-items";
+  collapseLineItemsLabel.textContent = 'Collapse irrelevant line items between results (shows "..." for large gaps between matches)';
+  collapseLineItemsField.append(collapseLineItemsCheckbox, collapseLineItemsLabel);
+  resultsSection.append(collapseLineItemsField);
+  const collapseThresholdField = document.createElement("div");
+  collapseThresholdField.className = "settings-field";
+  collapseThresholdField.innerHTML = `
+    <label for="line-items-collapse-threshold">Collapse threshold</label>
+  `;
+  const collapseThresholdSelect = document.createElement("select");
+  collapseThresholdSelect.id = "line-items-collapse-threshold";
+  collapseThresholdSelect.innerHTML = `
+    <option value="3">3 items</option>
+    <option value="5">5 items</option>
+    <option value="7">7 items</option>
+    <option value="10">10 items</option>
+  `;
+  collapseThresholdField.append(collapseThresholdSelect);
+  resultsSection.append(collapseThresholdField);
+  const maxFacetValuesField = document.createElement("div");
+  maxFacetValuesField.className = "settings-field";
+  maxFacetValuesField.innerHTML = `
+    <label for="max-facet-values">Max facet values to show</label>
+  `;
+  const maxFacetValuesSelect = document.createElement("select");
+  maxFacetValuesSelect.id = "max-facet-values";
+  maxFacetValuesSelect.innerHTML = `
+    <option value="3">3 values</option>
+    <option value="5">5 values</option>
+    <option value="7">7 values</option>
+    <option value="10">10 values</option>
+    <option value="15">15 values</option>
+    <option value="20">20 values</option>
+    <option value="0">Show all</option>
+  `;
+  maxFacetValuesField.append(maxFacetValuesSelect);
+  resultsSection.append(maxFacetValuesField);
+  const groupSection = document.createElement("fieldset");
+  groupSection.className = "settings-group";
+  groupSection.innerHTML = `
+    <legend>Mini results group sizes</legend>
+  `;
+  const groupFields = document.createElement("div");
+  groupFields.className = "settings-group__grid";
+  groupSection.append(groupFields);
+  const actions = document.createElement("div");
+  actions.className = "settings-actions";
+  const saveButton = document.createElement("button");
+  saveButton.type = "submit";
+  saveButton.className = "primary";
+  saveButton.textContent = "Save & Reload";
+  const resetButton = document.createElement("button");
+  resetButton.type = "button";
+  resetButton.className = "secondary";
+  resetButton.textContent = "Restore defaults";
+  actions.append(saveButton, resetButton);
+  form.append(overallSection, resultsSection, groupSection, actions);
+  container.append(heading, form);
+  const groupInputs = /* @__PURE__ */ new Map();
+  const renderGroupInputs = (groupLimits) => {
+    groupFields.innerHTML = "";
+    groupInputs.clear();
+    Object.entries(groupLimits).forEach(([key, value]) => {
+      const field = document.createElement("label");
+      field.className = "settings-field";
+      field.htmlFor = `group-${key}`;
+      const title = document.createElement("span");
+      title.textContent = formatEntityType(key, { plural: true });
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "1";
+      input.step = "1";
+      input.id = `group-${key}`;
+      input.value = String(value);
+      field.append(title, input);
+      groupFields.append(field);
+      groupInputs.set(key, input);
+    });
+  };
+  const render = () => {
+    const state = settingsStore.getState();
+    delayInput.value = String(state.searchDelayMs);
+    varianceInput.value = String(state.searchDelayVarianceMs);
+    recentSearchesSelect.value = String(state.recentSearchesDisplayLimit);
+    lineItemBehaviorSelect.value = state.lineItemBehavior;
+    collapseLineItemsCheckbox.checked = state.collapseIrrelevantLineItems;
+    collapseThresholdSelect.value = String(state.lineItemsCollapseThreshold);
+    maxFacetValuesSelect.value = String(state.maxFacetValues);
+    renderGroupInputs(state.groupLimits);
+  };
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const nextDelay = Number.parseInt(delayInput.value, 10);
+    const resolvedDelay = Number.isFinite(nextDelay) && nextDelay >= 0 ? nextDelay : 0;
+    const nextVariance = Number.parseInt(varianceInput.value, 10);
+    const resolvedVariance = Number.isFinite(nextVariance) && nextVariance >= 0 ? nextVariance : 10;
+    const collapseThreshold = Number.parseInt(collapseThresholdSelect.value, 10);
+    const resolvedCollapseThreshold = Number.isFinite(collapseThreshold) && collapseThreshold >= 0 ? collapseThreshold : 5;
+    const maxFacetValues = Number.parseInt(maxFacetValuesSelect.value, 10);
+    const resolvedMaxFacetValues = Number.isFinite(maxFacetValues) && maxFacetValues >= 0 ? maxFacetValues : 5;
+    const recentSearchesLimit = Number.parseInt(recentSearchesSelect.value, 10);
+    const resolvedRecentSearchesLimit = Number.isFinite(recentSearchesLimit) && recentSearchesLimit >= 0 ? recentSearchesLimit : 5;
+    const groupLimits = {};
+    groupInputs.forEach((input, key) => {
+      const parsed = Number.parseInt(input.value, 10);
+      groupLimits[key] = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+    });
+    settingsStore.update({
+      searchDelayMs: resolvedDelay,
+      searchDelayVarianceMs: resolvedVariance,
+      lineItemBehavior: lineItemBehaviorSelect.value,
+      collapseIrrelevantLineItems: collapseLineItemsCheckbox.checked,
+      lineItemsCollapseThreshold: resolvedCollapseThreshold,
+      maxFacetValues: resolvedMaxFacetValues,
+      recentSearchesDisplayLimit: resolvedRecentSearchesLimit,
+      groupLimits
+    });
+    window.location.reload();
+  });
+  resetButton.addEventListener("click", () => {
+    settingsStore.reset();
+    render();
+    window.location.reload();
+  });
+  render();
+  return {
+    element: container,
+    render
+  };
+}
+
+// src/components/skeletonComponents.ts
+function createSkeletonLine(options = {}) {
+  const { width = "100%", height = "1rem", className = "", animated = true } = options;
+  const line = document.createElement("div");
+  line.className = `skeleton-line ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  line.style.width = width;
+  line.style.height = height;
+  return line;
+}
+function createSkeletonRect(options = {}) {
+  const { width = "100%", height = "4rem", className = "", animated = true } = options;
+  const rect = document.createElement("div");
+  rect.className = `skeleton-rect ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  rect.style.width = width;
+  rect.style.height = height;
+  return rect;
+}
+function createSkeletonCircle(options = {}) {
+  const { width = "2rem", height = "2rem", className = "", animated = true } = options;
+  const circle = document.createElement("div");
+  circle.className = `skeleton-circle ${animated ? "skeleton-animated" : ""} ${className}`.trim();
+  circle.style.width = width;
+  circle.style.height = height;
+  return circle;
+}
+
+// src/components/homeSkeleton.ts
+function createHomeSkeleton() {
+  const container = document.createElement("div");
+  container.className = "skeleton-home";
+  const header2 = document.createElement("div");
+  header2.className = "skeleton-home__header";
+  const titleSection = document.createElement("div");
+  titleSection.className = "skeleton-home__title-section";
+  const projectTitle = createSkeletonLine({ width: "12rem", height: "1.5rem" });
+  const statusBadge = createSkeletonRect({ width: "4rem", height: "1.5rem", className: "skeleton-home__status-badge" });
+  titleSection.appendChild(projectTitle);
+  titleSection.appendChild(statusBadge);
+  header2.appendChild(titleSection);
+  const infoLines = document.createElement("div");
+  infoLines.className = "skeleton-home__info-lines";
+  const addressLine = createSkeletonLine({ width: "16rem", height: "1rem" });
+  const clockInLine = createSkeletonLine({ width: "14rem", height: "1rem" });
+  const actionLink = createSkeletonLine({ width: "8rem", height: "1rem", className: "skeleton-home__action-link" });
+  infoLines.appendChild(addressLine);
+  infoLines.appendChild(clockInLine);
+  infoLines.appendChild(actionLink);
+  header2.appendChild(infoLines);
+  const peopleSection = document.createElement("div");
+  peopleSection.className = "skeleton-home__people-section";
+  const clientsGroup = document.createElement("div");
+  clientsGroup.className = "skeleton-home__people-group";
+  const clientsLabel = createSkeletonLine({ width: "3rem", height: "1rem" });
+  const clientsAvatars = document.createElement("div");
+  clientsAvatars.className = "skeleton-home__people-avatars";
+  const clientAvatar = createSkeletonCircle({ width: "2.5rem", height: "2.5rem" });
+  clientsAvatars.appendChild(clientAvatar);
+  clientsGroup.appendChild(clientsLabel);
+  clientsGroup.appendChild(clientsAvatars);
+  peopleSection.appendChild(clientsGroup);
+  const managersGroup = document.createElement("div");
+  managersGroup.className = "skeleton-home__people-group";
+  const managersLabel = createSkeletonLine({ width: "6rem", height: "1rem" });
+  const managersAvatars = document.createElement("div");
+  managersAvatars.className = "skeleton-home__people-avatars";
+  const managerAvatar1 = createSkeletonCircle({ width: "2rem", height: "2rem" });
+  const managerAvatar2 = createSkeletonCircle({ width: "2rem", height: "2rem" });
+  managersAvatars.appendChild(managerAvatar1);
+  managersAvatars.appendChild(managerAvatar2);
+  managersGroup.appendChild(managersLabel);
+  managersGroup.appendChild(managersAvatars);
+  peopleSection.appendChild(managersGroup);
+  header2.appendChild(peopleSection);
+  container.appendChild(header2);
+  const mainContent = document.createElement("div");
+  mainContent.className = "skeleton-home__main-content";
+  const centralPanel = document.createElement("div");
+  centralPanel.className = "skeleton-home__central-panel";
+  const taskOverview = document.createElement("div");
+  taskOverview.className = "skeleton-home__task-overview";
+  const pastDueColumn = document.createElement("div");
+  pastDueColumn.className = "skeleton-home__task-column";
+  const pastDueHeader = createSkeletonLine({ width: "4rem", height: "1rem" });
+  pastDueColumn.appendChild(pastDueHeader);
+  taskOverview.appendChild(pastDueColumn);
+  const dueTodayColumn = document.createElement("div");
+  dueTodayColumn.className = "skeleton-home__task-column";
+  const dueTodayHeader = createSkeletonLine({ width: "5rem", height: "1rem" });
+  const thumbsUpIcon = createSkeletonRect({ width: "3rem", height: "3rem", className: "skeleton-home__task-icon" });
+  const motivationalMessage = createSkeletonLine({ width: "8rem", height: "1rem" });
+  dueTodayColumn.appendChild(dueTodayHeader);
+  dueTodayColumn.appendChild(thumbsUpIcon);
+  dueTodayColumn.appendChild(motivationalMessage);
+  taskOverview.appendChild(dueTodayColumn);
+  const actionItemsColumn = document.createElement("div");
+  actionItemsColumn.className = "skeleton-home__task-column";
+  const actionItemsHeader = createSkeletonLine({ width: "6rem", height: "1rem" });
+  actionItemsColumn.appendChild(actionItemsHeader);
+  taskOverview.appendChild(actionItemsColumn);
+  centralPanel.appendChild(taskOverview);
+  const activitySection = document.createElement("div");
+  activitySection.className = "skeleton-home__activity-section";
+  const activityHeader = document.createElement("div");
+  activityHeader.className = "skeleton-home__activity-header";
+  const activityTitle = createSkeletonLine({ width: "12rem", height: "1.25rem" });
+  const activityFilter = createSkeletonRect({ width: "3rem", height: "2rem", className: "skeleton-home__activity-filter" });
+  activityHeader.appendChild(activityTitle);
+  activityHeader.appendChild(activityFilter);
+  activitySection.appendChild(activityHeader);
+  const activityList = document.createElement("div");
+  activityList.className = "skeleton-home__activity-list";
+  const activityDate = createSkeletonLine({ width: "6rem", height: "1.25rem", className: "skeleton-home__activity-date" });
+  activityList.appendChild(activityDate);
+  const activityItems = document.createElement("div");
+  activityItems.className = "skeleton-home__activity-items";
+  for (let i = 0; i < 3; i++) {
+    const activityItem = document.createElement("div");
+    activityItem.className = "skeleton-home__activity-item";
+    const avatar = createSkeletonCircle({ width: "2rem", height: "2rem", className: "skeleton-home__activity-avatar" });
+    const content = document.createElement("div");
+    content.className = "skeleton-home__activity-content";
+    const primaryLine = createSkeletonLine({ width: "14rem", height: "1rem" });
+    const actionLine = createSkeletonLine({ width: "10rem", height: "0.875rem" });
+    if (i < 2) {
+      const detailLine = createSkeletonLine({ width: "8rem", height: "0.875rem" });
+      content.appendChild(detailLine);
+    }
+    content.appendChild(primaryLine);
+    content.appendChild(actionLine);
+    activityItem.appendChild(avatar);
+    activityItem.appendChild(content);
+    activityItems.appendChild(activityItem);
+  }
+  activityList.appendChild(activityItems);
+  activitySection.appendChild(activityList);
+  centralPanel.appendChild(activitySection);
+  mainContent.appendChild(centralPanel);
+  const sidebar = document.createElement("div");
+  sidebar.className = "skeleton-home__sidebar";
+  const updatesSection = document.createElement("div");
+  updatesSection.className = "skeleton-home__updates-section";
+  const updatesMetric = createSkeletonRect({ width: "4rem", height: "4rem", className: "skeleton-home__updates-metric" });
+  const updatesDescription = createSkeletonLine({ width: "10rem", height: "1rem" });
+  const updatesActions = document.createElement("div");
+  updatesActions.className = "skeleton-home__updates-actions";
+  const clientUpdatesBtn = createSkeletonRect({ width: "5rem", height: "2rem" });
+  const dailyLogsBtn = createSkeletonRect({ width: "4rem", height: "2rem" });
+  updatesActions.appendChild(clientUpdatesBtn);
+  updatesActions.appendChild(dailyLogsBtn);
+  updatesSection.appendChild(updatesMetric);
+  updatesSection.appendChild(updatesDescription);
+  updatesSection.appendChild(updatesActions);
+  sidebar.appendChild(updatesSection);
+  const agendaSection = document.createElement("div");
+  agendaSection.className = "skeleton-home__agenda-section";
+  const agendaHeader = document.createElement("div");
+  agendaHeader.className = "skeleton-home__agenda-header";
+  const agendaTitle = createSkeletonLine({ width: "8rem", height: "1.25rem" });
+  const agendaLink = createSkeletonLine({ width: "6rem", height: "1rem", className: "skeleton-home__agenda-link" });
+  agendaHeader.appendChild(agendaTitle);
+  agendaHeader.appendChild(agendaLink);
+  agendaSection.appendChild(agendaHeader);
+  const agendaList = document.createElement("div");
+  agendaList.className = "skeleton-home__agenda-list";
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (let i = 0; i < days.length; i++) {
+    const agendaItem = document.createElement("div");
+    agendaItem.className = "skeleton-home__agenda-item";
+    const dateIndicator = createSkeletonRect({ width: "2rem", height: "2rem", className: "skeleton-home__agenda-date" });
+    const content = document.createElement("div");
+    content.className = "skeleton-home__agenda-content";
+    const dayLine = createSkeletonLine({ width: "4rem", height: "1rem" });
+    const dateLine = createSkeletonLine({ width: "3rem", height: "0.875rem" });
+    content.appendChild(dayLine);
+    content.appendChild(dateLine);
+    if (i >= 5) {
+      const nonWorkdayLine = createSkeletonLine({ width: "5rem", height: "0.75rem" });
+      content.appendChild(nonWorkdayLine);
+    }
+    agendaItem.appendChild(dateIndicator);
+    agendaItem.appendChild(content);
+    agendaList.appendChild(agendaItem);
+  }
+  agendaSection.appendChild(agendaList);
+  sidebar.appendChild(agendaSection);
+  mainContent.appendChild(sidebar);
+  container.appendChild(mainContent);
+  return container;
+}
+
+// src/state/appState.ts
+var initialState2 = {
+  route: "home",
+  searchQuery: "",
+  lastSubmittedQuery: "",
+  facetSelections: {},
+  sortBy: "relevance",
+  recentResponse: null,
+  searchStatus: "idle",
+  dialogOpen: false,
+  errorMessage: void 0
+};
+function cloneSelections(selections) {
+  const next = {};
+  for (const key of Object.keys(selections)) {
+    const values = selections[key];
+    if (values && values.size > 0) {
+      next[key] = new Set(values);
+    }
+  }
+  return next;
+}
+var store2 = createStore(initialState2);
+var appState = {
+  getState: store2.getState,
+  subscribe: store2.subscribe,
+  setRoute(route) {
+    store2.setState({ route });
+  },
+  setSearchQuery(searchQuery) {
+    store2.setState({ searchQuery });
+  },
+  setDialogOpen(dialogOpen) {
+    store2.setState({ dialogOpen });
+  },
+  setStatus(status, errorMessage) {
+    store2.setState({ searchStatus: status, errorMessage });
+  },
+  setResponse(response) {
+    store2.setState({ recentResponse: response });
+  },
+  setLastSubmittedQuery(query) {
+    store2.setState({ lastSubmittedQuery: query });
+  },
+  setSortBy(sortBy) {
+    console.log("\u{1F504} setSortBy called:", sortBy);
+    store2.setState({ sortBy });
+  },
+  clearFacets() {
+    store2.setState({ facetSelections: {} });
+  },
+  toggleFacet(key, value) {
+    console.log("\u{1F504} toggleFacet called:", { key, value });
+    store2.setState((prev) => {
+      const selections = cloneSelections(prev.facetSelections);
+      console.log("\u{1F504} Previous selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
+      if (key === "groupBy") {
+        if (selections[key]?.has(value)) {
+          console.log("\u{1F504} Deselecting", key, value);
+          delete selections[key];
+        } else {
+          console.log("\u{1F504} Selecting", key, value);
+          selections[key] = /* @__PURE__ */ new Set([value]);
+        }
+      } else {
+        const current = selections[key] ?? /* @__PURE__ */ new Set();
+        if (current.has(value)) {
+          current.delete(value);
+        } else {
+          current.add(value);
+        }
+        if (current.size === 0) {
+          delete selections[key];
+        } else {
+          selections[key] = current;
+        }
+      }
+      console.log("\u{1F504} New selections:", Object.keys(selections).map((k) => ({ key: k, values: Array.from(selections[k] || []) })));
+      return {
+        ...prev,
+        facetSelections: selections
+      };
+    });
+  },
+  replaceFacets(nextSelections) {
+    const clone = cloneSelections(nextSelections);
+    store2.setState({ facetSelections: clone });
+  },
+  reset() {
+    store2.setState(initialState2);
+  }
+};
 
 // src/main.ts
 function isMonetaryQuery(query) {

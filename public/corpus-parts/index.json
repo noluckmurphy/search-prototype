@@ -1,6 +1,6 @@
 {
-  "totalDocuments": 260,
-  "totalFiles": 9,
+  "totalDocuments": 350,
+  "totalFiles": 12,
   "documentsPerFile": 30,
   "files": [
     {
@@ -316,6 +316,24 @@
         "document-359",
         "document-360"
       ]
+    },
+    {
+      "filename": "corpus-part-10.json",
+      "count": 30,
+      "generated": "2025-09-19T01:04:21.588Z",
+      "enhanced": true
+    },
+    {
+      "filename": "corpus-part-11.json",
+      "count": 30,
+      "generated": "2025-09-19T01:04:21.588Z",
+      "enhanced": true
+    },
+    {
+      "filename": "corpus-part-12.json",
+      "count": 30,
+      "generated": "2025-09-19T01:04:21.588Z",
+      "enhanced": true
     }
   ]
 }
