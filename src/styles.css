@@ -634,6 +634,7 @@ main {
   z-index: 1;
 }
 
+
 .see-all-button {
   font-weight: 600;
   margin: 0;
@@ -715,18 +716,7 @@ main {
 /* Responsive adjustments for keyboard shortcuts */
 @media (max-width: 768px) {
   .search-dialog__shortcuts {
-    gap: var(--space-sm);
-    font-size: calc(var(--font-size-xs) - 1px);
-  }
-  
-  .search-dialog__shortcut-key {
-    min-width: 1rem;
-    height: 1rem;
-    font-size: calc(var(--font-size-xs) - 1px);
-  }
-  
-  .search-dialog__shortcut-text {
-    font-size: calc(var(--font-size-xs) - 1px);
+    display: none;
   }
 }
 
@@ -1656,16 +1646,26 @@ button.secondary {
 @media (max-width: 768px) {
   .app-nav {
     padding: var(--space-md);
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
   }
 
-  .search-area {
-    width: 100%;
+  .app-nav > .brand {
+    flex-shrink: 0;
   }
 
-  .nav-actions {
-    justify-content: flex-end;
+  .app-nav > .search-area {
+    flex: 1;
+    min-width: 0; /* Allow search area to shrink */
+  }
+
+  .app-nav > .nav-actions {
+    flex-basis: 100%;
+    justify-content: center;
+    margin-top: var(--space-sm);
+    order: 3;
   }
 
   .app-main {
