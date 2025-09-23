@@ -20,6 +20,9 @@ export function formatEntityType(type: SearchEntityType, options?: { plural?: bo
 }
 
 export function formatCurrency(amount: number, currency: string = 'USD'): string {
+  if (amount == null || isNaN(amount)) {
+    return '$0';
+  }
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,

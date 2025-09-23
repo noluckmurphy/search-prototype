@@ -207,8 +207,36 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
 
   // Track previous context to avoid unnecessary re-renders
   let previousContext: ResultsRenderContext | null = null;
+  let lastWindowWidth = window.innerWidth;
+
+  // Add resize listener for responsive facets
+  const handleResize = () => {
+    const currentWidth = window.innerWidth;
+    const wasMobile = lastWindowWidth <= 768;
+    const isMobile = currentWidth <= 768;
+    
+    // Re-render facets if mobile state changed
+    if (wasMobile !== isMobile && previousContext) {
+      renderFacets(facetsContainer, previousContext.status, previousContext.response, previousContext.selections, options);
+    }
+    
+    lastWindowWidth = currentWidth;
+  };
+
+  window.addEventListener('resize', handleResize);
 
   const render = (context: ResultsRenderContext) => {
+    console.log('🎯 ResultsView render called with context:', {
+      status: context.status,
+      hasResponse: !!context.response,
+      hasFacets: !!(context.response?.facets),
+      query: context.query,
+      selections: context.selections,
+      sortBy: context.sortBy,
+      isMonetarySearch: context.isMonetarySearch,
+      errorMessage: context.errorMessage
+    });
+
     const { response, selections, sortBy, status, query, errorMessage, isMonetarySearch } = context;
 
     // Only update summary if relevant state changed
@@ -220,6 +248,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       previousContext.sortBy !== sortBy;
 
     if (summaryChanged) {
+      console.log('📝 Rendering summary');
       renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
     }
 
@@ -230,6 +259,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       previousContext.selections !== selections;
 
     if (facetsChanged) {
+      console.log('🔍 Rendering facets');
       renderFacets(facetsContainer, status, response, selections, options);
     }
 
@@ -244,6 +274,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       previousContext.sortBy !== sortBy;
 
     if (resultsChanged) {
+      console.log('📊 Rendering results');
       // Use requestAnimationFrame to defer heavy DOM operations
       requestAnimationFrame(() => {
         renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
@@ -362,9 +393,19 @@ function renderFacets(
   selections: FacetSelectionState,
   options: ResultsViewOptions,
 ) {
+  console.log('🔍 renderFacets called with:', {
+    status,
+    hasResponse: !!response,
+    hasFacets: !!(response?.facets),
+    facetsCount: response?.facets ? Object.keys(response.facets).length : 0,
+    selections,
+    windowWidth: window.innerWidth
+  });
+
   container.innerHTML = '';
 
   if (status === 'idle') {
+    console.log('📱 Status: idle - showing pro tips');
     container.classList.add('is-empty');
     // Show pro tips instead of simple helper text
     container.innerHTML = renderFacetProTips('idle');
@@ -372,18 +413,21 @@ function renderFacets(
   }
 
   if (status === 'loading') {
+    console.log('⏳ Status: loading');
     container.classList.add('is-empty');
     container.textContent = 'Calculating facets…';
     return;
   }
 
   if (status === 'error') {
+    console.log('❌ Status: error');
     container.classList.add('is-empty');
     container.textContent = 'Facets unavailable while search is failing.';
     return;
   }
 
   if (!response || !response.facets) {
+    console.log('📭 No response or facets - showing pro tips');
     container.classList.add('is-empty');
     // Show pro tips instead of simple helper text
     container.innerHTML = renderFacetProTips('empty');
@@ -391,7 +435,10 @@ function renderFacets(
   }
 
   const facetsEntries = Object.entries(response.facets) as [FacetKey, FacetValue[]][];
+  console.log('📊 Facets entries:', facetsEntries.map(([key, values]) => ({ key, count: values.length })));
+  
   if (facetsEntries.length === 0) {
+    console.log('📭 No facets entries - showing pro tips');
     container.classList.add('is-empty');
     // Show pro tips instead of simple helper text
     container.innerHTML = renderFacetProTips('no-results');
@@ -400,6 +447,64 @@ function renderFacets(
 
   container.classList.remove('is-empty');
 
+  // Check if we're on mobile
+  const isMobile = window.innerWidth <= 768;
+  console.log(`📱 Rendering ${isMobile ? 'mobile' : 'desktop'} facets`);
+
+  if (isMobile) {
+    renderMobileFacets(container, facetsEntries, selections, options);
+  } else {
+    renderDesktopFacets(container, facetsEntries, selections, options);
+  }
+
+  // Debug: Log what's actually in the container
+  console.log('🔍 Container after rendering:', {
+    innerHTML: container.innerHTML.substring(0, 500) + '...',
+    childrenCount: container.children.length,
+    classList: Array.from(container.classList),
+    firstChild: container.firstChild,
+    lastChild: container.lastChild,
+    isVisible: container.offsetHeight > 0,
+    computedStyle: window.getComputedStyle(container)
+  });
+}
+
+function renderMobileFacets(
+  container: HTMLElement,
+  facetsEntries: [FacetKey, FacetValue[]][],
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+) {
+  console.log('📱 renderMobileFacets called with:', {
+    facetsEntriesCount: facetsEntries.length,
+    selections,
+    hasOptions: !!options
+  });
+
+  // Create active filters summary
+  const activeFiltersSummary = createActiveFiltersSummary(selections, options);
+  console.log('✅ Created active filters summary:', activeFiltersSummary);
+  container.append(activeFiltersSummary);
+
+  // Create mobile filters section
+  const mobileFiltersSection = createMobileFiltersSection(facetsEntries, selections, options);
+  console.log('✅ Created mobile filters section:', mobileFiltersSection);
+  container.append(mobileFiltersSection);
+
+  // Debug: Log container state after appending
+  console.log('🔍 Container after appending mobile elements:', {
+    childrenCount: container.children.length,
+    firstChild: container.firstChild,
+    lastChild: container.lastChild
+  });
+}
+
+function renderDesktopFacets(
+  container: HTMLElement,
+  facetsEntries: [FacetKey, FacetValue[]][],
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+) {
   const settings = settingsStore.getState();
   const maxFacetValues = settings.maxFacetValues;
 
@@ -504,6 +609,297 @@ function renderFacets(
 
     container.append(block);
   });
+}
+
+function createActiveFiltersSummary(
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+): HTMLElement {
+  console.log('🏷️ createActiveFiltersSummary called with:', {
+    selections,
+    hasOptions: !!options,
+    hasOnFacetToggle: !!(options?.onFacetToggle)
+  });
+
+  const summary = document.createElement('div');
+  summary.className = 'active-filters-summary';
+
+  // Count active filters
+  const activeFilters: Array<{ key: FacetKey; value: string; label: string }> = [];
+  
+  Object.entries(selections).forEach(([key, values]) => {
+    console.log(`🔍 Processing facet key "${key}":`, { values, hasValues: !!values, size: values?.size });
+    
+    if (values && values.size > 0) {
+      values.forEach(value => {
+        console.log(`  📝 Processing value "${value}" for key "${key}"`);
+        const label = key === 'entityType' ? formatEntityType(value as any) : value;
+        const facetLabel = FACET_LABELS[key as FacetKey] ?? key;
+        const fullLabel = `${facetLabel}: ${label}`;
+        
+        console.log(`  ✅ Created label: "${fullLabel}"`);
+        
+        activeFilters.push({
+          key: key as FacetKey,
+          value,
+          label: fullLabel
+        });
+      });
+    }
+  });
+
+  console.log('📊 Total active filters:', activeFilters.length, activeFilters);
+
+  if (activeFilters.length === 0) {
+    console.log('📭 No active filters - hiding summary');
+    summary.classList.add('hidden');
+    return summary;
+  }
+
+  const label = document.createElement('span');
+  label.className = 'active-filters-label';
+  label.textContent = 'Active filters:';
+  summary.append(label);
+
+  activeFilters.forEach((filter, index) => {
+    console.log(`🏷️ Creating pill ${index + 1}:`, filter);
+    
+    const pill = document.createElement('div');
+    pill.className = 'filter-pill';
+    
+    const text = document.createElement('span');
+    text.textContent = filter.label;
+    
+    const removeButton = document.createElement('button');
+    removeButton.className = 'filter-pill-remove';
+    removeButton.innerHTML = '×';
+    removeButton.addEventListener('click', () => {
+      console.log('🗑️ Removing filter:', filter);
+      if (options.onFacetToggle) {
+        options.onFacetToggle(filter.key, filter.value);
+      } else {
+        console.error('❌ options.onFacetToggle is undefined!');
+      }
+    });
+    
+    pill.append(text, removeButton);
+    summary.append(pill);
+  });
+
+  console.log('✅ Active filters summary created:', summary);
+  return summary;
+}
+
+function createMobileFiltersSection(
+  facetsEntries: [FacetKey, FacetValue[]][],
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+): HTMLElement {
+  console.log('📱 createMobileFiltersSection called with:', {
+    facetsEntriesCount: facetsEntries.length,
+    selections,
+    hasOptions: !!options
+  });
+
+  const section = document.createElement('div');
+  section.className = 'mobile-filters-section';
+
+  // Count total active filters
+  const activeFilterCount = Object.values(selections).reduce((count, values) => {
+    return count + (values ? values.size : 0);
+  }, 0);
+
+  console.log('📊 Active filter count:', activeFilterCount);
+
+  // Create filters header
+  const header = document.createElement('div');
+  header.className = 'mobile-filters-header';
+  
+  const title = document.createElement('div');
+  title.className = 'mobile-filters-title';
+  title.innerHTML = '🔍 Filters';
+  
+  const count = document.createElement('span');
+  count.className = 'mobile-filters-count';
+  count.textContent = String(activeFilterCount);
+  title.append(count);
+  
+  const toggle = document.createElement('button');
+  toggle.className = 'mobile-filters-toggle';
+  toggle.innerHTML = '▼';
+  
+  header.append(title, toggle);
+  section.append(header);
+
+  // Create filters content
+  const content = document.createElement('div');
+  content.className = 'mobile-filters-content';
+
+  console.log('📋 Creating facet categories...');
+  facetsEntries.forEach(([key, values], index) => {
+    console.log(`  📁 Creating category ${index + 1}: ${key} with ${values.length} values`);
+    const category = createMobileFacetCategory(key, values, selections, options);
+    content.append(category);
+  });
+
+  section.append(content);
+
+  // Add toggle functionality
+  header.addEventListener('click', () => {
+    console.log('🔄 Toggling mobile filters section');
+    content.classList.toggle('expanded');
+    toggle.classList.toggle('expanded');
+  });
+
+  console.log('✅ Mobile filters section created:', section);
+  return section;
+}
+
+function createMobileFacetCategory(
+  key: FacetKey,
+  values: FacetValue[],
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+): HTMLElement {
+  console.log(`📁 createMobileFacetCategory called for "${key}" with ${values.length} values`);
+  
+  try {
+    const category = document.createElement('div');
+    category.className = 'mobile-facet-category';
+
+    // Create category header
+    const header = document.createElement('div');
+    header.className = 'mobile-facet-category-header';
+    
+    const title = document.createElement('span');
+    title.className = 'mobile-facet-category-title';
+    
+    const facetLabel = FACET_LABELS[key] ?? key;
+    console.log(`  🏷️ Using facet label: "${facetLabel}" for key "${key}"`);
+    title.textContent = facetLabel;
+    
+    const count = document.createElement('span');
+    count.className = 'mobile-facet-category-count';
+    count.textContent = String(values.length);
+    
+    const toggle = document.createElement('button');
+    toggle.className = 'mobile-facet-category-toggle';
+    toggle.innerHTML = '▼';
+    
+    header.append(title, count, toggle);
+    category.append(header);
+
+    // Create options
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'mobile-facet-options';
+
+    console.log(`  📋 Creating ${values.length} options for category "${key}"`);
+    values.forEach((facet, index) => {
+      console.log(`    📝 Creating option ${index + 1}: "${facet.value}" (count: ${facet.count})`);
+      try {
+        const option = createMobileFacetOption(key, facet, selections, options);
+        optionsContainer.append(option);
+      } catch (error) {
+        console.error(`    ❌ Error creating option ${index + 1}:`, error);
+      }
+    });
+
+    category.append(optionsContainer);
+
+    // Add toggle functionality
+    header.addEventListener('click', () => {
+      console.log(`🔄 Toggling category "${key}"`);
+      optionsContainer.classList.toggle('expanded');
+      toggle.classList.toggle('expanded');
+    });
+
+    console.log(`✅ Created category "${key}" successfully:`, category);
+    return category;
+  } catch (error) {
+    console.error(`❌ Error creating category "${key}":`, error);
+    // Return a fallback element
+    const fallback = document.createElement('div');
+    fallback.className = 'mobile-facet-category';
+    fallback.textContent = `Error loading ${key}`;
+    return fallback;
+  }
+}
+
+function createMobileFacetOption(
+  key: FacetKey,
+  facet: FacetValue,
+  selections: FacetSelectionState,
+  options: ResultsViewOptions,
+): HTMLElement {
+  console.log(`    📝 createMobileFacetOption called for "${key}" value "${facet.value}"`);
+  
+  try {
+    const option = document.createElement('div');
+    option.className = 'mobile-facet-option';
+
+    const checkbox = document.createElement('div');
+    checkbox.className = 'mobile-facet-checkbox';
+    
+    const isSelected = selections[key]?.has(facet.value) ?? false;
+    console.log(`      ✅ Is selected: ${isSelected}`);
+    if (isSelected) {
+      checkbox.classList.add('checked');
+      checkbox.innerHTML = '✓';
+    }
+
+    const content = document.createElement('div');
+    content.className = 'mobile-facet-option-content';
+    
+    const label = document.createElement('span');
+    label.className = 'mobile-facet-option-label';
+    
+    let labelText: string;
+    if (key === 'entityType') {
+      console.log(`      🔄 Formatting entity type: "${facet.value}"`);
+      labelText = formatEntityType(facet.value as any);
+      console.log(`      ✅ Formatted entity type: "${labelText}"`);
+    } else {
+      labelText = facet.value;
+    }
+    label.textContent = labelText;
+    
+    const count = document.createElement('span');
+    count.className = 'mobile-facet-option-count';
+    count.textContent = String(facet.count);
+    
+    content.append(label, count);
+    option.append(checkbox, content);
+
+    // Add click handler
+    option.addEventListener('click', () => {
+      console.log(`      🖱️ Clicked option: "${facet.value}" for key "${key}"`);
+      const isSelected = selections[key]?.has(facet.value) ?? false;
+      if (options.onFacetToggle) {
+        options.onFacetToggle(key, facet.value);
+      } else {
+        console.error('      ❌ options.onFacetToggle is undefined!');
+      }
+      
+      // Update visual state immediately
+      if (isSelected) {
+        checkbox.classList.remove('checked');
+        checkbox.innerHTML = '';
+      } else {
+        checkbox.classList.add('checked');
+        checkbox.innerHTML = '✓';
+      }
+    });
+
+    console.log(`      ✅ Created option successfully:`, option);
+    return option;
+  } catch (error) {
+    console.error(`      ❌ Error creating option:`, error);
+    // Return a fallback element
+    const fallback = document.createElement('div');
+    fallback.className = 'mobile-facet-option';
+    fallback.textContent = `Error: ${facet.value}`;
+    return fallback;
+  }
 }
 
 function renderGroups(
@@ -820,7 +1216,9 @@ function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: b
     pushMeta('Location', item.location);
     pushMeta('Email', item.email);
     pushMeta('Phone', item.phone);
-    pushMeta('Trade Focus', item.tradeFocus ?? undefined);
+    if (item.tradeFocus) {
+      pushMeta('Trade Focus', item.tradeFocus);
+    }
     return metas;
   }
 
@@ -831,7 +1229,9 @@ function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: b
     pushMeta('Primary Contact', item.primaryContact);
     pushMeta('Phone', item.phone);
     pushMeta('Email', item.email);
-    pushMeta('Website', item.website ?? undefined);
+    if (item.website) {
+      pushMeta('Website', item.website);
+    }
     return metas;
   }
 
@@ -866,7 +1266,7 @@ function hasLineItemMatches(item: SearchRecord, query?: string, isMonetarySearch
         lineItem.lineItemTitle,
         lineItem.lineItemDescription,
         lineItem.lineItemType,
-        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantity?.toString() || '',
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
         formatCurrency(lineItem.lineItemTotal),
@@ -915,7 +1315,7 @@ function getMatchingLineItemIndices(item: SearchRecord, query?: string, isMoneta
         lineItem.lineItemTitle,
         lineItem.lineItemDescription,
         lineItem.lineItemType,
-        lineItem.lineItemQuantity?.toString(),
+        lineItem.lineItemQuantity?.toString() || '',
         lineItem.lineItemQuantityUnitOfMeasure,
         formatCurrency(lineItem.lineItemUnitPrice),
         formatCurrency(lineItem.lineItemTotal),
