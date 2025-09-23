@@ -786,7 +786,7 @@ function createMobileFacetCategory(
     toggle.className = 'mobile-facet-category-toggle';
     toggle.innerHTML = '▼';
     
-    header.append(title, count, toggle);
+    header.append(count, title, toggle);
     category.append(header);
 
     // Create options
@@ -867,7 +867,7 @@ function createMobileFacetOption(
     count.className = 'mobile-facet-option-count';
     count.textContent = String(facet.count);
     
-    content.append(label, count);
+    content.append(count, label);
     option.append(checkbox, content);
 
     // Add click handler

@@ -5280,7 +5280,7 @@ function createMobileFacetCategory(key, values, selections, options) {
     const toggle = document.createElement("button");
     toggle.className = "mobile-facet-category-toggle";
     toggle.innerHTML = "\u25BC";
-    header2.append(title, count, toggle);
+    header2.append(count, title, toggle);
     category.append(header2);
     const optionsContainer = document.createElement("div");
     optionsContainer.className = "mobile-facet-options";
@@ -5339,7 +5339,7 @@ function createMobileFacetOption(key, facet, selections, options) {
     const count = document.createElement("span");
     count.className = "mobile-facet-option-count";
     count.textContent = String(facet.count);
-    content.append(label, count);
+    content.append(count, label);
     option.append(checkbox, content);
     option.addEventListener("click", () => {
       console.log(`      \u{1F5B1}\uFE0F Clicked option: "${facet.value}" for key "${key}"`);
