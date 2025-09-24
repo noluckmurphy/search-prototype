@@ -6432,37 +6432,37 @@ function getProTips(state, query) {
     icon: "\u{1F50D}",
     title: "Basic Text Search",
     description: "Search for any text in titles, summaries, projects, clients, and more.",
-    examples: ["kitchen renovation", "John Smith", "Henley Electric"]
+    examples: ["kitchen", "John Smith", "Project Alpha"]
   });
   tips.push({
     icon: "\u{1F4B0}",
     title: "Monetary Searches",
     description: "Find invoices, bills, and receipts by exact amounts or ranges.",
-    examples: ["$1234.56", "$500-$1000", "$123"] 
+    examples: ["$1234.56", "$500-$1000", "$123"]
   });
   tips.push({
     icon: "\u{1F4CB}",
     title: "Entity Types",
     description: "Search for specific types of records and documents.",
-    examples: ["invoices", "contracts", "people", "organizations"]
+    examples: ["invoices", "daily logs", "people"]
   });
   tips.push({
     icon: "\u{1F3D7}\uFE0F",
     title: "Project & Client Search",
     description: "Find records related to specific projects or clients.",
-    examples: ["Project Alpha", "Smith Construction"]
+    examples: ["Project Alpha", "Rodgers Murphy", "residential"]
   });
   tips.push({
     icon: "\u26A1",
     title: "Buildertrend Navigation",
     description: "Use trigger queries to quickly navigate to specific Buildertrend sections.",
-    examples: ["cost codes", "templates"]
+    examples: ["cost codes", "subs", "templates"]
   });
   tips.push({
     icon: "\u{1F4DD}",
     title: "Line Item Details",
-    description: "Search within detailed line items of invoices, bills, reciepts, and purchase orders.",
-    examples: ["lumber", "drywall", "labor", "material"]
+    description: "Search within detailed line items of invoices and purchase orders.",
+    examples: ["lumber", "labor", "material", "equipment"]
   });
   tips.push({
     icon: "\u{1F4CA}",
@@ -6473,7 +6473,7 @@ function getProTips(state, query) {
   tips.push({
     icon: "\u{1F3AF}",
     title: "Advanced Techniques",
-    description: "Combine multiple search terms with 'AND' 'OR' 'NOT' (capitaliezd) and use facets to refine results.",
+    description: 'Combine multiple search terms with "AND" "OR" "NOT" (capitalized) and use facets to refine results.',
     examples: ["kitchen AND renovation", "invoice NOT pending", "Smith OR Johnson"]
   });
   if (state === "no-results" && query) {
@@ -6494,7 +6494,7 @@ function getProTips(state, query) {
       icon: "\u{1F680}",
       title: "Get Started",
       description: "Begin your search with any of these popular search types.",
-      examples: ["$500", "kitchen", "Smith Construction"]
+      examples: ["$500", "kitchen", "Smith Construction", "recent invoices"]
     });
   }
   return tips;

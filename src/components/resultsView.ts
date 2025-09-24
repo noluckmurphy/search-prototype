@@ -2173,7 +2173,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '🔍',
     title: 'Basic Text Search',
     description: 'Search for any text in titles, summaries, projects, clients, and more.',
-    examples: ['kitchen renovation', 'John Smith', 'Project Alpha']
+    examples: ['kitchen', 'John Smith', 'Project Alpha']
   });
 
   // Add monetary search tips
@@ -2181,15 +2181,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '💰',
     title: 'Monetary Searches',
     description: 'Find invoices, bills, and receipts by exact amounts or ranges.',
-    examples: ['$1234.56', '$500-$1000', '1234.56', '1000 to 2000']
-  });
-
-  // Add range search tips
-  tips.push({
-    icon: '📊',
-    title: 'Range Queries',
-    description: 'Search for amounts within specific ranges using various formats.',
-    examples: ['$500-$1000', '1000 to 2000', '$50k-$100k']
+    examples: ['$1234.56', '$500-$1000', '$123']
   });
 
   // Add entity type tips
@@ -2197,7 +2189,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '📋',
     title: 'Entity Types',
     description: 'Search for specific types of records and documents.',
-    examples: ['invoices', 'contracts', 'people', 'organizations']
+    examples: ['invoices', 'daily logs', 'people']
   });
 
   // Add project/client tips
@@ -2205,15 +2197,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '🏗️',
     title: 'Project & Client Search',
     description: 'Find records related to specific projects or clients.',
-    examples: ['Project Alpha', 'Smith Construction', 'residential']
-  });
-
-  // Add date-based tips
-  tips.push({
-    icon: '📅',
-    title: 'Date-Based Search',
-    description: 'Search for records by date ranges, recent activity, or time periods.',
-    examples: ['recent', 'last month', '2024', 'Q1 2024']
+    examples: ['Project Alpha', 'Rodgers Murphy', 'residential']
   });
 
   // Add Buildertrend-specific tips
@@ -2221,7 +2205,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '⚡',
     title: 'Buildertrend Navigation',
     description: 'Use trigger queries to quickly navigate to specific Buildertrend sections.',
-    examples: ['schedule', 'estimates', 'change orders', 'punch list']
+    examples: ['cost codes', 'subs', 'templates']
   });
 
   // Add line item tips
@@ -2229,7 +2213,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
     icon: '📝',
     title: 'Line Item Details',
     description: 'Search within detailed line items of invoices and purchase orders.',
-    examples: ['lumber', 'labor', 'materials', 'equipment']
+    examples: ['lumber', 'labor', 'material', 'equipment']
   });
 
   // Add status-based tips
@@ -2244,8 +2228,8 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
   tips.push({
     icon: '🎯',
     title: 'Advanced Techniques',
-    description: 'Combine multiple search terms and use facets to refine results.',
-    examples: ['kitchen AND renovation', 'invoice AND pending', 'Smith OR Johnson']
+    description: 'Combine multiple search terms with "AND" "OR" "NOT" (capitalized) and use facets to refine results.',
+    examples: ['kitchen AND renovation', 'invoice NOT pending', 'Smith OR Johnson']
   });
 
   // Customize tips based on state
@@ -2258,8 +2242,8 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
       examples: [
         'Use fewer keywords',
         'Check spelling',
-        'Try broader terms',
-        'Use different formats'
+        'Try broader or related terms',
+        'Change formatting'
       ]
     });
   }
@@ -2270,7 +2254,7 @@ function getProTips(state: 'idle' | 'empty' | 'no-results', query?: string): Arr
       icon: '🚀',
       title: 'Get Started',
       description: 'Begin your search with any of these popular search types.',
-      examples: ['$5000', 'kitchen', 'Smith Construction', 'recent invoices']
+      examples: ['$500', 'kitchen', 'Smith Construction', 'recent invoices']
     });
   }
 
