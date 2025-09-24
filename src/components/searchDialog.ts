@@ -82,12 +82,36 @@ export function createSearchDialog(
   dialog.className = 'search-dialog';
   dialog.setAttribute('role', 'dialog');
   dialog.setAttribute('aria-modal', 'false');
+  dialog.setAttribute('aria-label', 'Search results');
+  dialog.setAttribute('aria-describedby', 'search-dialog-instructions');
   dialog.hidden = true;
 
-  host.append(dialog);
+  // Add instructions element for screen readers
+  const instructions = document.createElement('div');
+  instructions.id = 'search-dialog-instructions';
+  instructions.className = 'sr-only';
+  instructions.textContent = 'Use arrow keys to navigate results, Enter to select, Escape to close, Ctrl+Enter to see all results';
+  
+  // Add live region for announcements
+  const liveRegion = document.createElement('div');
+  liveRegion.setAttribute('aria-live', 'polite');
+  liveRegion.setAttribute('aria-atomic', 'true');
+  liveRegion.className = 'sr-only';
+  liveRegion.id = 'search-dialog-announcements';
+  
+  host.append(instructions, liveRegion, dialog);
 
   // Track previous state to avoid unnecessary re-renders
   let previousState: SearchDialogState | null = null;
+
+  // Function to announce changes to screen readers
+  function announce(message: string) {
+    liveRegion.textContent = message;
+    // Clear after a short delay to allow for new announcements
+    setTimeout(() => {
+      liveRegion.textContent = '';
+    }, 1000);
+  }
 
   // Add keyboard event handler with better event capture
   function handleKeyDown(event: KeyboardEvent) {
@@ -130,6 +154,11 @@ export function createSearchDialog(
                 console.log('🔽 Recent ArrowDown: currentIndex =', currentIndex, 'newIndex =', newIndex);
                 setState({ ...previousState, selectedIndex: newIndex });
                 scrollRecentIntoView(newIndex);
+                if (newIndex >= 0) {
+                  const item = recentItems[newIndex] as HTMLElement;
+                  const query = item.getAttribute('data-query') || 'recent search';
+                  announce(`Selected recent search: ${query}`);
+                }
               } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -137,11 +166,20 @@ export function createSearchDialog(
                 console.log('🔼 Recent ArrowUp: currentIndex =', currentIndex, 'newIndex =', newIndex);
                 setState({ ...previousState, selectedIndex: newIndex });
                 scrollRecentIntoView(newIndex);
+                if (newIndex >= 0) {
+                  const item = recentItems[newIndex] as HTMLElement;
+                  const query = item.getAttribute('data-query') || 'recent search';
+                  announce(`Selected recent search: ${query}`);
+                } else {
+                  announce('No recent search selected');
+                }
               } else if (event.key === 'Enter' && currentIndex >= 0) {
                 event.preventDefault();
                 event.stopPropagation();
                 const selectedItem = recentItems[currentIndex] as HTMLElement;
                 if (selectedItem) {
+                  const query = selectedItem.getAttribute('data-query') || 'recent search';
+                  announce(`Searching for: ${query}`);
                   selectedItem.click();
                 }
               }
@@ -164,6 +202,10 @@ export function createSearchDialog(
               console.log('🔽 ArrowDown: currentIndex =', currentIndex, 'newIndex =', newIndex, 'totalItems =', allItems.length);
               setState({ ...previousState, selectedIndex: newIndex });
               scrollSelectedIntoView(newIndex);
+              if (newIndex >= 0) {
+                const selectedItem = allItems[newIndex];
+                announce(`Selected result ${newIndex + 1} of ${allItems.length}: ${selectedItem.title}`);
+              }
             } else if (event.key === 'ArrowUp') {
               event.preventDefault();
               event.stopPropagation();
@@ -173,12 +215,19 @@ export function createSearchDialog(
               console.log('🔼 ArrowUp: currentIndex =', currentIndex, 'newIndex =', newIndex);
               setState({ ...previousState, selectedIndex: newIndex });
               scrollSelectedIntoView(newIndex);
+              if (newIndex >= 0) {
+                const selectedItem = allItems[newIndex];
+                announce(`Selected result ${newIndex + 1} of ${allItems.length}: ${selectedItem.title}`);
+              } else {
+                announce('No result selected');
+              }
             } else if (event.key === 'Enter' && (previousState.selectedIndex ?? -1) >= 0) {
         event.preventDefault();
         event.stopPropagation();
         const selectedItem = allItems[previousState.selectedIndex || -1];
         console.log('⏎ Enter: selectedIndex =', previousState.selectedIndex, 'selectedItem =', selectedItem);
         if (selectedItem && isBuildertrendRecord(selectedItem)) {
+          announce(`Navigating to: ${selectedItem.title}`);
           // TODO: Implement navigation logic
           console.log('Navigate to:', selectedItem.url);
         }
@@ -350,6 +399,9 @@ export function createSearchDialog(
         return;
       }
       dialog.style.display = 'flex';
+      if (state.visible) {
+        announce('Search dialog opened');
+      }
     }
 
     // Only update monetary search class if it changed
@@ -382,6 +434,19 @@ export function createSearchDialog(
       // Use requestAnimationFrame to defer heavy DOM operations
       requestAnimationFrame(() => {
         renderDialogContents(dialog, state, options);
+        
+        // Announce status changes
+        if (state.status === 'loading') {
+          announce('Searching...');
+        } else if (state.status === 'error') {
+          announce('Search failed. Please try again.');
+        } else if (state.status === 'ready' && state.response) {
+          const resultCount = state.response.totalResults;
+          const resultText = resultCount === 1 ? 'result' : 'results';
+          announce(`Found ${resultCount} ${resultText} for "${state.query}"`);
+        } else if (state.status === 'ready' && !state.response) {
+          announce(`No results found for "${state.query}"`);
+        }
       });
     } else {
       console.log('🔄 No content change, skipping re-render');
@@ -642,6 +707,9 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
     // Add selected state
     if (selectedIndex === index) {
       item.classList.add('search-dialog__recent-item--selected');
+      item.setAttribute('aria-selected', 'true');
+    } else {
+      item.setAttribute('aria-selected', 'false');
     }
     
     // Create the main content container
@@ -677,7 +745,8 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'search-dialog__recent-delete';
-    deleteButton.setAttribute('aria-label', `Delete search: ${search.query}`);
+    deleteButton.setAttribute('aria-label', `Delete recent search: ${search.query}`);
+    deleteButton.setAttribute('title', `Remove "${search.query}" from recent searches`);
     deleteButton.innerHTML = '×';
     
     // Add delete button click handler
@@ -703,6 +772,7 @@ function renderRecentSearchesState(selectedIndex?: number): HTMLElement {
     // Add keyboard support
     item.setAttribute('tabindex', '0');
     item.setAttribute('role', 'button');
+    item.setAttribute('aria-label', `Search for "${search.query}" - ${search.resultCountText || 'No results'} - ${search.timeAgo}`);
     item.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -802,7 +872,7 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
     li.setAttribute('data-url', item.url);
     li.setAttribute('tabindex', '0');
     li.setAttribute('role', 'button');
-    li.setAttribute('aria-label', `Navigate to ${item.title}`);
+    li.setAttribute('aria-label', `Navigate to ${item.title} - ${item.path || item.description || 'Buildertrend record'}`);
     
     // Add click handler for navigation
     li.addEventListener('click', () => {
@@ -819,11 +889,15 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
     });
   } else {
     li.className = 'search-dialog__item';
+    li.setAttribute('role', 'listitem');
   }
 
   // Add selected state
   if (isSelected) {
     li.classList.add('search-dialog__item--selected');
+    li.setAttribute('aria-selected', 'true');
+  } else {
+    li.setAttribute('aria-selected', 'false');
   }
 
   // Add hover effects

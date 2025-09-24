@@ -2460,9 +2460,26 @@ function createSearchDialog(host, options) {
   dialog.className = "search-dialog";
   dialog.setAttribute("role", "dialog");
   dialog.setAttribute("aria-modal", "false");
+  dialog.setAttribute("aria-label", "Search results");
+  dialog.setAttribute("aria-describedby", "search-dialog-instructions");
   dialog.hidden = true;
-  host.append(dialog);
+  const instructions = document.createElement("div");
+  instructions.id = "search-dialog-instructions";
+  instructions.className = "sr-only";
+  instructions.textContent = "Use arrow keys to navigate results, Enter to select, Escape to close, Ctrl+Enter to see all results";
+  const liveRegion = document.createElement("div");
+  liveRegion.setAttribute("aria-live", "polite");
+  liveRegion.setAttribute("aria-atomic", "true");
+  liveRegion.className = "sr-only";
+  liveRegion.id = "search-dialog-announcements";
+  host.append(instructions, liveRegion, dialog);
   let previousState2 = null;
+  function announce(message) {
+    liveRegion.textContent = message;
+    setTimeout(() => {
+      liveRegion.textContent = "";
+    }, 1e3);
+  }
   function handleKeyDown(event) {
     console.log("\u{1F50D} SearchDialog handleKeyDown:", {
       key: event.key,
@@ -2495,6 +2512,11 @@ function createSearchDialog(host, options) {
           console.log("\u{1F53D} Recent ArrowDown: currentIndex =", currentIndex, "newIndex =", newIndex);
           setState({ ...previousState2, selectedIndex: newIndex });
           scrollRecentIntoView(newIndex);
+          if (newIndex >= 0) {
+            const item = recentItems[newIndex];
+            const query = item.getAttribute("data-query") || "recent search";
+            announce(`Selected recent search: ${query}`);
+          }
         } else if (event.key === "ArrowUp") {
           event.preventDefault();
           event.stopPropagation();
@@ -2502,11 +2524,20 @@ function createSearchDialog(host, options) {
           console.log("\u{1F53C} Recent ArrowUp: currentIndex =", currentIndex, "newIndex =", newIndex);
           setState({ ...previousState2, selectedIndex: newIndex });
           scrollRecentIntoView(newIndex);
+          if (newIndex >= 0) {
+            const item = recentItems[newIndex];
+            const query = item.getAttribute("data-query") || "recent search";
+            announce(`Selected recent search: ${query}`);
+          } else {
+            announce("No recent search selected");
+          }
         } else if (event.key === "Enter" && currentIndex >= 0) {
           event.preventDefault();
           event.stopPropagation();
           const selectedItem = recentItems[currentIndex];
           if (selectedItem) {
+            const query = selectedItem.getAttribute("data-query") || "recent search";
+            announce(`Searching for: ${query}`);
             selectedItem.click();
           }
         }
@@ -2524,6 +2555,10 @@ function createSearchDialog(host, options) {
         console.log("\u{1F53D} ArrowDown: currentIndex =", currentIndex, "newIndex =", newIndex, "totalItems =", allItems.length);
         setState({ ...previousState2, selectedIndex: newIndex });
         scrollSelectedIntoView(newIndex);
+        if (newIndex >= 0) {
+          const selectedItem = allItems[newIndex];
+          announce(`Selected result ${newIndex + 1} of ${allItems.length}: ${selectedItem.title}`);
+        }
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
         event.stopPropagation();
@@ -2532,12 +2567,19 @@ function createSearchDialog(host, options) {
         console.log("\u{1F53C} ArrowUp: currentIndex =", currentIndex, "newIndex =", newIndex);
         setState({ ...previousState2, selectedIndex: newIndex });
         scrollSelectedIntoView(newIndex);
+        if (newIndex >= 0) {
+          const selectedItem = allItems[newIndex];
+          announce(`Selected result ${newIndex + 1} of ${allItems.length}: ${selectedItem.title}`);
+        } else {
+          announce("No result selected");
+        }
       } else if (event.key === "Enter" && (previousState2.selectedIndex ?? -1) >= 0) {
         event.preventDefault();
         event.stopPropagation();
         const selectedItem = allItems[previousState2.selectedIndex || -1];
         console.log("\u23CE Enter: selectedIndex =", previousState2.selectedIndex, "selectedItem =", selectedItem);
         if (selectedItem && isBuildertrendRecord(selectedItem)) {
+          announce(`Navigating to: ${selectedItem.title}`);
           console.log("Navigate to:", selectedItem.url);
         }
       }
@@ -2659,6 +2701,9 @@ function createSearchDialog(host, options) {
         return;
       }
       dialog.style.display = "flex";
+      if (state.visible) {
+        announce("Search dialog opened");
+      }
     }
     if (!previousState2 || previousState2.isMonetarySearch !== state.isMonetarySearch) {
       dialog.classList.toggle("monetary-search", state.isMonetarySearch || false);
@@ -2676,6 +2721,17 @@ function createSearchDialog(host, options) {
       console.log("\u{1F504} Re-rendering dialog contents");
       requestAnimationFrame(() => {
         renderDialogContents(dialog, state, options);
+        if (state.status === "loading") {
+          announce("Searching...");
+        } else if (state.status === "error") {
+          announce("Search failed. Please try again.");
+        } else if (state.status === "ready" && state.response) {
+          const resultCount = state.response.totalResults;
+          const resultText = resultCount === 1 ? "result" : "results";
+          announce(`Found ${resultCount} ${resultText} for "${state.query}"`);
+        } else if (state.status === "ready" && !state.response) {
+          announce(`No results found for "${state.query}"`);
+        }
       });
     } else {
       console.log("\u{1F504} No content change, skipping re-render");
@@ -2868,6 +2924,9 @@ function renderRecentSearchesState(selectedIndex) {
     item.setAttribute("data-query", search.query);
     if (selectedIndex === index) {
       item.classList.add("search-dialog__recent-item--selected");
+      item.setAttribute("aria-selected", "true");
+    } else {
+      item.setAttribute("aria-selected", "false");
     }
     const contentContainer = document.createElement("div");
     contentContainer.className = "search-dialog__recent-content";
@@ -2890,7 +2949,8 @@ function renderRecentSearchesState(selectedIndex) {
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "search-dialog__recent-delete";
-    deleteButton.setAttribute("aria-label", `Delete search: ${search.query}`);
+    deleteButton.setAttribute("aria-label", `Delete recent search: ${search.query}`);
+    deleteButton.setAttribute("title", `Remove "${search.query}" from recent searches`);
     deleteButton.innerHTML = "\xD7";
     deleteButton.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2907,6 +2967,7 @@ function renderRecentSearchesState(selectedIndex) {
     });
     item.setAttribute("tabindex", "0");
     item.setAttribute("role", "button");
+    item.setAttribute("aria-label", `Search for "${search.query}" - ${search.resultCountText || "No results"} - ${search.timeAgo}`);
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -2986,7 +3047,7 @@ function renderGroupItem(item, query, isMonetarySearch, isSelected, itemIndex) {
     li.setAttribute("data-url", item.url);
     li.setAttribute("tabindex", "0");
     li.setAttribute("role", "button");
-    li.setAttribute("aria-label", `Navigate to ${item.title}`);
+    li.setAttribute("aria-label", `Navigate to ${item.title} - ${item.path || item.description || "Buildertrend record"}`);
     li.addEventListener("click", () => {
       console.log("Navigate to:", item.url);
     });
@@ -2998,9 +3059,13 @@ function renderGroupItem(item, query, isMonetarySearch, isSelected, itemIndex) {
     });
   } else {
     li.className = "search-dialog__item";
+    li.setAttribute("role", "listitem");
   }
   if (isSelected) {
     li.classList.add("search-dialog__item--selected");
+    li.setAttribute("aria-selected", "true");
+  } else {
+    li.setAttribute("aria-selected", "false");
   }
   li.addEventListener("mouseenter", () => {
     li.classList.add("search-dialog__item--hover");
@@ -4892,9 +4957,14 @@ function createResultsView(options) {
       <p class="results-view__summary" id="results-summary"></p>
     </div>
     <div class="results-view__actions">
-      <button type="button" class="clear-facets" hidden>Clear filters</button>
+      <button type="button" class="clear-facets" hidden aria-label="Clear all active filters">Clear filters</button>
     </div>
   `;
+  const liveRegion = document.createElement("div");
+  liveRegion.setAttribute("aria-live", "polite");
+  liveRegion.setAttribute("aria-atomic", "true");
+  liveRegion.className = "sr-only";
+  liveRegion.id = "results-announcements";
   const mainContent = document.createElement("div");
   mainContent.className = "results-view__main";
   const facetsContainer = document.createElement("aside");
@@ -4902,10 +4972,17 @@ function createResultsView(options) {
   const resultsContainer = document.createElement("div");
   resultsContainer.className = "results-view__groups";
   mainContent.append(facetsContainer, resultsContainer);
-  container.append(header2, mainContent);
+  container.append(header2, liveRegion, mainContent);
   const summaryEl = header2.querySelector("#results-summary");
   const clearButton = header2.querySelector(".clear-facets");
+  const announce = (message) => {
+    liveRegion.textContent = message;
+    setTimeout(() => {
+      liveRegion.textContent = "";
+    }, 1e3);
+  };
   clearButton.addEventListener("click", () => {
+    announce("All filters cleared");
     options.onClearFacets?.();
   });
   let previousContext = null;
@@ -4935,12 +5012,12 @@ function createResultsView(options) {
     const summaryChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.sortBy !== sortBy;
     if (summaryChanged) {
       console.log("\u{1F4DD} Rendering summary");
-      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
+      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange, announce);
     }
     const facetsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.selections !== selections;
     if (facetsChanged) {
       console.log("\u{1F50D} Rendering facets");
-      renderFacets(facetsContainer, status, response, selections, options);
+      renderFacets(facetsContainer, status, response, selections, options, announce);
     }
     const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch || previousContext.sortBy !== sortBy;
     if (resultsChanged) {
@@ -4961,7 +5038,7 @@ function createResultsView(options) {
     render
   };
 }
-function renderSummary(target, status, response, query, errorMessage, sortBy, onSortByChange) {
+function renderSummary(target, status, response, query, errorMessage, sortBy, onSortByChange, announce) {
   target.innerHTML = "";
   switch (status) {
     case "idle":
@@ -5008,6 +5085,15 @@ function renderSummary(target, status, response, query, errorMessage, sortBy, on
           const newSort = sortSelect.value;
           console.log("\u{1F504} Sort By changed from", sortBy, "to", newSort);
           if (newSort !== sortBy) {
+            const sortLabels = {
+              relevance: "Relevance",
+              mostRecent: "Most recent",
+              dueFirst: "Due first",
+              dueLast: "Due last"
+            };
+            if (announce) {
+              announce(`Results sorted by ${sortLabels[newSort]}`);
+            }
             console.log("\u{1F3AF} Calling onSortByChange for sortBy:", newSort);
             onSortByChange(newSort);
           }
@@ -5022,7 +5108,7 @@ function renderSummary(target, status, response, query, errorMessage, sortBy, on
       target.textContent = "";
   }
 }
-function renderFacets(container, status, response, selections, options) {
+function renderFacets(container, status, response, selections, options, announce) {
   console.log("\u{1F50D} renderFacets called with:", {
     status,
     hasResponse: !!response,
@@ -5068,9 +5154,9 @@ function renderFacets(container, status, response, selections, options) {
   const isMobile = window.innerWidth <= 768;
   console.log(`\u{1F4F1} Rendering ${isMobile ? "mobile" : "desktop"} facets`);
   if (isMobile) {
-    renderMobileFacets(container, facetsEntries, selections, options);
+    renderMobileFacets(container, facetsEntries, selections, options, announce);
   } else {
-    renderDesktopFacets(container, facetsEntries, selections, options);
+    renderDesktopFacets(container, facetsEntries, selections, options, announce);
   }
   console.log("\u{1F50D} Container after rendering:", {
     innerHTML: container.innerHTML.substring(0, 500) + "...",
@@ -5082,7 +5168,7 @@ function renderFacets(container, status, response, selections, options) {
     computedStyle: window.getComputedStyle(container)
   });
 }
-function renderMobileFacets(container, facetsEntries, selections, options) {
+function renderMobileFacets(container, facetsEntries, selections, options, announce) {
   console.log("\u{1F4F1} renderMobileFacets called with:", {
     facetsEntriesCount: facetsEntries.length,
     selections,
@@ -5100,17 +5186,21 @@ function renderMobileFacets(container, facetsEntries, selections, options) {
     lastChild: container.lastChild
   });
 }
-function renderDesktopFacets(container, facetsEntries, selections, options) {
+function renderDesktopFacets(container, facetsEntries, selections, options, announce) {
   const settings = settingsStore.getState();
   const maxFacetValues = settings.maxFacetValues;
   facetsEntries.forEach(([key, values]) => {
     const block = document.createElement("section");
     block.className = "results-view__facet-block";
+    block.setAttribute("aria-labelledby", `facet-heading-${key}`);
     const heading = document.createElement("h3");
+    heading.id = `facet-heading-${key}`;
     heading.textContent = FACET_LABELS[key] ?? key;
     block.append(heading);
     const list = document.createElement("ul");
     list.className = "results-view__facet-list";
+    list.setAttribute("role", "group");
+    list.setAttribute("aria-labelledby", `facet-heading-${key}`);
     const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
     const initialCount = shouldLimit ? maxFacetValues : values.length;
     const hiddenCount = values.length - initialCount;
@@ -5122,11 +5212,13 @@ function renderDesktopFacets(container, facetsEntries, selections, options) {
       }
       const label = document.createElement("label");
       label.className = "facet-checkbox";
+      label.htmlFor = `facet-${key}-${facet.value.replace(/\s+/g, "-").toLowerCase()}`;
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.className = "facet-checkbox__input";
       checkbox.dataset.key = key;
       checkbox.dataset.value = facet.value;
+      checkbox.id = `facet-${key}-${facet.value.replace(/\s+/g, "-").toLowerCase()}`;
       const isSelected = selections[key]?.has(facet.value) ?? false;
       checkbox.checked = isSelected;
       const text = document.createElement("span");
@@ -5143,6 +5235,12 @@ function renderDesktopFacets(container, facetsEntries, selections, options) {
       listItem.append(label);
       list.append(listItem);
       checkbox.addEventListener("change", () => {
+        const isSelected2 = checkbox.checked;
+        const facetLabel = FACET_LABELS[key] ?? key;
+        const valueLabel = key === "entityType" ? formatEntityType(facet.value) : facet.value;
+        if (announce) {
+          announce(`${isSelected2 ? "Selected" : "Deselected"} filter: ${facetLabel} - ${valueLabel}`);
+        }
         options.onFacetToggle(key, facet.value);
       });
     });
@@ -5491,7 +5589,7 @@ async function renderResultCard(item, query, isMonetarySearch) {
     card.setAttribute("data-url", item.url);
     card.setAttribute("tabindex", "0");
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Navigate to ${item.title}`);
+    card.setAttribute("aria-label", `Navigate to ${item.title} - ${item.path || item.description || "Buildertrend record"}`);
     card.addEventListener("click", () => {
       console.log("Navigate to:", item.url);
     });
@@ -5503,6 +5601,7 @@ async function renderResultCard(item, query, isMonetarySearch) {
     });
   } else {
     card.className = "result-card";
+    card.setAttribute("role", "article");
   }
   const header2 = document.createElement("div");
   header2.className = "result-card__header";

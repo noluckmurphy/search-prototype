@@ -183,9 +183,16 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       <p class="results-view__summary" id="results-summary"></p>
     </div>
     <div class="results-view__actions">
-      <button type="button" class="clear-facets" hidden>Clear filters</button>
+      <button type="button" class="clear-facets" hidden aria-label="Clear all active filters">Clear filters</button>
     </div>
   `;
+
+  // Add live region for announcements
+  const liveRegion = document.createElement('div');
+  liveRegion.setAttribute('aria-live', 'polite');
+  liveRegion.setAttribute('aria-atomic', 'true');
+  liveRegion.className = 'sr-only';
+  liveRegion.id = 'results-announcements';
 
   const mainContent = document.createElement('div');
   mainContent.className = 'results-view__main';
@@ -197,12 +204,22 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
   resultsContainer.className = 'results-view__groups';
 
   mainContent.append(facetsContainer, resultsContainer);
-  container.append(header, mainContent);
+  container.append(header, liveRegion, mainContent);
 
   const summaryEl = header.querySelector<HTMLParagraphElement>('#results-summary')!;
   const clearButton = header.querySelector<HTMLButtonElement>('.clear-facets')!;
 
+  // Function to announce changes to screen readers
+  const announce = (message: string) => {
+    liveRegion.textContent = message;
+    // Clear after a short delay to allow for new announcements
+    setTimeout(() => {
+      liveRegion.textContent = '';
+    }, 1000);
+  };
+
   clearButton.addEventListener('click', () => {
+    announce('All filters cleared');
     options.onClearFacets?.();
   });
 
@@ -251,7 +268,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
 
     if (summaryChanged) {
       console.log('📝 Rendering summary');
-      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange);
+      renderSummary(summaryEl, status, response, query, errorMessage, sortBy, options.onSortByChange, announce);
     }
 
     // Only update facets if relevant state changed
@@ -262,7 +279,7 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
 
     if (facetsChanged) {
       console.log('🔍 Rendering facets');
-      renderFacets(facetsContainer, status, response, selections, options);
+      renderFacets(facetsContainer, status, response, selections, options, announce);
     }
 
 
@@ -307,6 +324,7 @@ function renderSummary(
   errorMessage?: string,
   sortBy?: SortOption,
   onSortByChange?: (sortBy: SortOption) => void,
+  announce?: (message: string) => void,
 ) {
   target.innerHTML = '';
 
@@ -371,6 +389,15 @@ function renderSummary(
           const newSort = sortSelect.value as SortOption;
           console.log('🔄 Sort By changed from', sortBy, 'to', newSort);
           if (newSort !== sortBy) {
+            const sortLabels: Record<SortOption, string> = {
+              relevance: 'Relevance',
+              mostRecent: 'Most recent',
+              dueFirst: 'Due first',
+              dueLast: 'Due last'
+            };
+            if (announce) {
+              announce(`Results sorted by ${sortLabels[newSort]}`);
+            }
             console.log('🎯 Calling onSortByChange for sortBy:', newSort);
             onSortByChange(newSort);
           }
@@ -394,6 +421,7 @@ function renderFacets(
   response: SearchResponse | null,
   selections: FacetSelectionState,
   options: ResultsViewOptions,
+  announce?: (message: string) => void,
 ) {
   console.log('🔍 renderFacets called with:', {
     status,
@@ -454,9 +482,9 @@ function renderFacets(
   console.log(`📱 Rendering ${isMobile ? 'mobile' : 'desktop'} facets`);
 
   if (isMobile) {
-    renderMobileFacets(container, facetsEntries, selections, options);
+    renderMobileFacets(container, facetsEntries, selections, options, announce);
   } else {
-    renderDesktopFacets(container, facetsEntries, selections, options);
+    renderDesktopFacets(container, facetsEntries, selections, options, announce);
   }
 
   // Debug: Log what's actually in the container
@@ -476,6 +504,7 @@ function renderMobileFacets(
   facetsEntries: [FacetKey, FacetValue[]][],
   selections: FacetSelectionState,
   options: ResultsViewOptions,
+  announce?: (message: string) => void,
 ) {
   console.log('📱 renderMobileFacets called with:', {
     facetsEntriesCount: facetsEntries.length,
@@ -506,6 +535,7 @@ function renderDesktopFacets(
   facetsEntries: [FacetKey, FacetValue[]][],
   selections: FacetSelectionState,
   options: ResultsViewOptions,
+  announce?: (message: string) => void,
 ) {
   const settings = settingsStore.getState();
   const maxFacetValues = settings.maxFacetValues;
@@ -513,13 +543,17 @@ function renderDesktopFacets(
   facetsEntries.forEach(([key, values]) => {
     const block = document.createElement('section');
     block.className = 'results-view__facet-block';
+    block.setAttribute('aria-labelledby', `facet-heading-${key}`);
 
     const heading = document.createElement('h3');
+    heading.id = `facet-heading-${key}`;
     heading.textContent = FACET_LABELS[key] ?? key;
     block.append(heading);
 
     const list = document.createElement('ul');
     list.className = 'results-view__facet-list';
+    list.setAttribute('role', 'group');
+    list.setAttribute('aria-labelledby', `facet-heading-${key}`);
 
     // Determine how many values to show initially
     const shouldLimit = maxFacetValues > 0 && values.length > maxFacetValues;
@@ -538,12 +572,14 @@ function renderDesktopFacets(
 
       const label = document.createElement('label');
       label.className = 'facet-checkbox';
+      label.htmlFor = `facet-${key}-${facet.value.replace(/\s+/g, '-').toLowerCase()}`;
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.className = 'facet-checkbox__input';
       checkbox.dataset.key = key;
       checkbox.dataset.value = facet.value;
+      checkbox.id = `facet-${key}-${facet.value.replace(/\s+/g, '-').toLowerCase()}`;
 
       const isSelected = selections[key]?.has(facet.value) ?? false;
       checkbox.checked = isSelected;
@@ -566,6 +602,12 @@ function renderDesktopFacets(
       list.append(listItem);
 
       checkbox.addEventListener('change', () => {
+        const isSelected = checkbox.checked;
+        const facetLabel = FACET_LABELS[key] ?? key;
+        const valueLabel = key === 'entityType' ? formatEntityType(facet.value as any) : facet.value;
+        if (announce) {
+          announce(`${isSelected ? 'Selected' : 'Deselected'} filter: ${facetLabel} - ${valueLabel}`);
+        }
         options.onFacetToggle(key, facet.value);
       });
     });
@@ -1056,7 +1098,7 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
     card.setAttribute('data-url', item.url);
     card.setAttribute('tabindex', '0');
     card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `Navigate to ${item.title}`);
+    card.setAttribute('aria-label', `Navigate to ${item.title} - ${item.path || item.description || 'Buildertrend record'}`);
     
     // Add click handler for navigation
     card.addEventListener('click', () => {
@@ -1073,6 +1115,7 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
     });
   } else {
     card.className = 'result-card';
+    card.setAttribute('role', 'article');
   }
 
   const header = document.createElement('div');
