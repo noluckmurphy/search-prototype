@@ -1413,7 +1413,6 @@ button.secondary {
 @media (max-width: 768px) {
   .line-items-table {
     font-size: var(--font-size-xs);
-    table-layout: fixed;
     width: 100%;
   }
   .line-items-table th,
@@ -1451,7 +1450,7 @@ button.secondary {
     gap: var(--space-xs);
   }
   .results-view__header {
-    padding: var(--space-xs);
+    padding: var(--space-xs) 0;
   }
   .mobile-filters-header {
     padding: var(--space-2xs);

@@ -1547,7 +1547,6 @@ button.secondary {
 @media (max-width: 768px) {
   .line-items-table {
     font-size: var(--font-size-xs);
-    table-layout: fixed;
     width: 100%;
   }
   
@@ -1560,7 +1559,7 @@ button.secondary {
   
   .line-item__unit-price,
   .line-item__total {
-    text-align: left;
+    text-align: right;
   }
   
   /* Make table columns more compact on very small screens */
