@@ -10,6 +10,7 @@ import { runSearch } from './data/searchService';
 import { recentSearches } from './data/recentSearches';
 import { ScreenRoute } from './types';
 import { getEffectiveQueryLength, MIN_EFFECTIVE_QUERY_LENGTH } from './utils/query';
+import { clearHighlightCache } from './utils/highlight';
 
 // Declare Lucide global
 declare global {
@@ -35,20 +36,40 @@ main.className = 'app-main';
 let activeSearchToken = 0;
 let searchDebounceTimer: number | null = null;
 
-// Debounce search operations to reduce UI blocking
+// Optimized debouncing for better performance
 function debouncedSearch(value: string, options: { openDialog?: boolean; updateSubmitted?: boolean }) {
   if (searchDebounceTimer) {
     clearTimeout(searchDebounceTimer);
   }
   
-  // For very short queries, search immediately to provide instant feedback
   const effectiveLength = getEffectiveQueryLength(value.trim());
-  const delay = effectiveLength < 2 ? 0 : 150; // 150ms debounce for longer queries
   
-  searchDebounceTimer = window.setTimeout(() => {
+  // More aggressive debouncing strategy to reduce input delay:
+  // - 0ms for 1-2 chars (instant feedback for common short queries)
+  // - 25ms for 3-4 chars (faster response for medium queries)
+  // - 75ms for 5-6 chars (balanced response for longer queries)
+  // - 100ms for 7+ chars (reduced server load for complex queries)
+  let delay: number;
+  if (effectiveLength <= 2) {
+    delay = 0;
+  } else if (effectiveLength <= 4) {
+    delay = 25;
+  } else if (effectiveLength <= 6) {
+    delay = 75;
+  } else {
+    delay = 100;
+  }
+  
+  // Use MessageChannel for better performance than setTimeout
+  if (delay === 0) {
+    // Immediate execution for short queries
     void performSearch(value, options);
-    searchDebounceTimer = null;
-  }, delay);
+  } else {
+    searchDebounceTimer = window.setTimeout(() => {
+      void performSearch(value, options);
+      searchDebounceTimer = null;
+    }, delay);
+  }
 }
 
 const header = createHeader({
@@ -61,6 +82,8 @@ const header = createHeader({
     appState.setStatus('idle');
     appState.setDialogOpen(false);
     appState.clearFacets();
+    // Clear highlighting cache when navigating home
+    clearHighlightCache();
     navigate('home');
   },
   onSearchChange: (value) => {
@@ -89,25 +112,26 @@ const header = createHeader({
     if (appState.getState().route !== 'home') {
       return;
     }
-    // Use requestAnimationFrame to defer heavy operations and keep UI responsive
-    requestAnimationFrame(() => {
+    // Use MessageChannel for better performance than requestAnimationFrame
+    const channel = new MessageChannel();
+    channel.port2.onmessage = () => {
       appState.setDialogOpen(true);
       const query = appState.getState().searchQuery;
       if (query.trim()) {
         // Use debounced search for focus events too
         debouncedSearch(query, { openDialog: true, updateSubmitted: false });
       }
-    });
+    };
+    channel.port1.postMessage(null);
   },
   onSearchBlur: () => {
     // Defer closing to outside-click + escape handlers.
   },
   onSearchKeyDown: (event) => {
-    console.log('🔍 Header onSearchKeyDown:', {
-      key: event.key,
-      target: event.target,
-      dialogOpen: appState.getState().dialogOpen
-    });
+    // Fast path: only handle specific keys
+    if (!['Enter', 'Escape', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+      return;
+    }
 
     // Handle CMD/CTRL+Enter for "See all results" when search input is focused
     if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && appState.getState().dialogOpen) {
@@ -119,36 +143,34 @@ const header = createHeader({
     }
 
     if (event.key === 'Escape') {
-      console.log('🎯 Header: handling Escape');
       appState.setDialogOpen(false);
       header.searchInput.blur();
     }
 
-          // Handle arrow keys when dialog is open and we have results
-          if (appState.getState().dialogOpen && appState.getState().recentResponse &&
-              (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-            console.log('🎯 Header: handling arrow key, blurring input');
-            event.preventDefault();
-            event.stopPropagation();
+    // Handle arrow keys when dialog is open and we have results
+    if (appState.getState().dialogOpen && appState.getState().recentResponse &&
+        (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      event.preventDefault();
+      event.stopPropagation();
 
-            // Blur the input to remove focus
-            header.searchInput.blur();
+      // Blur the input to remove focus
+      header.searchInput.blur();
 
-            // Focus the dialog so it can receive subsequent keyboard events
-            const dialog = document.querySelector('.search-dialog') as HTMLElement;
-            if (dialog) {
-              dialog.focus();
-            }
+      // Focus the dialog so it can receive subsequent keyboard events
+      const dialog = document.querySelector('.search-dialog') as HTMLElement;
+      if (dialog) {
+        dialog.focus();
+      }
 
-            // Let the search dialog handle the navigation
-            // We'll dispatch a custom event to trigger navigation
-            const customEvent = new KeyboardEvent('keydown', {
-              key: event.key,
-              bubbles: true,
-              cancelable: true
-            });
-            document.dispatchEvent(customEvent);
-          }
+      // Let the search dialog handle the navigation
+      // We'll dispatch a custom event to trigger navigation
+      const customEvent = new KeyboardEvent('keydown', {
+        key: event.key,
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(customEvent);
+    }
   },
 });
 
@@ -293,27 +315,42 @@ async function performSearch(
       }))
     });
     
-    const response = await runSearch({
-      query: trimmed,
-      selections: facetSelections,
-    });
+    // Use MessageChannel to defer the heavy search operation
+    const channel = new MessageChannel();
+    channel.port2.onmessage = async () => {
+      try {
+        const response = await runSearch({
+          query: trimmed,
+          selections: facetSelections,
+        });
 
-    if (requestId !== activeSearchToken) {
-      return;
-    }
+        if (requestId !== activeSearchToken) {
+          return;
+        }
 
-    appState.setResponse(response);
-    appState.setStatus('ready');
+        appState.setResponse(response);
+        appState.setStatus('ready');
 
-    if (updateSubmitted) {
-      appState.setLastSubmittedQuery(trimmed);
-      // Record the search in recent searches when it's a submitted query
-      recentSearches.addSearch(trimmed, response.totalResults);
-    }
+        if (updateSubmitted) {
+          appState.setLastSubmittedQuery(trimmed);
+          // Record the search in recent searches when it's a submitted query
+          recentSearches.addSearch(trimmed, response.totalResults);
+        }
 
-    if (openDialog && appState.getState().route === 'home') {
-      appState.setDialogOpen(true);
-    }
+        if (openDialog && appState.getState().route === 'home') {
+          appState.setDialogOpen(true);
+        }
+      } catch (error) {
+        if (requestId !== activeSearchToken) {
+          return;
+        }
+
+        console.error('Search failed', error);
+        appState.setStatus('error', 'Unable to complete search. Try again.');
+      }
+    };
+    channel.port1.postMessage(null);
+    
   } catch (error) {
     if (requestId !== activeSearchToken) {
       return;
@@ -340,11 +377,10 @@ function focusSearchBar() {
 }
 
 function handleGlobalKeydown(event: KeyboardEvent) {
-  console.log('🌍 Global keydown:', {
-    key: event.key,
-    target: event.target,
-    dialogOpen: appState.getState().dialogOpen
-  });
+  // Fast path: only handle specific keys
+  if (!['/', 'k', 'Escape', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+    return;
+  }
 
   const target = event.target as HTMLElement | null;
   const isEditable =
@@ -354,28 +390,24 @@ function handleGlobalKeydown(event: KeyboardEvent) {
       target.isContentEditable);
 
   if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditable) {
-    console.log('🎯 Global: handling / key');
     event.preventDefault();
     focusSearchBar();
     return;
   }
 
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-    console.log('🎯 Global: handling Cmd/Ctrl+K');
     event.preventDefault();
     focusSearchBar();
     return;
   }
 
   if (event.key === 'Escape' && appState.getState().dialogOpen) {
-    console.log('🎯 Global: handling Escape');
     appState.setDialogOpen(false);
     header.searchInput.blur();
   }
 
   // Handle arrow keys when dialog is open
   if (appState.getState().dialogOpen && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-    console.log('🎯 Global: handling arrow key in dialog');
     // Don't prevent default here, let the search dialog handle it
   }
 }
@@ -446,15 +478,20 @@ appState.subscribe((state) => {
     previousState.errorMessage !== state.errorMessage;
 
   if (resultsStateChanged) {
-    resultsView.render({
-      response: state.recentResponse,
-      selections: state.facetSelections,
-      sortBy: state.sortBy,
-      status: state.searchStatus,
-      query: state.lastSubmittedQuery || state.searchQuery,
-      errorMessage: state.errorMessage,
-      isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
-    });
+    // Use MessageChannel to defer results rendering and reduce input delay
+    const channel = new MessageChannel();
+    channel.port2.onmessage = () => {
+      resultsView.render({
+        response: state.recentResponse,
+        selections: state.facetSelections,
+        sortBy: state.sortBy,
+        status: state.searchStatus,
+        query: state.lastSubmittedQuery || state.searchQuery,
+        errorMessage: state.errorMessage,
+        isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
+      });
+    };
+    channel.port1.postMessage(null);
   }
 
   previousState = state;

@@ -282,7 +282,6 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
       renderFacets(facetsContainer, status, response, selections, options, announce);
     }
 
-
     // Only update results if relevant state changed
     const resultsChanged = !previousContext ||
       previousContext.status !== status ||
@@ -294,10 +293,13 @@ export function createResultsView(options: ResultsViewOptions): ResultsViewHandl
 
     if (resultsChanged) {
       console.log('📊 Rendering results');
-      // Use requestAnimationFrame to defer heavy DOM operations
-      requestAnimationFrame(() => {
+      // Use MessageChannel for better performance than requestAnimationFrame
+      // This allows the browser to prioritize the work more efficiently
+      const channel = new MessageChannel();
+      channel.port2.onmessage = () => {
         renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
-      });
+      };
+      channel.port1.postMessage(null);
     }
 
     // Only update clear button if selections changed
@@ -955,13 +957,19 @@ function renderGroups(
   isMonetarySearch?: boolean,
   sortBy?: SortOption,
 ) {
+  // Use DocumentFragment for better performance
+  const fragment = document.createDocumentFragment();
+  
+  // Clear container efficiently using innerHTML for better performance
   container.innerHTML = '';
 
   if (status === 'idle') {
     if (isQueryTooShort(query)) {
       // Show pro tips for short queries - hide facets entirely
       const message = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`;
-      container.innerHTML = renderProTipsState(message, 'idle');
+      const proTipsElement = document.createElement('div');
+      proTipsElement.innerHTML = renderProTipsState(message, 'idle');
+      fragment.appendChild(proTipsElement);
       // Hide the facets container for idle state
       const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
       if (facetsContainer) {
@@ -969,36 +977,48 @@ function renderGroups(
       }
     } else {
       // Show empty state with pro tips - no heading message
-      container.innerHTML = renderProTipsState('', 'empty');
+      const proTipsElement = document.createElement('div');
+      proTipsElement.innerHTML = renderProTipsState('', 'empty');
+      fragment.appendChild(proTipsElement);
       // Hide the facets container for empty state
       const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
       if (facetsContainer) {
         facetsContainer.style.display = 'none';
       }
     }
+    container.appendChild(fragment);
     return;
   }
 
   if (status === 'loading') {
-    container.innerHTML = '<p class="results-view__empty">Fetching results…</p>';
+    const loadingElement = document.createElement('p');
+    loadingElement.className = 'results-view__empty';
+    loadingElement.textContent = 'Fetching results…';
+    fragment.appendChild(loadingElement);
+    container.appendChild(fragment);
     return;
   }
 
   if (status === 'error') {
-    container.innerHTML = `<p class="results-view__empty">${
-      errorMessage ?? 'Something went wrong while searching.'
-    }</p>`;
+    const errorElement = document.createElement('p');
+    errorElement.className = 'results-view__empty';
+    errorElement.textContent = errorMessage ?? 'Something went wrong while searching.';
+    fragment.appendChild(errorElement);
+    container.appendChild(fragment);
     return;
   }
 
   if (!response || !response.fullGroups.length) {
     // Show no results state with pro tips instead of simple message - hide facets entirely
-    container.innerHTML = renderProTipsState('No results found', 'no-results', query);
+    const proTipsElement = document.createElement('div');
+    proTipsElement.innerHTML = renderProTipsState('No results found', 'no-results', query);
+    fragment.appendChild(proTipsElement);
     // Hide the facets container for no results state
     const facetsContainer = container.closest('.results-view__main')?.querySelector('.results-view__facets') as HTMLElement;
     if (facetsContainer) {
       facetsContainer.style.display = 'none';
     }
+    container.appendChild(fragment);
     return;
   }
 
@@ -1034,25 +1054,62 @@ function renderGroups(
 
   // If results are grouped, render groups; otherwise render as flat list
   if (sortedResponse.isGrouped) {
-    sortedResponse.fullGroups.forEach((group) => {
-      container.append(renderGroup(group, group.groupTitle, query, isMonetarySearch));
-    });
+    // Use batch rendering to avoid blocking the main thread
+    const batchSize = 5; // Process 5 groups at a time
+    let currentIndex = 0;
+    
+    const renderBatch = () => {
+      const endIndex = Math.min(currentIndex + batchSize, sortedResponse.fullGroups.length);
+      
+      for (let i = currentIndex; i < endIndex; i++) {
+        const group = sortedResponse.fullGroups[i];
+        fragment.appendChild(renderGroup(group, group.groupTitle, query, isMonetarySearch));
+      }
+      
+      currentIndex = endIndex;
+      
+      if (currentIndex < sortedResponse.fullGroups.length) {
+        // Use setTimeout to yield control back to the browser
+        setTimeout(renderBatch, 0);
+      } else {
+        // All groups rendered, append to container
+        container.appendChild(fragment);
+      }
+    };
+    
+    renderBatch();
   } else {
     // Render as flat list without group headers
     const flatList = document.createElement('div');
     flatList.className = 'results-list';
     
-    // Use Promise.all to handle async rendering properly
-    Promise.all(sortedResponse.records.map(async (record) => {
-      const card = await renderResultCard(record, query, isMonetarySearch);
-      return { record, card };
-    })).then(results => {
-      results.forEach(({ card }) => {
+    // Use batch rendering for flat list as well
+    const batchSize = 10; // Process 10 records at a time
+    let currentIndex = 0;
+    
+    const renderBatch = () => {
+      const endIndex = Math.min(currentIndex + batchSize, sortedResponse.records.length);
+      const batch = sortedResponse.records.slice(currentIndex, endIndex);
+      
+      // Process batch synchronously for better performance
+      batch.forEach(record => {
+        const card = renderResultCardSync(record, query, isMonetarySearch);
         flatList.append(card);
       });
-    });
+      
+      currentIndex = endIndex;
+      
+      if (currentIndex < sortedResponse.records.length) {
+        // Use setTimeout to yield control back to the browser
+        setTimeout(renderBatch, 0);
+      } else {
+        // All records rendered, append to container
+        fragment.appendChild(flatList);
+        container.appendChild(fragment);
+      }
+    };
     
-    container.append(flatList);
+    renderBatch();
   }
 }
 
@@ -1072,21 +1129,18 @@ function renderGroup(group: SearchGroup, groupTitle?: string, query?: string, is
   const list = document.createElement('div');
   list.className = 'results-group__list';
 
-  // Use Promise.all to handle async rendering properly
-  Promise.all(group.items.map(async (item) => {
-    const card = await renderResultCard(item, query, isMonetarySearch);
-    return { item, card };
-  })).then(results => {
-    results.forEach(({ card }) => {
-      list.append(card);
-    });
+  // Use synchronous rendering for better performance
+  group.items.forEach(item => {
+    const card = renderResultCardSync(item, query, isMonetarySearch);
+    list.append(card);
   });
 
   section.append(heading, list);
   return section;
 }
 
-async function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): Promise<HTMLElement> {
+// Synchronous version for better performance
+function renderResultCardSync(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLElement {
   const card = document.createElement('article');
   
   // Add document ID metadata for debugging
@@ -1133,8 +1187,8 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
     icon.setAttribute('data-lucide', item.icon);
     header.append(icon, title);
     
-    // Update icons after DOM is ready
-    requestAnimationFrame(() => {
+    // Defer icon updates to avoid blocking
+    setTimeout(() => {
       if (window.lucide) {
         try {
           window.lucide.createIcons();
@@ -1142,7 +1196,7 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
           console.warn('Error updating icons:', error);
         }
       }
-    });
+    }, 0);
   } else {
     header.append(title);
   }
@@ -1189,36 +1243,43 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
     }
   }
 
-  // Add related items and smart actions
-  const settings = settingsStore.getState();
-  const includeInferred = settings.showInferredRelationships ?? true;
-  
-  try {
-    // Get related entities
-    const relatedEntities = await getRelatedEntities(item.id, {
-      includeInferred,
-      limit: 3
-    });
+  // Defer async operations to avoid blocking the main thread
+  setTimeout(async () => {
+    const settings = settingsStore.getState();
+    const includeInferred = settings.showInferredRelationships ?? true;
+    
+    try {
+      // Get related entities
+      const relatedEntities = await getRelatedEntities(item.id, {
+        includeInferred,
+        limit: 3
+      });
 
-    // Get smart actions
-    const smartActions = await getEntitySmartActions(item, includeInferred);
+      // Get smart actions
+      const smartActions = await getEntitySmartActions(item, includeInferred);
 
-    // Render related items if any exist
-    if (relatedEntities.length > 0) {
-      const relatedSection = renderRelatedItems(relatedEntities, item.id);
-      card.append(relatedSection);
+      // Render related items if any exist
+      if (relatedEntities.length > 0) {
+        const relatedSection = renderRelatedItems(relatedEntities, item.id);
+        card.append(relatedSection);
+      }
+
+      // Render smart actions if any exist
+      if (smartActions.length > 0) {
+        const actionsSection = renderSmartActions(smartActions, item);
+        card.append(actionsSection);
+      }
+    } catch (error) {
+      console.warn('Error loading relationships for', item.id, ':', error);
     }
-
-    // Render smart actions if any exist
-    if (smartActions.length > 0) {
-      const actionsSection = renderSmartActions(smartActions, item);
-      card.append(actionsSection);
-    }
-  } catch (error) {
-    console.warn('Error loading relationships for', item.id, ':', error);
-  }
+  }, 0);
 
   return card;
+}
+
+// Keep the async version for backward compatibility
+async function renderResultCard(item: SearchRecord, query?: string, isMonetarySearch?: boolean): Promise<HTMLElement> {
+  return renderResultCardSync(item, query, isMonetarySearch);
 }
 
 function buildMetaItems(item: SearchRecord, query?: string, isMonetarySearch?: boolean): HTMLLIElement[] {

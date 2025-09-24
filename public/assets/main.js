@@ -1670,13 +1670,38 @@ function hasMonetaryValue(text) {
 }
 
 // src/utils/highlight.ts
+var highlightCache = /* @__PURE__ */ new Map();
+var MAX_CACHE_SIZE = 1e3;
+function getCacheKey(text, query, type) {
+  return `${type}:${text.length}:${query}:${text.substring(0, 50)}`;
+}
+function setCache(key, value) {
+  if (highlightCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = highlightCache.keys().next().value;
+    highlightCache.delete(firstKey);
+  }
+  highlightCache.set(key, value);
+}
+function getCache(key) {
+  return highlightCache.get(key);
+}
+function clearHighlightCache() {
+  highlightCache.clear();
+}
 function highlightText(text, query) {
   if (!query.trim()) {
     return escapeHtml(text);
   }
+  const cacheKey = getCacheKey(text, query, "text");
+  const cached = getCache(cacheKey);
+  if (cached !== void 0) {
+    return cached;
+  }
   const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
-    return escapeHtml(text);
+    const result = escapeHtml(text);
+    setCache(cacheKey, result);
+    return result;
   }
   let highlightedText = escapeHtml(text);
   const textLower = text.toLowerCase();
@@ -1688,6 +1713,7 @@ function highlightText(text, query) {
     const regex = new RegExp(`(${escapeRegex(token)})`, "gi");
     highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
   }
+  setCache(cacheKey, highlightedText);
   return highlightedText;
 }
 function extractSearchTermsFromQuery(query) {
@@ -2002,18 +2028,31 @@ function highlightMonetaryValuesWithPartialMatches(text, query) {
   if (!query.trim()) {
     return escapeHtml(text);
   }
+  const cacheKey = getCacheKey(text, query, "monetary");
+  const cached = getCache(cacheKey);
+  if (cached !== void 0) {
+    return cached;
+  }
   const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
-    return escapeHtml(text);
+    const result2 = escapeHtml(text);
+    setCache(cacheKey, result2);
+    return result2;
   }
   if (isBooleanQuery(query)) {
-    return highlightHybridBoolean(text, query, tokens);
+    const result2 = highlightHybridBoolean(text, query, tokens);
+    setCache(cacheKey, result2);
+    return result2;
   }
   const { amounts, textTokens, range } = extractMonetaryTokens(query);
   if (amounts.length === 0 && textTokens.length === 0 && !range) {
-    return escapeHtml(text);
+    const result2 = escapeHtml(text);
+    setCache(cacheKey, result2);
+    return result2;
   }
-  return highlightWithPositionTracking(text, query, amounts, textTokens, range);
+  const result = highlightWithPositionTracking(text, query, amounts, textTokens, range);
+  setCache(cacheKey, result);
+  return result;
 }
 function highlightWithPositionTracking(text, query, amounts, textTokens, range) {
   const isExplicitMonetary = query.trim().startsWith("$");
@@ -2481,15 +2520,7 @@ function createSearchDialog(host, options) {
     }, 1e3);
   }
   function handleKeyDown(event) {
-    console.log("\u{1F50D} SearchDialog handleKeyDown:", {
-      key: event.key,
-      target: event.target,
-      visible: previousState2?.visible,
-      hasResponse: !!previousState2?.response,
-      query: previousState2?.query
-    });
     if (!previousState2?.visible) {
-      console.log("\u274C Dialog not visible, ignoring");
       return;
     }
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
@@ -2499,17 +2530,13 @@ function createSearchDialog(host, options) {
       return;
     }
     if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter") {
-      console.log("\u{1F3AF} Handling navigation key:", event.key);
       if (!previousState2.response || previousState2.query === "") {
-        console.log("\u{1F3AF} In recent searches mode");
         const recentItems = dialog.querySelectorAll(".search-dialog__recent-item");
         const currentIndex = previousState2.selectedIndex ?? -1;
-        console.log("\u{1F3AF} Recent searches: currentIndex =", currentIndex, "totalItems =", recentItems.length);
         if (event.key === "ArrowDown") {
           event.preventDefault();
           event.stopPropagation();
           const newIndex = Math.min(currentIndex + 1, recentItems.length - 1);
-          console.log("\u{1F53D} Recent ArrowDown: currentIndex =", currentIndex, "newIndex =", newIndex);
           setState({ ...previousState2, selectedIndex: newIndex });
           scrollRecentIntoView(newIndex);
           if (newIndex >= 0) {
@@ -2521,7 +2548,6 @@ function createSearchDialog(host, options) {
           event.preventDefault();
           event.stopPropagation();
           const newIndex = Math.max(currentIndex - 1, -1);
-          console.log("\u{1F53C} Recent ArrowUp: currentIndex =", currentIndex, "newIndex =", newIndex);
           setState({ ...previousState2, selectedIndex: newIndex });
           scrollRecentIntoView(newIndex);
           if (newIndex >= 0) {
@@ -2552,7 +2578,6 @@ function createSearchDialog(host, options) {
         event.stopPropagation();
         const currentIndex = previousState2.selectedIndex ?? -1;
         const newIndex = Math.min(currentIndex + 1, allItems.length - 1);
-        console.log("\u{1F53D} ArrowDown: currentIndex =", currentIndex, "newIndex =", newIndex, "totalItems =", allItems.length);
         setState({ ...previousState2, selectedIndex: newIndex });
         scrollSelectedIntoView(newIndex);
         if (newIndex >= 0) {
@@ -2564,7 +2589,6 @@ function createSearchDialog(host, options) {
         event.stopPropagation();
         const currentIndex = previousState2.selectedIndex ?? -1;
         const newIndex = Math.max(currentIndex - 1, -1);
-        console.log("\u{1F53C} ArrowUp: currentIndex =", currentIndex, "newIndex =", newIndex);
         setState({ ...previousState2, selectedIndex: newIndex });
         scrollSelectedIntoView(newIndex);
         if (newIndex >= 0) {
@@ -2577,90 +2601,65 @@ function createSearchDialog(host, options) {
         event.preventDefault();
         event.stopPropagation();
         const selectedItem = allItems[previousState2.selectedIndex || -1];
-        console.log("\u23CE Enter: selectedIndex =", previousState2.selectedIndex, "selectedItem =", selectedItem);
         if (selectedItem && isBuildertrendRecord(selectedItem)) {
           announce(`Navigating to: ${selectedItem.title}`);
-          console.log("Navigate to:", selectedItem.url);
         }
       }
     }
   }
   function scrollSelectedIntoView(selectedIndex) {
     if (selectedIndex < 0) {
-      console.log("\u{1F4CD} Scroll: selectedIndex < 0, skipping scroll");
       return;
     }
     requestAnimationFrame(() => {
       const selectedElement = dialog.querySelector(`[data-item-index="${selectedIndex}"]`);
-      console.log('\u{1F4CD} Scroll: looking for element with data-item-index="' + selectedIndex + '"', "found:", selectedElement);
       if (selectedElement) {
-        console.log("\u{1F4CD} Scroll: scrolling element into view");
         selectedElement.scrollIntoView({
           behavior: "smooth",
           block: "nearest",
           inline: "nearest"
         });
-      } else {
-        console.log("\u{1F4CD} Scroll: element not found!");
       }
     });
   }
   function scrollRecentIntoView(selectedIndex) {
     if (selectedIndex < 0) {
-      console.log("\u{1F4CD} Recent Scroll: selectedIndex < 0, skipping scroll");
       return;
     }
     requestAnimationFrame(() => {
       const recentItems = dialog.querySelectorAll(".search-dialog__recent-item");
       const selectedElement = recentItems[selectedIndex];
-      console.log("\u{1F4CD} Recent Scroll: looking for recent item at index", selectedIndex, "found:", selectedElement, "total items:", recentItems.length);
       if (selectedElement) {
-        console.log("\u{1F4CD} Recent Scroll: scrolling recent item into view");
         selectedElement.scrollIntoView({
           behavior: "smooth",
           block: "nearest",
           inline: "nearest"
         });
-      } else {
-        console.log("\u{1F4CD} Recent Scroll: recent item not found!");
       }
     });
   }
   dialog.addEventListener("keydown", handleKeyDown, true);
   dialog.setAttribute("tabindex", "-1");
   document.addEventListener("keydown", (event) => {
-    console.log("\u{1F4C4} Document keydown:", {
-      key: event.key,
-      target: event.target,
-      visible: previousState2?.visible,
-      hasResponse: !!previousState2?.response
-    });
     if (!previousState2?.visible) {
-      console.log("\u274C Document handler: dialog not visible");
+      return;
+    }
+    if (!["ArrowDown", "ArrowUp", "Enter"].includes(event.key)) {
       return;
     }
     const target = event.target;
     const isInputField = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable || target.closest && target.closest(".search-dialog__recent-item"));
-    console.log("\u{1F3AF} Document handler: isInputField =", isInputField, "target =", target);
     if (isInputField && previousState2?.response) {
-      console.log("\u274C Document handler: in input field with response, ignoring");
       return;
     }
-    if (isInputField && !previousState2?.response) {
-      console.log("\u{1F3AF} Document handler: in input field but no response (recent searches), handling");
-    }
-    console.log("\u2705 Document handler: calling handleKeyDown");
     handleKeyDown(event);
   });
   const searchInput = document.querySelector('input[type="search"]');
   if (searchInput) {
     searchInput.addEventListener("keydown", (event) => {
-      console.log("\u{1F50D} Search input keydown:", {
-        key: event.key,
-        target: event.target,
-        visible: previousState2?.visible,
-        hasResponse: !!previousState2?.response
-      });
+      if (!["Enter", "ArrowDown", "ArrowUp"].includes(event.key)) {
+        return;
+      }
       if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         event.stopPropagation();
@@ -2668,7 +2667,6 @@ function createSearchDialog(host, options) {
         return;
       }
       if (previousState2?.visible && previousState2?.response && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-        console.log("\u{1F3AF} Search input: handling arrow key, blurring input");
         event.preventDefault();
         event.stopPropagation();
         searchInput.blur();
@@ -2678,48 +2676,41 @@ function createSearchDialog(host, options) {
   }
   window.addEventListener("refresh-dialog", () => {
     if (previousState2?.visible) {
-      console.log("\u{1F504} Refreshing dialog due to recent searches clear");
       requestAnimationFrame(() => {
         renderDialogContents(dialog, previousState2, options);
       });
     }
   });
   const setState = (state) => {
-    console.log("\u{1F504} setState called:", {
-      oldSelectedIndex: previousState2?.selectedIndex,
-      newSelectedIndex: state.selectedIndex,
-      visible: state.visible,
-      hasResponse: !!state.response
-    });
     const visibilityChanged = !previousState2 || previousState2.visible !== state.visible;
     if (visibilityChanged) {
-      dialog.hidden = !state.visible;
-      if (dialog.hidden) {
-        dialog.innerHTML = "";
-        dialog.style.display = "none";
-        previousState2 = state;
-        return;
-      }
-      dialog.style.display = "flex";
+      requestAnimationFrame(() => {
+        dialog.hidden = !state.visible;
+        if (dialog.hidden) {
+          dialog.innerHTML = "";
+          dialog.style.display = "none";
+        } else {
+          dialog.style.display = "flex";
+        }
+      });
       if (state.visible) {
         announce("Search dialog opened");
       }
+      if (!state.visible) {
+        previousState2 = state;
+        return;
+      }
     }
     if (!previousState2 || previousState2.isMonetarySearch !== state.isMonetarySearch) {
-      dialog.classList.toggle("monetary-search", state.isMonetarySearch || false);
+      requestAnimationFrame(() => {
+        dialog.classList.toggle("monetary-search", state.isMonetarySearch || false);
+      });
     }
     const selectedIndexChanged = !previousState2 || previousState2.selectedIndex !== state.selectedIndex;
     const contentChanged = visibilityChanged || !previousState2 || previousState2.status !== state.status || previousState2.query !== state.query || previousState2.response !== state.response || selectedIndexChanged;
-    console.log("\u{1F504} Content changed:", contentChanged, {
-      visibilityChanged,
-      statusChanged: !previousState2 || previousState2.status !== state.status,
-      queryChanged: !previousState2 || previousState2.query !== state.query,
-      responseChanged: !previousState2 || previousState2.response !== state.response,
-      selectedIndexChanged
-    });
     if (contentChanged) {
-      console.log("\u{1F504} Re-rendering dialog contents");
-      requestAnimationFrame(() => {
+      const channel = new MessageChannel();
+      channel.port2.onmessage = () => {
         renderDialogContents(dialog, state, options);
         if (state.status === "loading") {
           announce("Searching...");
@@ -2732,9 +2723,8 @@ function createSearchDialog(host, options) {
         } else if (state.status === "ready" && !state.response) {
           announce(`No results found for "${state.query}"`);
         }
-      });
-    } else {
-      console.log("\u{1F504} No content change, skipping re-render");
+      };
+      channel.port1.postMessage(null);
     }
     previousState2 = state;
   };
@@ -2757,19 +2747,24 @@ function renderDialogContents(container, state, options) {
     selectedIndex: state.selectedIndex,
     hasResponse: !!state.response
   });
-  container.innerHTML = "";
+  const fragment = document.createDocumentFragment();
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
   if (state.status === "loading") {
-    container.append(renderLoadingState(state.query));
+    fragment.appendChild(renderLoadingState(state.query));
+    container.appendChild(fragment);
     return;
   }
   if (state.status === "error") {
-    container.append(renderErrorState());
+    fragment.appendChild(renderErrorState());
+    container.appendChild(fragment);
     return;
   }
   const effectiveLength = getEffectiveQueryLength(state.query);
   if (effectiveLength === 0) {
     console.log("\u{1F3A8} Rendering recent searches with selectedIndex:", state.selectedIndex);
-    container.append(renderRecentSearchesState(state.selectedIndex));
+    fragment.appendChild(renderRecentSearchesState(state.selectedIndex));
     const footer2 = document.createElement("div");
     footer2.className = "search-dialog__footer";
     const shortcutsContainer2 = document.createElement("div");
@@ -2818,22 +2813,25 @@ function renderDialogContents(container, state, options) {
       window.dispatchEvent(event);
     });
     footer2.append(shortcutsContainer2, clearButton);
-    container.append(footer2);
+    fragment.appendChild(footer2);
+    container.appendChild(fragment);
     return;
   }
   if (isQueryTooShort(state.query)) {
-    container.append(renderShortQueryState());
+    fragment.appendChild(renderShortQueryState());
+    container.appendChild(fragment);
     return;
   }
   const response = state.response;
   if (!response || response.totalResults === 0) {
-    container.append(renderNoResults(state.query));
+    fragment.appendChild(renderNoResults(state.query));
+    container.appendChild(fragment);
     return;
   }
   const allItems = getAllSearchItems(response);
   let itemIndex = 0;
   response.limitedGroups.forEach((group) => {
-    container.append(renderGroup(group, state.query, state.isMonetarySearch, state.selectedIndex, itemIndex));
+    fragment.appendChild(renderGroup(group, state.query, state.isMonetarySearch, state.selectedIndex, itemIndex));
     itemIndex += group.items.length;
   });
   const footer = document.createElement("div");
@@ -2896,7 +2894,8 @@ function renderDialogContents(container, state, options) {
   seeAllButton.textContent = `See ${response.totalResults} result${response.totalResults === 1 ? "" : "s"} \u2192`;
   seeAllButton.addEventListener("click", () => options.onSeeAllResults());
   footer.append(shortcutsContainer, seeAllButton);
-  container.append(footer);
+  fragment.appendChild(footer);
+  container.appendChild(fragment);
 }
 function renderRecentSearchesState(selectedIndex) {
   const wrapper = document.createElement("div");
@@ -3061,18 +3060,10 @@ function renderGroupItem(item, query, isMonetarySearch, isSelected, itemIndex) {
     li.className = "search-dialog__item";
     li.setAttribute("role", "listitem");
   }
+  li.setAttribute("aria-selected", String(isSelected));
   if (isSelected) {
     li.classList.add("search-dialog__item--selected");
-    li.setAttribute("aria-selected", "true");
-  } else {
-    li.setAttribute("aria-selected", "false");
   }
-  li.addEventListener("mouseenter", () => {
-    li.classList.add("search-dialog__item--hover");
-  });
-  li.addEventListener("mouseleave", () => {
-    li.classList.remove("search-dialog__item--hover");
-  });
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
   const header2 = document.createElement("div");
   header2.className = "search-dialog__item-header";
@@ -3083,11 +3074,7 @@ function renderGroupItem(item, query, isMonetarySearch, isSelected, itemIndex) {
     header2.append(icon);
     requestAnimationFrame(() => {
       if (window.lucide) {
-        try {
-          window.lucide.createIcons();
-        } catch (error) {
-          console.warn("Error updating icons:", error);
-        }
+        window.lucide.createIcons();
       }
     });
   }
@@ -4343,29 +4330,39 @@ function bucketIssuedDate(dateString) {
   if (diffInDays <= 730) return "Last 2 years";
   return "Older than 2 years";
 }
-function computeFacets(records) {
+async function computeFacets(records) {
   const facetMaps = {};
   for (const key of FACET_KEYS) {
     if (key !== "groupBy") {
       facetMaps[key] = /* @__PURE__ */ new Map();
     }
   }
-  records.forEach((record) => {
-    for (const key of FACET_KEYS) {
-      if (key === "groupBy") {
-        continue;
+  const batchSize = 200;
+  let currentIndex = 0;
+  while (currentIndex < records.length) {
+    const endIndex = Math.min(currentIndex + batchSize, records.length);
+    const batch = records.slice(currentIndex, endIndex);
+    batch.forEach((record) => {
+      for (const key of FACET_KEYS) {
+        if (key === "groupBy") {
+          continue;
+        }
+        const value = getFacetValue(record, key);
+        if (!value) {
+          continue;
+        }
+        const map = facetMaps[key];
+        if (!map) {
+          continue;
+        }
+        map.set(value, (map.get(value) ?? 0) + 1);
       }
-      const value = getFacetValue(record, key);
-      if (!value) {
-        continue;
-      }
-      const map = facetMaps[key];
-      if (!map) {
-        continue;
-      }
-      map.set(value, (map.get(value) ?? 0) + 1);
+    });
+    currentIndex = endIndex;
+    if (currentIndex < records.length) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-  });
+  }
   const facets = {};
   for (const key of FACET_KEYS) {
     if (key === "groupBy") {
@@ -4592,30 +4589,53 @@ function calculateMonetaryRelevanceScore(record, query) {
   }
   return score;
 }
-function sortByRelevance(records, query, isMonetary = false) {
-  return [...records].sort((a, b) => {
-    let scoreA;
-    let scoreB;
+async function sortByRelevance(records, query, isMonetary = false) {
+  if (records.length <= 50) {
+    return [...records].sort((a, b) => {
+      let scoreA;
+      let scoreB;
+      const isBoolean = isBooleanQuery2(query);
+      const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+      if (isBoolean && parsedQuery) {
+        scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+        scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+      } else if (isMonetary) {
+        scoreA = calculateMonetaryRelevanceScore(a, query);
+        scoreB = calculateMonetaryRelevanceScore(b, query);
+      } else if (hasMonetaryPotential(query)) {
+        scoreA = calculateHybridRelevanceScore(a, query);
+        scoreB = calculateHybridRelevanceScore(b, query);
+      } else {
+        scoreA = calculateRelevanceScore(a, query);
+        scoreB = calculateRelevanceScore(b, query);
+      }
+      if (scoreA !== scoreB) {
+        return scoreB - scoreA;
+      }
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  }
+  const recordsWithScores = await Promise.all(records.map(async (record) => {
+    let score;
     const isBoolean = isBooleanQuery2(query);
     const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
     if (isBoolean && parsedQuery) {
-      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
-      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+      score = calculateBooleanRelevanceScore(record, parsedQuery);
     } else if (isMonetary) {
-      scoreA = calculateMonetaryRelevanceScore(a, query);
-      scoreB = calculateMonetaryRelevanceScore(b, query);
+      score = calculateMonetaryRelevanceScore(record, query);
     } else if (hasMonetaryPotential(query)) {
-      scoreA = calculateHybridRelevanceScore(a, query);
-      scoreB = calculateHybridRelevanceScore(b, query);
+      score = calculateHybridRelevanceScore(record, query);
     } else {
-      scoreA = calculateRelevanceScore(a, query);
-      scoreB = calculateRelevanceScore(b, query);
+      score = calculateRelevanceScore(record, query);
     }
-    if (scoreA !== scoreB) {
-      return scoreB - scoreA;
+    return { record, score, updatedAt: new Date(record.updatedAt).getTime() };
+  }));
+  return recordsWithScores.sort((a, b) => {
+    if (a.score !== b.score) {
+      return b.score - a.score;
     }
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
+    return b.updatedAt - a.updatedAt;
+  }).map((item) => item.record);
 }
 function sortByRecency(records) {
   return [...records].sort(
@@ -4641,37 +4661,48 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
   if (isBoolean && parsedQuery) {
     console.log("\u{1F50D} Parsed boolean query:", JSON.stringify(parsedQuery, null, 2));
   }
-  corpus.forEach((record, index) => {
-    let matchesQueryResult;
-    if (isBuildertrendRecord(record)) {
-      console.log(`Checking Buildertrend record ${index}:`, record.title, "triggerQueries:", record.triggerQueries);
-      matchesQueryResult = record.triggerQueries.some((triggerQuery) => {
-        const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
-        if (match) {
-          console.log("Found exact match:", triggerQuery, "===", searchQuery);
+  const batchSize = 100;
+  let currentIndex = 0;
+  while (currentIndex < corpus.length) {
+    const endIndex = Math.min(currentIndex + batchSize, corpus.length);
+    const batch = corpus.slice(currentIndex, endIndex);
+    batch.forEach((record, batchIndex) => {
+      const index = currentIndex + batchIndex;
+      let matchesQueryResult;
+      if (isBuildertrendRecord(record)) {
+        console.log(`Checking Buildertrend record ${index}:`, record.title, "triggerQueries:", record.triggerQueries);
+        matchesQueryResult = record.triggerQueries.some((triggerQuery) => {
+          const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
+          if (match) {
+            console.log("Found exact match:", triggerQuery, "===", searchQuery);
+          }
+          return match;
+        });
+        if (matchesQueryResult) {
+          console.log("Buildertrend match found:", record.title, "for query:", searchQuery);
+          buildertrendMatches.push(record);
         }
-        return match;
-      });
-      if (matchesQueryResult) {
-        console.log("Buildertrend match found:", record.title, "for query:", searchQuery);
-        buildertrendMatches.push(record);
+        return;
       }
-      return;
+      if (isBoolean && parsedQuery) {
+        matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
+      } else if (isMonetary) {
+        matchesQueryResult = matchesMonetaryQuery2(record, searchQuery);
+      } else if (hasMonetaryPotential(searchQuery)) {
+        matchesQueryResult = matchesHybridQuery(record, searchQuery);
+      } else {
+        matchesQueryResult = matchesQuery(record, searchQuery);
+      }
+      if (matchesQueryResult && matchesSelections(record, selections)) {
+        otherMatches.push(record);
+      }
+    });
+    currentIndex = endIndex;
+    if (currentIndex < corpus.length) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-    if (isBoolean && parsedQuery) {
-      matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
-    } else if (isMonetary) {
-      matchesQueryResult = matchesMonetaryQuery2(record, searchQuery);
-    } else if (hasMonetaryPotential(searchQuery)) {
-      matchesQueryResult = matchesHybridQuery(record, searchQuery);
-    } else {
-      matchesQueryResult = matchesQuery(record, searchQuery);
-    }
-    if (matchesQueryResult && matchesSelections(record, selections)) {
-      otherMatches.push(record);
-    }
-  });
-  const sortedOtherMatches = searchQuery.trim() ? sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
+  }
+  const sortedOtherMatches = searchQuery.trim() ? await sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
   console.log('Search results for "' + searchQuery + '":', {
     buildertrendMatches: buildertrendMatches.length,
     otherMatches: sortedOtherMatches.length,
@@ -4702,15 +4733,25 @@ function determineGroupEntityType(records) {
   }
   return mostCommonType;
 }
-function buildGroups(records, groupBy) {
+async function buildGroups(records, groupBy) {
   if (!groupBy || groupBy === "None") {
     const typeGroups = /* @__PURE__ */ new Map();
-    records.forEach((record) => {
-      if (!typeGroups.has(record.entityType)) {
-        typeGroups.set(record.entityType, []);
+    const batchSize2 = 200;
+    let currentIndex2 = 0;
+    while (currentIndex2 < records.length) {
+      const endIndex = Math.min(currentIndex2 + batchSize2, records.length);
+      const batch = records.slice(currentIndex2, endIndex);
+      batch.forEach((record) => {
+        if (!typeGroups.has(record.entityType)) {
+          typeGroups.set(record.entityType, []);
+        }
+        typeGroups.get(record.entityType).push(record);
+      });
+      currentIndex2 = endIndex;
+      if (currentIndex2 < records.length) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
-      typeGroups.get(record.entityType).push(record);
-    });
+    }
     return Array.from(typeGroups.entries()).sort((a, b) => {
       const orderA = GROUP_ORDER.indexOf(a[0]);
       const orderB = GROUP_ORDER.indexOf(b[0]);
@@ -4729,29 +4770,39 @@ function buildGroups(records, groupBy) {
     }));
   }
   const map = /* @__PURE__ */ new Map();
-  records.forEach((record) => {
-    let groupKey;
-    switch (groupBy) {
-      case "Type":
-        groupKey = record.entityType;
-        break;
-      case "Project":
-        groupKey = record.project || "No Project";
-        break;
-      case "Status":
-        groupKey = record.status || "No Status";
-        break;
-      case "Client":
-        groupKey = record.client || "No Client";
-        break;
-      default:
-        groupKey = record.entityType;
+  const batchSize = 200;
+  let currentIndex = 0;
+  while (currentIndex < records.length) {
+    const endIndex = Math.min(currentIndex + batchSize, records.length);
+    const batch = records.slice(currentIndex, endIndex);
+    batch.forEach((record) => {
+      let groupKey;
+      switch (groupBy) {
+        case "Type":
+          groupKey = record.entityType;
+          break;
+        case "Project":
+          groupKey = record.project || "No Project";
+          break;
+        case "Status":
+          groupKey = record.status || "No Status";
+          break;
+        case "Client":
+          groupKey = record.client || "No Client";
+          break;
+        default:
+          groupKey = record.entityType;
+      }
+      if (!map.has(groupKey)) {
+        map.set(groupKey, []);
+      }
+      map.get(groupKey).push(record);
+    });
+    currentIndex = endIndex;
+    if (currentIndex < records.length) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-    if (!map.has(groupKey)) {
-      map.set(groupKey, []);
-    }
-    map.get(groupKey).push(record);
-  });
+  }
   const sortedEntries = Array.from(map.entries()).sort((a, b) => {
     const aIsEmpty = a[0].startsWith("No ");
     const bIsEmpty = b[0].startsWith("No ");
@@ -4814,11 +4865,14 @@ async function runSearch(options, overrides) {
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   const records = await filterRecords(searchOptions);
   console.log("\u{1F4CA} filterRecords returned", records.length, "records");
-  const facets = computeFacets(records);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const facets = await computeFacets(records);
   console.log("\u{1F3AF} computeFacets returned facets for keys:", Object.keys(facets));
+  await new Promise((resolve) => setTimeout(resolve, 0));
   const groupBy = options.selections?.groupBy?.values().next().value;
   const isGrouped = groupBy && groupBy !== "None";
-  const fullGroups = buildGroups(records, groupBy);
+  const fullGroups = await buildGroups(records, groupBy);
+  await new Promise((resolve) => setTimeout(resolve, 0));
   const limitedGroups = applyGroupLimits(fullGroups, groupLimits);
   const randomDelay = generateNormalRandom(meanDelay, variance);
   const effectiveDelay = Math.max(0, options.query.trim().length < 3 ? Math.min(randomDelay, 50) : randomDelay);
@@ -5022,9 +5076,11 @@ function createResultsView(options) {
     const resultsChanged = !previousContext || previousContext.status !== status || previousContext.response !== response || previousContext.query !== query || previousContext.errorMessage !== errorMessage || previousContext.isMonetarySearch !== isMonetarySearch || previousContext.sortBy !== sortBy;
     if (resultsChanged) {
       console.log("\u{1F4CA} Rendering results");
-      requestAnimationFrame(() => {
+      const channel = new MessageChannel();
+      channel.port2.onmessage = () => {
         renderGroups(resultsContainer, status, response, query, errorMessage, isMonetarySearch, sortBy);
-      });
+      };
+      channel.port1.postMessage(null);
     }
     const selectionsChanged = !previousContext || previousContext.selections !== selections;
     if (selectionsChanged) {
@@ -5484,38 +5540,55 @@ function createMobileFacetOption(key, facet, selections, options) {
   }
 }
 function renderGroups(container, status, response, query, errorMessage, isMonetarySearch, sortBy) {
+  const fragment = document.createDocumentFragment();
   container.innerHTML = "";
   if (status === "idle") {
     if (isQueryTooShort(query)) {
       const message = `Enter at least ${MIN_EFFECTIVE_QUERY_LENGTH} characters to see matching records.`;
-      container.innerHTML = renderProTipsState(message, "idle");
+      const proTipsElement = document.createElement("div");
+      proTipsElement.innerHTML = renderProTipsState(message, "idle");
+      fragment.appendChild(proTipsElement);
       const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
       if (facetsContainer2) {
         facetsContainer2.style.display = "none";
       }
     } else {
-      container.innerHTML = renderProTipsState("", "empty");
+      const proTipsElement = document.createElement("div");
+      proTipsElement.innerHTML = renderProTipsState("", "empty");
+      fragment.appendChild(proTipsElement);
       const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
       if (facetsContainer2) {
         facetsContainer2.style.display = "none";
       }
     }
+    container.appendChild(fragment);
     return;
   }
   if (status === "loading") {
-    container.innerHTML = '<p class="results-view__empty">Fetching results\u2026</p>';
+    const loadingElement = document.createElement("p");
+    loadingElement.className = "results-view__empty";
+    loadingElement.textContent = "Fetching results\u2026";
+    fragment.appendChild(loadingElement);
+    container.appendChild(fragment);
     return;
   }
   if (status === "error") {
-    container.innerHTML = `<p class="results-view__empty">${errorMessage ?? "Something went wrong while searching."}</p>`;
+    const errorElement = document.createElement("p");
+    errorElement.className = "results-view__empty";
+    errorElement.textContent = errorMessage ?? "Something went wrong while searching.";
+    fragment.appendChild(errorElement);
+    container.appendChild(fragment);
     return;
   }
   if (!response || !response.fullGroups.length) {
-    container.innerHTML = renderProTipsState("No results found", "no-results", query);
+    const proTipsElement = document.createElement("div");
+    proTipsElement.innerHTML = renderProTipsState("No results found", "no-results", query);
+    fragment.appendChild(proTipsElement);
     const facetsContainer2 = container.closest(".results-view__main")?.querySelector(".results-view__facets");
     if (facetsContainer2) {
       facetsContainer2.style.display = "none";
     }
+    container.appendChild(fragment);
     return;
   }
   const facetsContainer = container.closest(".results-view__main")?.querySelector(".results-view__facets");
@@ -5541,21 +5614,43 @@ function renderGroups(container, status, response, query, errorMessage, isMoneta
     };
   }
   if (sortedResponse.isGrouped) {
-    sortedResponse.fullGroups.forEach((group) => {
-      container.append(renderGroup2(group, group.groupTitle, query, isMonetarySearch));
-    });
+    const batchSize = 5;
+    let currentIndex = 0;
+    const renderBatch = () => {
+      const endIndex = Math.min(currentIndex + batchSize, sortedResponse.fullGroups.length);
+      for (let i = currentIndex; i < endIndex; i++) {
+        const group = sortedResponse.fullGroups[i];
+        fragment.appendChild(renderGroup2(group, group.groupTitle, query, isMonetarySearch));
+      }
+      currentIndex = endIndex;
+      if (currentIndex < sortedResponse.fullGroups.length) {
+        setTimeout(renderBatch, 0);
+      } else {
+        container.appendChild(fragment);
+      }
+    };
+    renderBatch();
   } else {
     const flatList = document.createElement("div");
     flatList.className = "results-list";
-    Promise.all(sortedResponse.records.map(async (record) => {
-      const card = await renderResultCard(record, query, isMonetarySearch);
-      return { record, card };
-    })).then((results) => {
-      results.forEach(({ card }) => {
+    const batchSize = 10;
+    let currentIndex = 0;
+    const renderBatch = () => {
+      const endIndex = Math.min(currentIndex + batchSize, sortedResponse.records.length);
+      const batch = sortedResponse.records.slice(currentIndex, endIndex);
+      batch.forEach((record) => {
+        const card = renderResultCardSync(record, query, isMonetarySearch);
         flatList.append(card);
       });
-    });
-    container.append(flatList);
+      currentIndex = endIndex;
+      if (currentIndex < sortedResponse.records.length) {
+        setTimeout(renderBatch, 0);
+      } else {
+        fragment.appendChild(flatList);
+        container.appendChild(fragment);
+      }
+    };
+    renderBatch();
   }
 }
 function renderGroup2(group, groupTitle, query, isMonetarySearch) {
@@ -5570,18 +5665,14 @@ function renderGroup2(group, groupTitle, query, isMonetarySearch) {
   `;
   const list = document.createElement("div");
   list.className = "results-group__list";
-  Promise.all(group.items.map(async (item) => {
-    const card = await renderResultCard(item, query, isMonetarySearch);
-    return { item, card };
-  })).then((results) => {
-    results.forEach(({ card }) => {
-      list.append(card);
-    });
+  group.items.forEach((item) => {
+    const card = renderResultCardSync(item, query, isMonetarySearch);
+    list.append(card);
   });
   section.append(heading, list);
   return section;
 }
-async function renderResultCard(item, query, isMonetarySearch) {
+function renderResultCardSync(item, query, isMonetarySearch) {
   const card = document.createElement("article");
   card.setAttribute("data-document-id", item.id);
   if (isBuildertrendRecord(item)) {
@@ -5613,7 +5704,7 @@ async function renderResultCard(item, query, isMonetarySearch) {
     icon.className = "result-card__icon";
     icon.setAttribute("data-lucide", item.icon);
     header2.append(icon, title);
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       if (window.lucide) {
         try {
           window.lucide.createIcons();
@@ -5621,7 +5712,7 @@ async function renderResultCard(item, query, isMonetarySearch) {
           console.warn("Error updating icons:", error);
         }
       }
-    });
+    }, 0);
   } else {
     header2.append(title);
   }
@@ -5658,25 +5749,27 @@ async function renderResultCard(item, query, isMonetarySearch) {
       card.append(dailyLogContent);
     }
   }
-  const settings = settingsStore.getState();
-  const includeInferred = settings.showInferredRelationships ?? true;
-  try {
-    const relatedEntities = await getRelatedEntities(item.id, {
-      includeInferred,
-      limit: 3
-    });
-    const smartActions = await getEntitySmartActions(item, includeInferred);
-    if (relatedEntities.length > 0) {
-      const relatedSection = renderRelatedItems(relatedEntities, item.id);
-      card.append(relatedSection);
+  setTimeout(async () => {
+    const settings = settingsStore.getState();
+    const includeInferred = settings.showInferredRelationships ?? true;
+    try {
+      const relatedEntities = await getRelatedEntities(item.id, {
+        includeInferred,
+        limit: 3
+      });
+      const smartActions = await getEntitySmartActions(item, includeInferred);
+      if (relatedEntities.length > 0) {
+        const relatedSection = renderRelatedItems(relatedEntities, item.id);
+        card.append(relatedSection);
+      }
+      if (smartActions.length > 0) {
+        const actionsSection = renderSmartActions(smartActions, item);
+        card.append(actionsSection);
+      }
+    } catch (error) {
+      console.warn("Error loading relationships for", item.id, ":", error);
     }
-    if (smartActions.length > 0) {
-      const actionsSection = renderSmartActions(smartActions, item);
-      card.append(actionsSection);
-    }
-  } catch (error) {
-    console.warn("Error loading relationships for", item.id, ":", error);
-  }
+  }, 0);
   return card;
 }
 function buildMetaItems(item, query, isMonetarySearch) {
@@ -6339,19 +6432,13 @@ function getProTips(state, query) {
     icon: "\u{1F50D}",
     title: "Basic Text Search",
     description: "Search for any text in titles, summaries, projects, clients, and more.",
-    examples: ["kitchen renovation", "John Smith", "Project Alpha"]
+    examples: ["kitchen renovation", "John Smith", "Henley Electric"]
   });
   tips.push({
     icon: "\u{1F4B0}",
     title: "Monetary Searches",
     description: "Find invoices, bills, and receipts by exact amounts or ranges.",
-    examples: ["$1234.56", "$500-$1000", "1234.56", "1000 to 2000"]
-  });
-  tips.push({
-    icon: "\u{1F4CA}",
-    title: "Range Queries",
-    description: "Search for amounts within specific ranges using various formats.",
-    examples: ["$500-$1000", "1000 to 2000", "$50k-$100k"]
+    examples: ["$1234.56", "$500-$1000", "$123"] 
   });
   tips.push({
     icon: "\u{1F4CB}",
@@ -6363,25 +6450,19 @@ function getProTips(state, query) {
     icon: "\u{1F3D7}\uFE0F",
     title: "Project & Client Search",
     description: "Find records related to specific projects or clients.",
-    examples: ["Project Alpha", "Smith Construction", "residential"]
-  });
-  tips.push({
-    icon: "\u{1F4C5}",
-    title: "Date-Based Search",
-    description: "Search for records by date ranges, recent activity, or time periods.",
-    examples: ["recent", "last month", "2024", "Q1 2024"]
+    examples: ["Project Alpha", "Smith Construction"]
   });
   tips.push({
     icon: "\u26A1",
     title: "Buildertrend Navigation",
     description: "Use trigger queries to quickly navigate to specific Buildertrend sections.",
-    examples: ["schedule", "estimates", "change orders", "punch list"]
+    examples: ["cost codes", "templates"]
   });
   tips.push({
     icon: "\u{1F4DD}",
     title: "Line Item Details",
-    description: "Search within detailed line items of invoices and purchase orders.",
-    examples: ["lumber", "labor", "materials", "equipment"]
+    description: "Search within detailed line items of invoices, bills, reciepts, and purchase orders.",
+    examples: ["lumber", "drywall", "labor", "material"]
   });
   tips.push({
     icon: "\u{1F4CA}",
@@ -6392,8 +6473,8 @@ function getProTips(state, query) {
   tips.push({
     icon: "\u{1F3AF}",
     title: "Advanced Techniques",
-    description: "Combine multiple search terms and use facets to refine results.",
-    examples: ["kitchen AND renovation", "invoice AND pending", "Smith OR Johnson"]
+    description: "Combine multiple search terms with 'AND' 'OR' 'NOT' (capitaliezd) and use facets to refine results.",
+    examples: ["kitchen AND renovation", "invoice NOT pending", "Smith OR Johnson"]
   });
   if (state === "no-results" && query) {
     tips.unshift({
@@ -6403,8 +6484,8 @@ function getProTips(state, query) {
       examples: [
         "Use fewer keywords",
         "Check spelling",
-        "Try broader terms",
-        "Use different formats"
+        "Try broader or related terms",
+        "Change formatting"
       ]
     });
   }
@@ -6413,7 +6494,7 @@ function getProTips(state, query) {
       icon: "\u{1F680}",
       title: "Get Started",
       description: "Begin your search with any of these popular search types.",
-      examples: ["$5000", "kitchen", "Smith Construction", "recent invoices"]
+      examples: ["$500", "kitchen", "Smith Construction"]
     });
   }
   return tips;
@@ -7053,11 +7134,24 @@ function debouncedSearch(value, options) {
     clearTimeout(searchDebounceTimer);
   }
   const effectiveLength = getEffectiveQueryLength(value.trim());
-  const delay = effectiveLength < 2 ? 0 : 150;
-  searchDebounceTimer = window.setTimeout(() => {
+  let delay;
+  if (effectiveLength <= 2) {
+    delay = 0;
+  } else if (effectiveLength <= 4) {
+    delay = 25;
+  } else if (effectiveLength <= 6) {
+    delay = 75;
+  } else {
+    delay = 100;
+  }
+  if (delay === 0) {
     void performSearch(value, options);
-    searchDebounceTimer = null;
-  }, delay);
+  } else {
+    searchDebounceTimer = window.setTimeout(() => {
+      void performSearch(value, options);
+      searchDebounceTimer = null;
+    }, delay);
+  }
 }
 var header = createHeader({
   onNavigate: (route) => navigate(route),
@@ -7068,6 +7162,7 @@ var header = createHeader({
     appState.setStatus("idle");
     appState.setDialogOpen(false);
     appState.clearFacets();
+    clearHighlightCache();
     navigate("home");
   },
   onSearchChange: (value) => {
@@ -7089,22 +7184,22 @@ var header = createHeader({
     if (appState.getState().route !== "home") {
       return;
     }
-    requestAnimationFrame(() => {
+    const channel = new MessageChannel();
+    channel.port2.onmessage = () => {
       appState.setDialogOpen(true);
       const query = appState.getState().searchQuery;
       if (query.trim()) {
         debouncedSearch(query, { openDialog: true, updateSubmitted: false });
       }
-    });
+    };
+    channel.port1.postMessage(null);
   },
   onSearchBlur: () => {
   },
   onSearchKeyDown: (event) => {
-    console.log("\u{1F50D} Header onSearchKeyDown:", {
-      key: event.key,
-      target: event.target,
-      dialogOpen: appState.getState().dialogOpen
-    });
+    if (!["Enter", "Escape", "ArrowDown", "ArrowUp"].includes(event.key)) {
+      return;
+    }
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && appState.getState().dialogOpen) {
       event.preventDefault();
       event.stopPropagation();
@@ -7113,12 +7208,10 @@ var header = createHeader({
       return;
     }
     if (event.key === "Escape") {
-      console.log("\u{1F3AF} Header: handling Escape");
       appState.setDialogOpen(false);
       header.searchInput.blur();
     }
     if (appState.getState().dialogOpen && appState.getState().recentResponse && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-      console.log("\u{1F3AF} Header: handling arrow key, blurring input");
       event.preventDefault();
       event.stopPropagation();
       header.searchInput.blur();
@@ -7250,22 +7343,34 @@ async function performSearch(query, options = {}) {
         values: Array.from(facetSelections[key] || [])
       }))
     });
-    const response = await runSearch({
-      query: trimmed,
-      selections: facetSelections
-    });
-    if (requestId !== activeSearchToken) {
-      return;
-    }
-    appState.setResponse(response);
-    appState.setStatus("ready");
-    if (updateSubmitted) {
-      appState.setLastSubmittedQuery(trimmed);
-      recentSearches.addSearch(trimmed, response.totalResults);
-    }
-    if (openDialog && appState.getState().route === "home") {
-      appState.setDialogOpen(true);
-    }
+    const channel = new MessageChannel();
+    channel.port2.onmessage = async () => {
+      try {
+        const response = await runSearch({
+          query: trimmed,
+          selections: facetSelections
+        });
+        if (requestId !== activeSearchToken) {
+          return;
+        }
+        appState.setResponse(response);
+        appState.setStatus("ready");
+        if (updateSubmitted) {
+          appState.setLastSubmittedQuery(trimmed);
+          recentSearches.addSearch(trimmed, response.totalResults);
+        }
+        if (openDialog && appState.getState().route === "home") {
+          appState.setDialogOpen(true);
+        }
+      } catch (error) {
+        if (requestId !== activeSearchToken) {
+          return;
+        }
+        console.error("Search failed", error);
+        appState.setStatus("error", "Unable to complete search. Try again.");
+      }
+    };
+    channel.port1.postMessage(null);
   } catch (error) {
     if (requestId !== activeSearchToken) {
       return;
@@ -7289,32 +7394,26 @@ function focusSearchBar() {
   }
 }
 function handleGlobalKeydown(event) {
-  console.log("\u{1F30D} Global keydown:", {
-    key: event.key,
-    target: event.target,
-    dialogOpen: appState.getState().dialogOpen
-  });
+  if (!["/", "k", "Escape", "ArrowDown", "ArrowUp"].includes(event.key)) {
+    return;
+  }
   const target = event.target;
   const isEditable = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
   if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditable) {
-    console.log("\u{1F3AF} Global: handling / key");
     event.preventDefault();
     focusSearchBar();
     return;
   }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-    console.log("\u{1F3AF} Global: handling Cmd/Ctrl+K");
     event.preventDefault();
     focusSearchBar();
     return;
   }
   if (event.key === "Escape" && appState.getState().dialogOpen) {
-    console.log("\u{1F3AF} Global: handling Escape");
     appState.setDialogOpen(false);
     header.searchInput.blur();
   }
   if (appState.getState().dialogOpen && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-    console.log("\u{1F3AF} Global: handling arrow key in dialog");
   }
 }
 function handleDocumentClick(event) {
@@ -7355,15 +7454,19 @@ appState.subscribe((state) => {
   }
   const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.sortBy !== state.sortBy || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.errorMessage !== state.errorMessage;
   if (resultsStateChanged) {
-    resultsView.render({
-      response: state.recentResponse,
-      selections: state.facetSelections,
-      sortBy: state.sortBy,
-      status: state.searchStatus,
-      query: state.lastSubmittedQuery || state.searchQuery,
-      errorMessage: state.errorMessage,
-      isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery)
-    });
+    const channel = new MessageChannel();
+    channel.port2.onmessage = () => {
+      resultsView.render({
+        response: state.recentResponse,
+        selections: state.facetSelections,
+        sortBy: state.sortBy,
+        status: state.searchStatus,
+        query: state.lastSubmittedQuery || state.searchQuery,
+        errorMessage: state.errorMessage,
+        isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery)
+      });
+    };
+    channel.port1.postMessage(null);
   }
   previousState = state;
 });

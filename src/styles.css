@@ -21,6 +21,21 @@ p, div, span, a, li, ul, ol {
   padding: 0;
 }
 
+/* Performance optimizations for layout containment */
+.search-dialog {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+.search-dialog__item {
+  contain: layout style;
+  transition: background-color 0.1s ease;
+}
+
+.search-dialog__item:hover {
+  background-color: var(--color-search-item-hover-bg, rgba(0, 0, 0, 0.05));
+}
+
 /* Search highlighting styles */
 .search-highlight {
   background-color: var(--color-search-highlight-bg);

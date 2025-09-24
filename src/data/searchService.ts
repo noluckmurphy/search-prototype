@@ -854,7 +854,7 @@ function bucketIssuedDate(dateString: string): string {
 }
 
 
-function computeFacets(records: SearchRecord[]): Partial<Record<FacetKey, FacetValue[]>> {
+async function computeFacets(records: SearchRecord[]): Promise<Partial<Record<FacetKey, FacetValue[]>>> {
   const facetMaps: Partial<Record<FacetKey, Map<string, number>>> = {};
 
   for (const key of FACET_KEYS) {
@@ -863,25 +863,41 @@ function computeFacets(records: SearchRecord[]): Partial<Record<FacetKey, FacetV
     }
   }
 
-  records.forEach((record) => {
-    for (const key of FACET_KEYS) {
-      if (key === 'groupBy') {
-        continue; // Skip groupBy as it's handled separately
-      }
-      
-      const value = getFacetValue(record, key);
-      if (!value) {
-        continue;
-      }
+  // Process records in batches to avoid blocking the main thread
+  const batchSize = 200; // Process 200 records at a time
+  let currentIndex = 0;
+  
+  while (currentIndex < records.length) {
+    const endIndex = Math.min(currentIndex + batchSize, records.length);
+    const batch = records.slice(currentIndex, endIndex);
+    
+    batch.forEach((record) => {
+      for (const key of FACET_KEYS) {
+        if (key === 'groupBy') {
+          continue; // Skip groupBy as it's handled separately
+        }
+        
+        const value = getFacetValue(record, key);
+        if (!value) {
+          continue;
+        }
 
-      const map = facetMaps[key];
-      if (!map) {
-        continue;
-      }
+        const map = facetMaps[key];
+        if (!map) {
+          continue;
+        }
 
-      map.set(value, (map.get(value) ?? 0) + 1);
+        map.set(value, (map.get(value) ?? 0) + 1);
+      }
+    });
+    
+    currentIndex = endIndex;
+    
+    // Yield control to the browser between batches
+    if (currentIndex < records.length) {
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
-  });
+  }
 
   const facets: Partial<Record<FacetKey, FacetValue[]>> = {};
 
@@ -1219,10 +1235,49 @@ function calculateMonetaryRelevanceScore(record: SearchRecord, query: string): n
   return score;
 }
 
-function sortByRelevance(records: SearchRecord[], query: string, isMonetary: boolean = false): SearchRecord[] {
-  return [...records].sort((a, b) => {
-    let scoreA: number;
-    let scoreB: number;
+async function sortByRelevance(records: SearchRecord[], query: string, isMonetary: boolean = false): Promise<SearchRecord[]> {
+  // For small arrays, sort synchronously
+  if (records.length <= 50) {
+    return [...records].sort((a, b) => {
+      let scoreA: number;
+      let scoreB: number;
+      
+      // Check if this is a boolean query
+      const isBoolean = isBooleanQuery(query);
+      const parsedQuery = isBoolean ? parseBooleanQuery(query) : null;
+      
+      if (isBoolean && parsedQuery) {
+        // Boolean scoring
+        scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
+        scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+      } else if (isMonetary) {
+        // Explicit monetary search (query starts with $)
+        scoreA = calculateMonetaryRelevanceScore(a, query);
+        scoreB = calculateMonetaryRelevanceScore(b, query);
+      } else if (hasMonetaryPotential(query)) {
+        // Hybrid scoring for queries with numeric potential (like "123")
+        scoreA = calculateHybridRelevanceScore(a, query);
+        scoreB = calculateHybridRelevanceScore(b, query);
+      } else {
+        // Regular scoring for non-numeric queries
+        scoreA = calculateRelevanceScore(a, query);
+        scoreB = calculateRelevanceScore(b, query);
+      }
+      
+      // Primary sort by relevance score (descending)
+      if (scoreA !== scoreB) {
+        return scoreB - scoreA;
+      }
+      
+      // Secondary sort by recency (descending) as tiebreaker
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  }
+  
+  // For large arrays, use a more efficient sorting approach
+  // Pre-calculate scores to avoid recalculating during sort
+  const recordsWithScores = await Promise.all(records.map(async (record) => {
+    let score: number;
     
     // Check if this is a boolean query
     const isBoolean = isBooleanQuery(query);
@@ -1230,30 +1285,33 @@ function sortByRelevance(records: SearchRecord[], query: string, isMonetary: boo
     
     if (isBoolean && parsedQuery) {
       // Boolean scoring
-      scoreA = calculateBooleanRelevanceScore(a, parsedQuery);
-      scoreB = calculateBooleanRelevanceScore(b, parsedQuery);
+      score = calculateBooleanRelevanceScore(record, parsedQuery);
     } else if (isMonetary) {
       // Explicit monetary search (query starts with $)
-      scoreA = calculateMonetaryRelevanceScore(a, query);
-      scoreB = calculateMonetaryRelevanceScore(b, query);
+      score = calculateMonetaryRelevanceScore(record, query);
     } else if (hasMonetaryPotential(query)) {
       // Hybrid scoring for queries with numeric potential (like "123")
-      scoreA = calculateHybridRelevanceScore(a, query);
-      scoreB = calculateHybridRelevanceScore(b, query);
+      score = calculateHybridRelevanceScore(record, query);
     } else {
       // Regular scoring for non-numeric queries
-      scoreA = calculateRelevanceScore(a, query);
-      scoreB = calculateRelevanceScore(b, query);
+      score = calculateRelevanceScore(record, query);
     }
     
-    // Primary sort by relevance score (descending)
-    if (scoreA !== scoreB) {
-      return scoreB - scoreA;
-    }
-    
-    // Secondary sort by recency (descending) as tiebreaker
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
+    return { record, score, updatedAt: new Date(record.updatedAt).getTime() };
+  }));
+  
+  // Sort by score and recency
+  return recordsWithScores
+    .sort((a, b) => {
+      // Primary sort by relevance score (descending)
+      if (a.score !== b.score) {
+        return b.score - a.score;
+      }
+      
+      // Secondary sort by recency (descending) as tiebreaker
+      return b.updatedAt - a.updatedAt;
+    })
+    .map(item => item.record);
 }
 
 function sortByRecency(records: SearchRecord[]): SearchRecord[] {
@@ -1427,48 +1485,65 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
     console.log('🔍 Parsed boolean query:', JSON.stringify(parsedQuery, null, 2));
   }
   
-  corpus.forEach((record, index) => {
-    let matchesQueryResult: boolean;
+  // Process corpus in batches to avoid blocking the main thread
+  const batchSize = 100; // Process 100 records at a time
+  let currentIndex = 0;
+  
+  while (currentIndex < corpus.length) {
+    const endIndex = Math.min(currentIndex + batchSize, corpus.length);
+    const batch = corpus.slice(currentIndex, endIndex);
     
-    // Check for Buildertrend trigger query matches first
-    if (isBuildertrendRecord(record)) {
-      console.log(`Checking Buildertrend record ${index}:`, record.title, 'triggerQueries:', record.triggerQueries);
-      matchesQueryResult = record.triggerQueries.some(triggerQuery => {
-        const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
-        if (match) {
-          console.log('Found exact match:', triggerQuery, '===', searchQuery);
+    batch.forEach((record, batchIndex) => {
+      const index = currentIndex + batchIndex;
+      let matchesQueryResult: boolean;
+      
+      // Check for Buildertrend trigger query matches first
+      if (isBuildertrendRecord(record)) {
+        console.log(`Checking Buildertrend record ${index}:`, record.title, 'triggerQueries:', record.triggerQueries);
+        matchesQueryResult = record.triggerQueries.some(triggerQuery => {
+          const match = triggerQuery.toLowerCase() === searchQuery.toLowerCase();
+          if (match) {
+            console.log('Found exact match:', triggerQuery, '===', searchQuery);
+          }
+          return match;
+        });
+        if (matchesQueryResult) {
+          console.log('Buildertrend match found:', record.title, 'for query:', searchQuery);
+          buildertrendMatches.push(record);
         }
-        return match;
-      });
-      if (matchesQueryResult) {
-        console.log('Buildertrend match found:', record.title, 'for query:', searchQuery);
-        buildertrendMatches.push(record);
+        return; // Always skip regular matching for Buildertrend records
       }
-      return; // Always skip regular matching for Buildertrend records
-    }
+      
+      // Determine which matching logic to use
+      if (isBoolean && parsedQuery) {
+        // Boolean search
+        matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
+      } else if (isMonetary) {
+        // Explicit monetary search (query starts with $)
+        matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
+      } else if (hasMonetaryPotential(searchQuery)) {
+        // Hybrid search for queries with numeric potential (like "123")
+        matchesQueryResult = matchesHybridQuery(record, searchQuery);
+      } else {
+        // Regular text search for non-numeric queries
+        matchesQueryResult = matchesQuery(record, searchQuery);
+      }
+      
+      if (matchesQueryResult && matchesSelections(record, selections)) {
+        otherMatches.push(record);
+      }
+    });
     
-    // Determine which matching logic to use
-    if (isBoolean && parsedQuery) {
-      // Boolean search
-      matchesQueryResult = matchesBooleanQuery(record, parsedQuery);
-    } else if (isMonetary) {
-      // Explicit monetary search (query starts with $)
-      matchesQueryResult = matchesMonetaryQuery(record, searchQuery);
-    } else if (hasMonetaryPotential(searchQuery)) {
-      // Hybrid search for queries with numeric potential (like "123")
-      matchesQueryResult = matchesHybridQuery(record, searchQuery);
-    } else {
-      // Regular text search for non-numeric queries
-      matchesQueryResult = matchesQuery(record, searchQuery);
-    }
+    currentIndex = endIndex;
     
-    if (matchesQueryResult && matchesSelections(record, selections)) {
-      otherMatches.push(record);
+    // Yield control to the browser between batches
+    if (currentIndex < corpus.length) {
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
-  });
+  }
   
   // Sort other matches by relevance (default sorting)
-  const sortedOtherMatches = searchQuery.trim() ? sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
+  const sortedOtherMatches = searchQuery.trim() ? await sortByRelevance(otherMatches, searchQuery, isMonetary) : sortByRecency(otherMatches);
   
   console.log('Search results for "' + searchQuery + '":', {
     buildertrendMatches: buildertrendMatches.length,
@@ -1511,18 +1586,34 @@ function determineGroupEntityType(records: SearchRecord[]): SearchEntityType {
   return mostCommonType;
 }
 
-function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
+async function buildGroups(records: SearchRecord[], groupBy?: string): Promise<SearchGroup[]> {
   if (!groupBy || groupBy === 'None') {
     // When not grouping, create separate groups for each entity type
     // This allows us to apply individual limits to each type
     const typeGroups = new Map<SearchEntityType, SearchRecord[]>();
     
-    records.forEach((record) => {
-      if (!typeGroups.has(record.entityType)) {
-        typeGroups.set(record.entityType, []);
+    // Process records in batches to avoid blocking the main thread
+    const batchSize = 200;
+    let currentIndex = 0;
+    
+    while (currentIndex < records.length) {
+      const endIndex = Math.min(currentIndex + batchSize, records.length);
+      const batch = records.slice(currentIndex, endIndex);
+      
+      batch.forEach((record) => {
+        if (!typeGroups.has(record.entityType)) {
+          typeGroups.set(record.entityType, []);
+        }
+        typeGroups.get(record.entityType)!.push(record);
+      });
+      
+      currentIndex = endIndex;
+      
+      // Yield control to the browser between batches
+      if (currentIndex < records.length) {
+        await new Promise(resolve => setTimeout(resolve, 0));
       }
-      typeGroups.get(record.entityType)!.push(record);
-    });
+    }
     
     // Convert to SearchGroup array, sorted by entity type
     return Array.from(typeGroups.entries())
@@ -1547,31 +1638,47 @@ function buildGroups(records: SearchRecord[], groupBy?: string): SearchGroup[] {
 
   const map = new Map<string, SearchRecord[]>();
 
-  records.forEach((record) => {
-    let groupKey: string;
+  // Process records in batches to avoid blocking the main thread
+  const batchSize = 200;
+  let currentIndex = 0;
+  
+  while (currentIndex < records.length) {
+    const endIndex = Math.min(currentIndex + batchSize, records.length);
+    const batch = records.slice(currentIndex, endIndex);
     
-    switch (groupBy) {
-      case 'Type':
-        groupKey = record.entityType;
-        break;
-      case 'Project':
-        groupKey = record.project || 'No Project';
-        break;
-      case 'Status':
-        groupKey = record.status || 'No Status';
-        break;
-      case 'Client':
-        groupKey = record.client || 'No Client';
-        break;
-      default:
-        groupKey = record.entityType;
-    }
+    batch.forEach((record) => {
+      let groupKey: string;
+      
+      switch (groupBy) {
+        case 'Type':
+          groupKey = record.entityType;
+          break;
+        case 'Project':
+          groupKey = record.project || 'No Project';
+          break;
+        case 'Status':
+          groupKey = record.status || 'No Status';
+          break;
+        case 'Client':
+          groupKey = record.client || 'No Client';
+          break;
+        default:
+          groupKey = record.entityType;
+      }
 
-    if (!map.has(groupKey)) {
-      map.set(groupKey, []);
+      if (!map.has(groupKey)) {
+        map.set(groupKey, []);
+      }
+      map.get(groupKey)!.push(record);
+    });
+    
+    currentIndex = endIndex;
+    
+    // Yield control to the browser between batches
+    if (currentIndex < records.length) {
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
-    map.get(groupKey)!.push(record);
-  });
+  }
 
   // Sort groups by key name for consistent ordering
   const sortedEntries = Array.from(map.entries()).sort((a, b) => {
@@ -1662,17 +1769,28 @@ export async function runSearch(
   const { isMonetary } = parseMonetaryQuery(options.query);
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   
+  // Break up the heavy operations to avoid blocking the main thread
   const records = await filterRecords(searchOptions);
   console.log('📊 filterRecords returned', records.length, 'records');
   
-  const facets = computeFacets(records);
+  // Yield control to allow other tasks to run
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
+  const facets = await computeFacets(records);
   console.log('🎯 computeFacets returned facets for keys:', Object.keys(facets));
+  
+  // Yield control again
+  await new Promise(resolve => setTimeout(resolve, 0));
   
   // Determine grouping option from selections
   const groupBy = options.selections?.groupBy?.values().next().value;
   const isGrouped = groupBy && groupBy !== 'None';
   
-  const fullGroups = buildGroups(records, groupBy);
+  const fullGroups = await buildGroups(records, groupBy);
+  
+  // Yield control before applying limits
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
   const limitedGroups = applyGroupLimits(fullGroups, groupLimits);
 
   // Generate random delay using normal distribution

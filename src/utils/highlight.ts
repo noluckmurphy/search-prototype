@@ -1,6 +1,42 @@
 import { SearchRecord, isFinancialRecord, isOrganizationRecord, isPersonRecord } from '../types';
 import { hasMonetaryValue } from './monetary';
 
+// Memoization cache for highlighting functions
+const highlightCache = new Map<string, string>();
+const MAX_CACHE_SIZE = 1000; // Prevent memory leaks
+
+// Cache key generator for highlighting functions
+function getCacheKey(text: string, query: string, type: string): string {
+  return `${type}:${text.length}:${query}:${text.substring(0, 50)}`;
+}
+
+// Cache management
+function setCache(key: string, value: string): void {
+  if (highlightCache.size >= MAX_CACHE_SIZE) {
+    // Remove oldest entries (simple LRU approximation)
+    const firstKey = highlightCache.keys().next().value;
+    highlightCache.delete(firstKey);
+  }
+  highlightCache.set(key, value);
+}
+
+function getCache(key: string): string | undefined {
+  return highlightCache.get(key);
+}
+
+// Clear cache when search context changes significantly
+export function clearHighlightCache(): void {
+  highlightCache.clear();
+}
+
+// Get cache statistics for debugging
+export function getHighlightCacheStats(): { size: number; maxSize: number } {
+  return {
+    size: highlightCache.size,
+    maxSize: MAX_CACHE_SIZE
+  };
+}
+
 export interface HighlightMatch {
   field: string;
   content: string;
@@ -9,16 +45,26 @@ export interface HighlightMatch {
 
 /**
  * Highlights matching text in a string with yellow background
+ * Optimized with memoization for better performance
  */
 export function highlightText(text: string, query: string): string {
   if (!query.trim()) {
     return escapeHtml(text);
   }
 
+  // Check cache first
+  const cacheKey = getCacheKey(text, query, 'text');
+  const cached = getCache(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   // Check if this is a boolean query and extract search terms
   const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
-    return escapeHtml(text);
+    const result = escapeHtml(text);
+    setCache(cacheKey, result);
+    return result;
   }
 
   let highlightedText = escapeHtml(text);
@@ -37,6 +83,8 @@ export function highlightText(text: string, query: string): string {
     highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
   }
 
+  // Cache the result
+  setCache(cacheKey, highlightedText);
   return highlightedText;
 }
 
@@ -737,32 +785,47 @@ function isPartialMonetaryMatch(queryAmount: number, dataValue: number): boolean
  * Enhanced monetary highlighting that shows different colors for exact vs partial matches
  * This provides better UX by visually distinguishing match types
  * 
- * NEW ARCHITECTURE: Single-pass highlighting with cache to prevent double highlighting
+ * OPTIMIZED: Single-pass highlighting with memoization for better performance
  */
 export function highlightMonetaryValuesWithPartialMatches(text: string, query: string): string {
   if (!query.trim()) {
     return escapeHtml(text);
   }
 
+  // Check cache first - this is the most expensive highlighting function
+  const cacheKey = getCacheKey(text, query, 'monetary');
+  const cached = getCache(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   // Check if this is a boolean query and extract search terms
   const tokens = extractSearchTermsFromQuery(query);
   if (tokens.length === 0) {
-    return escapeHtml(text);
+    const result = escapeHtml(text);
+    setCache(cacheKey, result);
+    return result;
   }
 
   // For boolean queries, use hybrid highlighting (both text and monetary)
   if (isBooleanQuery(query)) {
-    return highlightHybridBoolean(text, query, tokens);
+    const result = highlightHybridBoolean(text, query, tokens);
+    setCache(cacheKey, result);
+    return result;
   }
 
   const { amounts, textTokens, range } = extractMonetaryTokens(query);
   
   if (amounts.length === 0 && textTokens.length === 0 && !range) {
-    return escapeHtml(text);
+    const result = escapeHtml(text);
+    setCache(cacheKey, result);
+    return result;
   }
 
   // NEW APPROACH: Single-pass highlighting with position tracking
-  return highlightWithPositionTracking(text, query, amounts, textTokens, range);
+  const result = highlightWithPositionTracking(text, query, amounts, textTokens, range);
+  setCache(cacheKey, result);
+  return result;
 }
 
 /**

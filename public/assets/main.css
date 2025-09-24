@@ -134,6 +134,17 @@ ol {
   margin: 0;
   padding: 0;
 }
+.search-dialog {
+  contain: layout style paint;
+  will-change: transform;
+}
+.search-dialog__item {
+  contain: layout style;
+  transition: background-color 0.1s ease;
+}
+.search-dialog__item:hover {
+  background-color: var(--color-search-item-hover-bg, rgba(0, 0, 0, 0.05));
+}
 .search-highlight {
   background-color: var(--color-search-highlight-bg);
   color: var(--color-search-highlight-text);

@@ -115,16 +115,7 @@ export function createSearchDialog(
 
   // Add keyboard event handler with better event capture
   function handleKeyDown(event: KeyboardEvent) {
-    console.log('🔍 SearchDialog handleKeyDown:', {
-      key: event.key,
-      target: event.target,
-      visible: previousState?.visible,
-      hasResponse: !!previousState?.response,
-      query: previousState?.query
-    });
-
     if (!previousState?.visible) {
-      console.log('❌ Dialog not visible, ignoring');
       return;
     }
 
@@ -138,20 +129,15 @@ export function createSearchDialog(
 
     // Only handle arrow keys and enter when the dialog is visible
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Enter') {
-      console.log('🎯 Handling navigation key:', event.key);
             // Handle recent searches state (when no query or no response)
             if (!previousState.response || previousState.query === '') {
-              console.log('🎯 In recent searches mode');
               const recentItems = dialog.querySelectorAll('.search-dialog__recent-item');
-              // Get the current selectedIndex from the dialog's current state
               const currentIndex = previousState.selectedIndex ?? -1;
-              console.log('🎯 Recent searches: currentIndex =', currentIndex, 'totalItems =', recentItems.length);
 
               if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 event.stopPropagation();
                 const newIndex = Math.min(currentIndex + 1, recentItems.length - 1);
-                console.log('🔽 Recent ArrowDown: currentIndex =', currentIndex, 'newIndex =', newIndex);
                 setState({ ...previousState, selectedIndex: newIndex });
                 scrollRecentIntoView(newIndex);
                 if (newIndex >= 0) {
@@ -163,7 +149,6 @@ export function createSearchDialog(
                 event.preventDefault();
                 event.stopPropagation();
                 const newIndex = Math.max(currentIndex - 1, -1);
-                console.log('🔼 Recent ArrowUp: currentIndex =', currentIndex, 'newIndex =', newIndex);
                 setState({ ...previousState, selectedIndex: newIndex });
                 scrollRecentIntoView(newIndex);
                 if (newIndex >= 0) {
@@ -199,7 +184,6 @@ export function createSearchDialog(
               // Get the current selectedIndex from the dialog's current state
               const currentIndex = previousState.selectedIndex ?? -1;
               const newIndex = Math.min(currentIndex + 1, allItems.length - 1);
-              console.log('🔽 ArrowDown: currentIndex =', currentIndex, 'newIndex =', newIndex, 'totalItems =', allItems.length);
               setState({ ...previousState, selectedIndex: newIndex });
               scrollSelectedIntoView(newIndex);
               if (newIndex >= 0) {
@@ -212,7 +196,6 @@ export function createSearchDialog(
               // Get the current selectedIndex from the dialog's current state
               const currentIndex = previousState.selectedIndex ?? -1;
               const newIndex = Math.max(currentIndex - 1, -1);
-              console.log('🔼 ArrowUp: currentIndex =', currentIndex, 'newIndex =', newIndex);
               setState({ ...previousState, selectedIndex: newIndex });
               scrollSelectedIntoView(newIndex);
               if (newIndex >= 0) {
@@ -225,11 +208,9 @@ export function createSearchDialog(
         event.preventDefault();
         event.stopPropagation();
         const selectedItem = allItems[previousState.selectedIndex || -1];
-        console.log('⏎ Enter: selectedIndex =', previousState.selectedIndex, 'selectedItem =', selectedItem);
         if (selectedItem && isBuildertrendRecord(selectedItem)) {
           announce(`Navigating to: ${selectedItem.title}`);
           // TODO: Implement navigation logic
-          console.log('Navigate to:', selectedItem.url);
         }
       }
     }
@@ -238,22 +219,17 @@ export function createSearchDialog(
   // Function to scroll selected item into view
   function scrollSelectedIntoView(selectedIndex: number) {
     if (selectedIndex < 0) {
-      console.log('📍 Scroll: selectedIndex < 0, skipping scroll');
       return;
     }
     
     requestAnimationFrame(() => {
       const selectedElement = dialog.querySelector(`[data-item-index="${selectedIndex}"]`);
-      console.log('📍 Scroll: looking for element with data-item-index="' + selectedIndex + '"', 'found:', selectedElement);
       if (selectedElement) {
-        console.log('📍 Scroll: scrolling element into view');
         selectedElement.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
           inline: 'nearest'
         });
-      } else {
-        console.log('📍 Scroll: element not found!');
       }
     });
   }
@@ -261,23 +237,18 @@ export function createSearchDialog(
   // Function to scroll recent search item into view
   function scrollRecentIntoView(selectedIndex: number) {
     if (selectedIndex < 0) {
-      console.log('📍 Recent Scroll: selectedIndex < 0, skipping scroll');
       return;
     }
     
     requestAnimationFrame(() => {
       const recentItems = dialog.querySelectorAll('.search-dialog__recent-item');
       const selectedElement = recentItems[selectedIndex] as HTMLElement;
-      console.log('📍 Recent Scroll: looking for recent item at index', selectedIndex, 'found:', selectedElement, 'total items:', recentItems.length);
       if (selectedElement) {
-        console.log('📍 Recent Scroll: scrolling recent item into view');
         selectedElement.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
           inline: 'nearest'
         });
-      } else {
-        console.log('📍 Recent Scroll: recent item not found!');
       }
     });
   }
@@ -290,46 +261,29 @@ export function createSearchDialog(
   
   // Also add to document to catch events when dialog doesn't have focus
   document.addEventListener('keydown', (event) => {
-    console.log('📄 Document keydown:', {
-      key: event.key,
-      target: event.target,
-      visible: previousState?.visible,
-      hasResponse: !!previousState?.response
-    });
-
-    // Only handle if dialog is visible
+    // Fast path: only handle if dialog is visible
     if (!previousState?.visible) {
-      console.log('❌ Document handler: dialog not visible');
       return;
     }
 
-    // For recent searches (no response), we still want to handle navigation
-    // For search results (has response), we also want to handle navigation
-    // So we don't need to check hasResponse here
+    // Fast path: only handle arrow keys and enter
+    if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) {
+      return;
+    }
     
     const target = event.target as HTMLElement;
     const isInputField = target && (
       target.tagName === 'INPUT' || 
       target.tagName === 'TEXTAREA' || 
       target.isContentEditable ||
-      (target.closest && target.closest('.search-dialog__recent-item')) // Don't interfere with recent searches
+      (target.closest && target.closest('.search-dialog__recent-item'))
     );
 
-    console.log('🎯 Document handler: isInputField =', isInputField, 'target =', target);
-
-    // For recent searches (no response), we want to handle arrow keys even from input field
-    // For search results (has response), we only handle when not in input field
+    // For search results (has response), only handle when not in input field
     if (isInputField && previousState?.response) {
-      console.log('❌ Document handler: in input field with response, ignoring');
       return;
     }
 
-    // If we're in an input field but have no response (recent searches), handle the event
-    if (isInputField && !previousState?.response) {
-      console.log('🎯 Document handler: in input field but no response (recent searches), handling');
-    }
-
-    console.log('✅ Document handler: calling handleKeyDown');
     handleKeyDown(event);
   });
 
@@ -337,12 +291,10 @@ export function createSearchDialog(
   const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
   if (searchInput) {
     searchInput.addEventListener('keydown', (event) => {
-      console.log('🔍 Search input keydown:', {
-        key: event.key,
-        target: event.target,
-        visible: previousState?.visible,
-        hasResponse: !!previousState?.response
-      });
+      // Fast path: only handle specific keys
+      if (!['Enter', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+        return;
+      }
 
       // Handle CMD/CTRL+Enter for "See all results" even when input is focused
       if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -355,7 +307,6 @@ export function createSearchDialog(
       // If we have results and user presses arrow keys, blur the input and handle navigation
       if (previousState?.visible && previousState?.response && 
           (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-        console.log('🎯 Search input: handling arrow key, blurring input');
         event.preventDefault();
         event.stopPropagation();
         
@@ -371,7 +322,6 @@ export function createSearchDialog(
   // Listen for refresh-dialog events to re-render when recent searches are cleared
   window.addEventListener('refresh-dialog', () => {
     if (previousState?.visible) {
-      console.log('🔄 Refreshing dialog due to recent searches clear');
       // Force a re-render by directly calling renderDialogContents
       // This bypasses the state comparison logic since we know we need to refresh
       requestAnimationFrame(() => {
@@ -381,32 +331,38 @@ export function createSearchDialog(
   });
 
   const setState = (state: SearchDialogState) => {
-    console.log('🔄 setState called:', {
-      oldSelectedIndex: previousState?.selectedIndex,
-      newSelectedIndex: state.selectedIndex,
-      visible: state.visible,
-      hasResponse: !!state.response
-    });
 
     // Only update visibility if it changed
     const visibilityChanged = !previousState || previousState.visible !== state.visible;
     if (visibilityChanged) {
-      dialog.hidden = !state.visible;
-      if (dialog.hidden) {
-        dialog.innerHTML = '';
-        dialog.style.display = 'none';
-        previousState = state;
-        return;
-      }
-      dialog.style.display = 'flex';
+      // Batch visibility changes to reduce layout thrashing
+      requestAnimationFrame(() => {
+        dialog.hidden = !state.visible;
+        if (dialog.hidden) {
+          dialog.innerHTML = '';
+          dialog.style.display = 'none';
+        } else {
+          dialog.style.display = 'flex';
+        }
+      });
+      
       if (state.visible) {
         announce('Search dialog opened');
+      }
+      
+      // Early return for hidden state to avoid unnecessary processing
+      if (!state.visible) {
+        previousState = state;
+        return;
       }
     }
 
     // Only update monetary search class if it changed
     if (!previousState || previousState.isMonetarySearch !== state.isMonetarySearch) {
-      dialog.classList.toggle('monetary-search', state.isMonetarySearch || false);
+      // Use requestAnimationFrame to batch style changes
+      requestAnimationFrame(() => {
+        dialog.classList.toggle('monetary-search', state.isMonetarySearch || false);
+      });
     }
 
     // Always re-render when selectedIndex changes
@@ -421,18 +377,10 @@ export function createSearchDialog(
       previousState.response !== state.response ||
       selectedIndexChanged;
 
-    console.log('🔄 Content changed:', contentChanged, {
-      visibilityChanged,
-      statusChanged: !previousState || previousState.status !== state.status,
-      queryChanged: !previousState || previousState.query !== state.query,
-      responseChanged: !previousState || previousState.response !== state.response,
-      selectedIndexChanged
-    });
-
     if (contentChanged) {
-      console.log('🔄 Re-rendering dialog contents');
-      // Use requestAnimationFrame to defer heavy DOM operations
-      requestAnimationFrame(() => {
+      // Use MessageChannel for better performance than requestAnimationFrame
+      const channel = new MessageChannel();
+      channel.port2.onmessage = () => {
         renderDialogContents(dialog, state, options);
         
         // Announce status changes
@@ -447,9 +395,8 @@ export function createSearchDialog(
         } else if (state.status === 'ready' && !state.response) {
           announce(`No results found for "${state.query}"`);
         }
-      });
-    } else {
-      console.log('🔄 No content change, skipping re-render');
+      };
+      channel.port1.postMessage(null);
     }
 
     // Always update previousState to keep it in sync
@@ -483,15 +430,23 @@ function renderDialogContents(
     hasResponse: !!state.response
   });
 
-  container.innerHTML = '';
+  // Use DocumentFragment for better performance
+  const fragment = document.createDocumentFragment();
+  
+  // Clear container efficiently
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
 
   if (state.status === 'loading') {
-    container.append(renderLoadingState(state.query));
+    fragment.appendChild(renderLoadingState(state.query));
+    container.appendChild(fragment);
     return;
   }
 
   if (state.status === 'error') {
-    container.append(renderErrorState());
+    fragment.appendChild(renderErrorState());
+    container.appendChild(fragment);
     return;
   }
 
@@ -499,7 +454,7 @@ function renderDialogContents(
 
   if (effectiveLength === 0) {
     console.log('🎨 Rendering recent searches with selectedIndex:', state.selectedIndex);
-    container.append(renderRecentSearchesState(state.selectedIndex));
+    fragment.appendChild(renderRecentSearchesState(state.selectedIndex));
     
     // Add footer with keyboard shortcuts and clear button for recent searches
     const footer = document.createElement('div');
@@ -563,18 +518,21 @@ function renderDialogContents(
     });
     
     footer.append(shortcutsContainer, clearButton);
-    container.append(footer);
+    fragment.appendChild(footer);
+    container.appendChild(fragment);
     return;
   }
 
   if (isQueryTooShort(state.query)) {
-    container.append(renderShortQueryState());
+    fragment.appendChild(renderShortQueryState());
+    container.appendChild(fragment);
     return;
   }
 
   const response = state.response;
   if (!response || response.totalResults === 0) {
-    container.append(renderNoResults(state.query));
+    fragment.appendChild(renderNoResults(state.query));
+    container.appendChild(fragment);
     return;
   }
 
@@ -582,7 +540,7 @@ function renderDialogContents(
   let itemIndex = 0;
   
   response.limitedGroups.forEach((group) => {
-    container.append(renderGroup(group, state.query, state.isMonetarySearch, state.selectedIndex, itemIndex));
+    fragment.appendChild(renderGroup(group, state.query, state.isMonetarySearch, state.selectedIndex, itemIndex));
     itemIndex += group.items.length;
   });
 
@@ -659,7 +617,8 @@ function renderDialogContents(
   seeAllButton.addEventListener('click', () => options.onSeeAllResults());
 
   footer.append(shortcutsContainer, seeAllButton);
-  container.append(footer);
+  fragment.appendChild(footer);
+  container.appendChild(fragment);
 }
 
 function renderEmptyState(): HTMLElement {
@@ -892,22 +851,13 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
     li.setAttribute('role', 'listitem');
   }
 
-  // Add selected state
+  // Add selected state - batch attribute changes
+  li.setAttribute('aria-selected', String(isSelected));
   if (isSelected) {
     li.classList.add('search-dialog__item--selected');
-    li.setAttribute('aria-selected', 'true');
-  } else {
-    li.setAttribute('aria-selected', 'false');
   }
 
-  // Add hover effects
-  li.addEventListener('mouseenter', () => {
-    li.classList.add('search-dialog__item--hover');
-  });
-
-  li.addEventListener('mouseleave', () => {
-    li.classList.remove('search-dialog__item--hover');
-  });
+  // Hover effects are now handled by CSS :hover pseudo-class for better performance
 
   const highlightFn = getHighlightFunction(query, isMonetarySearch || false);
 
@@ -924,11 +874,7 @@ function renderGroupItem(item: SearchRecord, query: string, isMonetarySearch?: b
     // Update icons after DOM is ready
     requestAnimationFrame(() => {
       if (window.lucide) {
-        try {
-          window.lucide.createIcons();
-        } catch (error) {
-          console.warn('Error updating icons:', error);
-        }
+        window.lucide.createIcons();
       }
     });
   }
