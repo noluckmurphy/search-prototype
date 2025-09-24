@@ -1,0 +1,1291 @@
+[
+  {
+    "id": "dailylog-326",
+    "entityType": "DailyLog",
+    "title": "Completed final inspections - Entertainment Complex",
+    "summary": "Daily log for Entertainment Complex. Completed final inspections. Issues: Concrete truck arrived late, causing minor delay.",
+    "project": "Entertainment Complex",
+    "client": "Bay Area Hospital",
+    "status": "Published",
+    "logDate": "2025-08-02T00:00:00.000Z",
+    "author": "Mike Rodriguez",
+    "weatherConditions": {
+      "description": "Heavy rain",
+      "temperature": {
+        "current": 58,
+        "low": 40,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 19,
+        "unit": "mph"
+      },
+      "humidity": 94,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T07:45:35.454Z"
+    },
+    "weatherNotes": "High winds, secured loose materials and equipment. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed final inspections",
+      "issues": "Concrete truck arrived late, causing minor delay"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-08-02T15:45:35.454Z",
+    "updatedAt": "2025-08-02T15:45:35.454Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Mike Rodriguez",
+      "location": "Happy Valley, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-327",
+    "entityType": "DailyLog",
+    "title": "Finished plumbing rough-in - Maple Grove Subdivision",
+    "summary": "Daily log for Maple Grove Subdivision. Finished plumbing rough-in. Issues: Foundation crack discovered during inspection.",
+    "project": "Maple Grove Subdivision",
+    "client": "Starbucks Corporation",
+    "status": "Published",
+    "logDate": "2025-06-27T00:00:00.000Z",
+    "author": "Matthew Jackson",
+    "weatherConditions": {
+      "description": "Clear skies",
+      "temperature": {
+        "current": 76,
+        "low": 65,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 23,
+        "unit": "mph"
+      },
+      "humidity": 100,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T10:45:35.454Z"
+    },
+    "weatherNotes": "High winds, secured loose materials and equipment. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Finished plumbing rough-in",
+      "issues": "Foundation crack discovered during inspection",
+      "materialsDelivered": "Roofing materials and shingles"
+    },
+    "attachments": [
+      "report-019",
+      "invoice-069"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials",
+      "Plumbing"
+    ],
+    "createdAt": "2025-06-27T15:45:35.454Z",
+    "updatedAt": "2025-06-27T15:45:35.454Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Matthew Jackson",
+      "location": "Gaston, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-328",
+    "entityType": "DailyLog",
+    "title": "Installed lighting fixtures - Urban Heights",
+    "summary": "Daily log for Urban Heights. Installed lighting fixtures. Issues: Electrical permit inspection required.",
+    "project": "Urban Heights",
+    "client": "Salem Health",
+    "status": "Published",
+    "logDate": "2025-07-21T00:00:00.000Z",
+    "author": "Matthew Jackson",
+    "weatherConditions": {
+      "description": "Sunny with light winds",
+      "temperature": {
+        "current": 78,
+        "low": 71,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 3,
+        "unit": "mph"
+      },
+      "humidity": 64,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T10:45:35.454Z"
+    },
+    "structuredNotes": {
+      "progress": "Installed lighting fixtures",
+      "issues": "Electrical permit inspection required"
+    },
+    "attachments": [
+      "receipt-091",
+      "receipt-065",
+      "drawing-047"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-07-21T15:45:35.454Z",
+    "updatedAt": "2025-07-21T15:45:35.454Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Matthew Jackson",
+      "location": "Tigard, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-329",
+    "entityType": "DailyLog",
+    "title": "Completed insulation installation - Warehouse Complex",
+    "summary": "Daily log for Warehouse Complex. Completed insulation installation. Issues: Foundation crack discovered during inspection.",
+    "project": "Warehouse Complex",
+    "client": "Lake Oswego School District",
+    "status": "Published",
+    "logDate": "2025-09-14T00:00:00.000Z",
+    "author": "Christopher Lee",
+    "weatherConditions": {
+      "description": "Partly cloudy",
+      "temperature": {
+        "current": 88,
+        "low": 77,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 8,
+        "unit": "mph"
+      },
+      "humidity": 82,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T13:45:35.454Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed insulation installation",
+      "issues": "Foundation crack discovered during inspection",
+      "materialsDelivered": "Electrical wire and outlets"
+    },
+    "attachments": [
+      "invoice-097"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials"
+    ],
+    "createdAt": "2025-09-14T15:45:35.454Z",
+    "updatedAt": "2025-09-14T15:45:35.454Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Christopher Lee",
+      "location": "Dundee, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-330",
+    "entityType": "DailyLog",
+    "title": "Completed final inspections - Downtown Gateway",
+    "summary": "Daily log for Downtown Gateway. Completed final inspections. Issues: Concrete truck arrived late, causing minor delay.",
+    "project": "Downtown Gateway",
+    "client": "Stephanie & Andrew Garcia",
+    "status": "Published",
+    "logDate": "2025-09-08T00:00:00.000Z",
+    "author": "Michael Brown",
+    "weatherConditions": {
+      "description": "Hot and humid",
+      "temperature": {
+        "current": 94,
+        "low": 82,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 20,
+        "unit": "mph"
+      },
+      "humidity": 82,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T09:45:35.454Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High winds, secured loose materials and equipment. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed final inspections",
+      "issues": "Concrete truck arrived late, causing minor delay"
+    },
+    "attachments": [
+      "drawing-021",
+      "report-093",
+      "inspection-037"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-09-08T15:45:35.454Z",
+    "updatedAt": "2025-09-08T15:45:35.454Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Michael Brown",
+      "location": "Yamhill, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-331",
+    "entityType": "DailyLog",
+    "title": "Installed electrical rough-in - Shopping Center Renovation",
+    "summary": "Daily log for Shopping Center Renovation. Installed electrical rough-in for kitchen. Issues: Building inspector found minor code violation.",
+    "project": "Shopping Center Renovation",
+    "client": "Rachel & Christopher Brown",
+    "status": "Published",
+    "logDate": "2025-08-16T00:00:00.000Z",
+    "author": "Lisa Martinez",
+    "weatherConditions": {
+      "description": "Partly cloudy with isolated showers",
+      "temperature": {
+        "current": 60,
+        "low": 50,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 18,
+        "unit": "mph"
+      },
+      "humidity": 57,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "High winds, secured loose materials and equipment",
+    "structuredNotes": {
+      "progress": "Installed electrical rough-in for kitchen",
+      "issues": "Building inspector found minor code violation"
+    },
+    "attachments": [
+      "invoice-099",
+      "report-023"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Electrical"
+    ],
+    "createdAt": "2025-08-16T15:45:35.455Z",
+    "updatedAt": "2025-08-16T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Construction",
+      "projectManager": "Lisa Martinez",
+      "location": "Camas, WA",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-332",
+    "entityType": "DailyLog",
+    "title": "Completed foundation pour - Data Center",
+    "summary": "Daily log for Data Center. Completed foundation pour for main structure. Issues: Minor plumbing leak discovered and repaired.",
+    "project": "Data Center",
+    "client": "Stephanie & Andrew Garcia",
+    "status": "Published",
+    "logDate": "2025-09-09T00:00:00.000Z",
+    "author": "Ashley Thomas",
+    "weatherConditions": {
+      "description": "Partly cloudy with isolated showers",
+      "temperature": {
+        "current": 67,
+        "low": 48,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 12,
+        "unit": "mph"
+      },
+      "humidity": 33,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T11:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Completed foundation pour for main structure",
+      "issues": "Minor plumbing leak discovered and repaired"
+    },
+    "attachments": [
+      "drawing-099"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-09-09T15:45:35.455Z",
+    "updatedAt": "2025-09-09T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Completion",
+      "projectManager": "Ashley Thomas",
+      "location": "McMinnville, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-333",
+    "entityType": "DailyLog",
+    "title": "Finished plumbing rough-in - Urban Village",
+    "summary": "Daily log for Urban Village. Finished plumbing rough-in. Issues: Concrete truck arrived late, causing minor delay.",
+    "project": "Urban Village",
+    "client": "Courtney & Hunter Garcia",
+    "status": "Published",
+    "logDate": "2025-09-18T00:00:00.000Z",
+    "author": "Michael Brown",
+    "weatherConditions": {
+      "description": "Heavy rain",
+      "temperature": {
+        "current": 52,
+        "low": 37,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 19,
+        "unit": "mph"
+      },
+      "humidity": 68,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T07:45:35.455Z"
+    },
+    "weatherNotes": "High winds, secured loose materials and equipment",
+    "structuredNotes": {
+      "progress": "Finished plumbing rough-in",
+      "issues": "Concrete truck arrived late, causing minor delay",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [
+      "inspection-020",
+      "drawing-093"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Plumbing"
+    ],
+    "createdAt": "2025-09-18T15:45:35.455Z",
+    "updatedAt": "2025-09-18T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Michael Brown",
+      "location": "Bend, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-334",
+    "entityType": "DailyLog",
+    "title": "Finished painting interior - Metro Office Complex",
+    "summary": "Daily log for Metro Office Complex. Finished painting interior walls.",
+    "project": "Metro Office Complex",
+    "client": "Kayla & Jordan Harris",
+    "status": "Published",
+    "logDate": "2025-08-11T00:00:00.000Z",
+    "author": "Christopher Lee",
+    "weatherConditions": {
+      "description": "Hot and humid",
+      "temperature": {
+        "current": 48,
+        "low": 41,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 10,
+        "unit": "mph"
+      },
+      "humidity": 81,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T14:45:35.455Z"
+    },
+    "weatherNotes": "Cold weather, adjusted concrete curing schedule. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Finished painting interior walls",
+      "materialsDelivered": "Bathroom fixtures and tile",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [
+      "specification-078",
+      "permit-093"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials",
+      "Painting"
+    ],
+    "createdAt": "2025-08-11T15:45:35.455Z",
+    "updatedAt": "2025-08-11T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Completion",
+      "projectManager": "Christopher Lee",
+      "location": "Battle Ground, WA",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-335",
+    "entityType": "DailyLog",
+    "title": "Completed exterior siding - Sunset Heights",
+    "summary": "Daily log for Sunset Heights. Completed exterior siding installation.",
+    "project": "Sunset Heights",
+    "client": "New Seasons Market",
+    "status": "Published",
+    "logDate": "2025-07-04T00:00:00.000Z",
+    "author": "Robert Johnson",
+    "weatherConditions": {
+      "description": "Partly cloudy with isolated showers",
+      "temperature": {
+        "current": 59,
+        "low": 46,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 6,
+        "unit": "mph"
+      },
+      "humidity": 100,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed exterior siding installation",
+      "materialsDelivered": "Electrical wire and outlets",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [
+      "invoice-032"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials"
+    ],
+    "createdAt": "2025-07-04T15:45:35.455Z",
+    "updatedAt": "2025-07-04T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Completion",
+      "projectManager": "Robert Johnson",
+      "location": "Salem, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-336",
+    "entityType": "DailyLog",
+    "title": "Installed lighting fixtures - Water Treatment Plant",
+    "summary": "Daily log for Water Treatment Plant. Installed lighting fixtures.",
+    "project": "Water Treatment Plant",
+    "client": "Portland Public Schools",
+    "status": "Published",
+    "logDate": "2025-07-20T00:00:00.000Z",
+    "author": "Daniel White",
+    "weatherConditions": {
+      "description": "Sunny with light winds",
+      "temperature": {
+        "current": 90,
+        "low": 81,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 22,
+        "unit": "mph"
+      },
+      "humidity": 42,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High winds, secured loose materials and equipment",
+    "structuredNotes": {
+      "progress": "Installed lighting fixtures",
+      "materialsDelivered": "Bathroom fixtures and tile"
+    },
+    "attachments": [
+      "invoice-030",
+      "report-083"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials"
+    ],
+    "createdAt": "2025-07-20T15:45:35.455Z",
+    "updatedAt": "2025-07-20T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Daniel White",
+      "location": "Oregon City, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-337",
+    "entityType": "DailyLog",
+    "title": "Finished flooring installation - City Center Plaza",
+    "summary": "Daily log for City Center Plaza. Finished flooring installation throughout. Issues: Material shortage for custom millwork.",
+    "project": "City Center Plaza",
+    "client": "UrbanCore Development",
+    "status": "Published",
+    "logDate": "2025-07-10T00:00:00.000Z",
+    "author": "Christopher Lee",
+    "weatherConditions": {
+      "description": "Clear skies",
+      "temperature": {
+        "current": 59,
+        "low": 51,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 1,
+        "unit": "mph"
+      },
+      "humidity": 64,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T09:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Finished flooring installation throughout",
+      "issues": "Material shortage for custom millwork",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-07-10T15:45:35.455Z",
+    "updatedAt": "2025-07-10T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Christopher Lee",
+      "location": "West Linn, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-338",
+    "entityType": "DailyLog",
+    "title": "Cleaned up construction - Wastewater Facility",
+    "summary": "Daily log for Wastewater Facility. Cleaned up construction debris and site.",
+    "project": "Wastewater Facility",
+    "client": "Premier Development Corp",
+    "status": "Published",
+    "logDate": "2025-07-25T00:00:00.000Z",
+    "author": "Ashley Thomas",
+    "weatherConditions": {
+      "description": "Clear and cold",
+      "temperature": {
+        "current": 90,
+        "low": 80,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 17,
+        "unit": "mph"
+      },
+      "humidity": 73,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High winds, secured loose materials and equipment",
+    "structuredNotes": {
+      "progress": "Cleaned up construction debris and site"
+    },
+    "attachments": [
+      "report-043"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress"
+    ],
+    "createdAt": "2025-07-25T15:45:35.455Z",
+    "updatedAt": "2025-07-25T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Completion",
+      "projectManager": "Ashley Thomas",
+      "location": "Ridgefield, WA",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-339",
+    "entityType": "DailyLog",
+    "title": "Finished painting interior - Water Treatment Plant",
+    "summary": "Daily log for Water Treatment Plant. Finished painting interior walls.",
+    "project": "Water Treatment Plant",
+    "client": "Columbia Sportswear",
+    "status": "Published",
+    "logDate": "2025-09-01T00:00:00.000Z",
+    "author": "Jennifer Davis",
+    "weatherConditions": {
+      "description": "Hot and humid",
+      "temperature": {
+        "current": 74,
+        "low": 68,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 7,
+        "unit": "mph"
+      },
+      "humidity": 55,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T12:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Finished painting interior walls",
+      "materialsDelivered": "Kitchen cabinets and hardware"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials",
+      "Painting"
+    ],
+    "createdAt": "2025-09-01T15:45:35.455Z",
+    "updatedAt": "2025-09-01T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Jennifer Davis",
+      "location": "Happy Valley, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-340",
+    "entityType": "DailyLog",
+    "title": "Completed drywall installation - Parking Garage",
+    "summary": "Daily log for Parking Garage. Completed drywall installation in living areas. Issues: Equipment malfunction caused brief work stoppage.",
+    "project": "Parking Garage",
+    "client": "Target Corporation",
+    "status": "Published",
+    "logDate": "2025-09-13T00:00:00.000Z",
+    "author": "Daniel White",
+    "weatherConditions": {
+      "description": "Hot and humid",
+      "temperature": {
+        "current": 95,
+        "low": 85,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 15,
+        "unit": "mph"
+      },
+      "humidity": 82,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T13:45:35.455Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed drywall installation in living areas",
+      "issues": "Equipment malfunction caused brief work stoppage",
+      "materialsDelivered": "Lighting fixtures and switches"
+    },
+    "attachments": [
+      "receipt-082"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials"
+    ],
+    "createdAt": "2025-09-13T15:45:35.455Z",
+    "updatedAt": "2025-09-13T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Daniel White",
+      "location": "Milwaukie, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-341",
+    "entityType": "DailyLog",
+    "title": "Completed drywall installation - Parking Garage",
+    "summary": "Daily log for Parking Garage. Completed drywall installation in living areas. Issues: Concrete truck arrived late, causing minor delay.",
+    "project": "Parking Garage",
+    "client": "Evergreen Builders Network",
+    "status": "Published",
+    "logDate": "2025-07-07T00:00:00.000Z",
+    "author": "Sarah Chen",
+    "weatherConditions": {
+      "description": "Cool and dry",
+      "temperature": {
+        "current": 86,
+        "low": 79,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 22,
+        "unit": "mph"
+      },
+      "humidity": 72,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High winds, secured loose materials and equipment",
+    "structuredNotes": {
+      "progress": "Completed drywall installation in living areas",
+      "issues": "Concrete truck arrived late, causing minor delay",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [
+      "photo-097",
+      "permit-016"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-07-07T15:45:35.455Z",
+    "updatedAt": "2025-07-07T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Construction",
+      "projectManager": "Sarah Chen",
+      "location": "Medford, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-342",
+    "entityType": "DailyLog",
+    "title": "Completed bathroom tile - Call Center",
+    "summary": "Daily log for Call Center. Completed bathroom tile work.",
+    "project": "Call Center",
+    "client": "Adventist Health",
+    "status": "Published",
+    "logDate": "2025-08-04T00:00:00.000Z",
+    "author": "Matthew Jackson",
+    "weatherConditions": {
+      "description": "Fog",
+      "temperature": {
+        "current": 77,
+        "low": 60,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 11,
+        "unit": "mph"
+      },
+      "humidity": 68,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T10:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Completed bathroom tile work",
+      "materialsDelivered": "Roofing materials and shingles"
+    },
+    "attachments": [
+      "photo-054"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials"
+    ],
+    "createdAt": "2025-08-04T15:45:35.455Z",
+    "updatedAt": "2025-08-04T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Construction",
+      "projectManager": "Matthew Jackson",
+      "location": "West Linn, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-343",
+    "entityType": "DailyLog",
+    "title": "Installed HVAC system - Call Center",
+    "summary": "Daily log for Call Center. Installed HVAC system and ductwork. Issues: Concrete truck arrived late, causing minor delay.",
+    "project": "Call Center",
+    "client": "Rachel & Christopher Brown",
+    "status": "Published",
+    "logDate": "2025-09-08T00:00:00.000Z",
+    "author": "Mike Rodriguez",
+    "weatherConditions": {
+      "description": "Windy",
+      "temperature": {
+        "current": 49,
+        "low": 31,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 25,
+        "unit": "mph"
+      },
+      "humidity": 100,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T13:45:35.455Z"
+    },
+    "weatherNotes": "Cold weather, adjusted concrete curing schedule. High winds, secured loose materials and equipment. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Installed HVAC system and ductwork",
+      "issues": "Concrete truck arrived late, causing minor delay"
+    },
+    "attachments": [
+      "permit-041",
+      "receipt-018"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues"
+    ],
+    "createdAt": "2025-09-08T15:45:35.455Z",
+    "updatedAt": "2025-09-08T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Finishing",
+      "projectManager": "Mike Rodriguez",
+      "location": "Banks, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-344",
+    "entityType": "DailyLog",
+    "title": "Completed drywall installation - Downtown Lofts",
+    "summary": "Daily log for Downtown Lofts. Completed drywall installation in living areas. Issues: Weather conditions affecting outdoor work.",
+    "project": "Downtown Lofts",
+    "client": "Stephanie & Andrew Garcia",
+    "status": "Published",
+    "logDate": "2025-08-10T00:00:00.000Z",
+    "author": "Mike Rodriguez",
+    "weatherConditions": {
+      "description": "Cloudy with occasional rain",
+      "temperature": {
+        "current": 93,
+        "low": 88,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 9,
+        "unit": "mph"
+      },
+      "humidity": 93,
+      "precipitation": {
+        "total": 1,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T11:45:35.455Z"
+    },
+    "weatherNotes": "Rain expected throughout the day, covered materials properly. Hot weather conditions, ensured proper hydration for crew. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Completed drywall installation in living areas",
+      "issues": "Weather conditions affecting outdoor work",
+      "materialsDelivered": "HVAC ductwork and equipment"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials",
+      "Weather"
+    ],
+    "createdAt": "2025-08-10T15:45:35.455Z",
+    "updatedAt": "2025-08-10T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Mike Rodriguez",
+      "location": "Bend, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "Yes"
+    }
+  },
+  {
+    "id": "dailylog-345",
+    "entityType": "DailyLog",
+    "title": "Completed exterior siding - Harbor View Condos",
+    "summary": "Daily log for Harbor View Condos. Completed exterior siding installation.",
+    "project": "Harbor View Condos",
+    "client": "Centennial School District",
+    "status": "Published",
+    "logDate": "2025-07-03T00:00:00.000Z",
+    "author": "Ashley Thomas",
+    "weatherConditions": {
+      "description": "Overcast",
+      "temperature": {
+        "current": 48,
+        "low": 37,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 8,
+        "unit": "mph"
+      },
+      "humidity": 35,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T08:45:35.455Z"
+    },
+    "weatherNotes": "Cold weather, adjusted concrete curing schedule",
+    "structuredNotes": {
+      "progress": "Completed exterior siding installation",
+      "materialsDelivered": "Concrete and rebar for foundation"
+    },
+    "attachments": [
+      "photo-052"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Materials"
+    ],
+    "createdAt": "2025-07-03T15:45:35.455Z",
+    "updatedAt": "2025-07-03T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Ashley Thomas",
+      "location": "Lake Oswego, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-346",
+    "entityType": "DailyLog",
+    "title": "Delivered and staged - Office Tower",
+    "summary": "Daily log for Office Tower. Delivered and staged materials for next phase.",
+    "project": "Office Tower",
+    "client": "Hillsboro School District",
+    "status": "Published",
+    "logDate": "2025-09-11T00:00:00.000Z",
+    "author": "Jennifer Davis",
+    "weatherConditions": {
+      "description": "Heavy rain",
+      "temperature": {
+        "current": 57,
+        "low": 52,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 4,
+        "unit": "mph"
+      },
+      "humidity": 52,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T10:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Delivered and staged materials for next phase"
+    },
+    "attachments": [
+      "specification-006",
+      "report-014",
+      "photo-042"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress"
+    ],
+    "createdAt": "2025-09-11T15:45:35.455Z",
+    "updatedAt": "2025-09-11T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Construction",
+      "projectManager": "Jennifer Davis",
+      "location": "Bend, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-347",
+    "entityType": "DailyLog",
+    "title": "Installed windows and - Theater Renovation",
+    "summary": "Daily log for Theater Renovation. Installed windows and doors. Issues: Minor plumbing leak discovered and repaired.",
+    "project": "Theater Renovation",
+    "client": "Lowe's",
+    "status": "Published",
+    "logDate": "2025-07-23T00:00:00.000Z",
+    "author": "Christopher Lee",
+    "weatherConditions": {
+      "description": "Fog",
+      "temperature": {
+        "current": 90,
+        "low": 81,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 15,
+        "unit": "mph"
+      },
+      "humidity": 93,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T12:45:35.455Z"
+    },
+    "weatherNotes": "Hot weather conditions, ensured proper hydration for crew. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Installed windows and doors",
+      "issues": "Minor plumbing leak discovered and repaired",
+      "materialsDelivered": "Hardware and fasteners"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials"
+    ],
+    "createdAt": "2025-07-23T15:45:35.455Z",
+    "updatedAt": "2025-07-23T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Christopher Lee",
+      "location": "Ridgefield, WA",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-348",
+    "entityType": "DailyLog",
+    "title": "Completed exterior siding - Call Center",
+    "summary": "Daily log for Call Center. Completed exterior siding installation.",
+    "project": "Call Center",
+    "client": "Fred Meyer",
+    "status": "Published",
+    "logDate": "2025-08-10T00:00:00.000Z",
+    "author": "Jennifer Davis",
+    "weatherConditions": {
+      "description": "Snow",
+      "temperature": {
+        "current": 95,
+        "low": 88,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 11,
+        "unit": "mph"
+      },
+      "humidity": 31,
+      "precipitation": {
+        "total": 1,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T13:45:35.455Z"
+    },
+    "weatherNotes": "Rain expected throughout the day, covered materials properly. Hot weather conditions, ensured proper hydration for crew",
+    "structuredNotes": {
+      "progress": "Completed exterior siding installation"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Weather"
+    ],
+    "createdAt": "2025-08-10T15:45:35.455Z",
+    "updatedAt": "2025-08-10T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Jennifer Davis",
+      "location": "Forest Grove, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "Yes"
+    }
+  },
+  {
+    "id": "dailylog-349",
+    "entityType": "DailyLog",
+    "title": "Delivered and staged - Convention Center",
+    "summary": "Daily log for Convention Center. Delivered and staged materials for next phase. Issues: Building inspector found minor code violation.",
+    "project": "Convention Center",
+    "client": "Metro Builders Alliance",
+    "status": "Published",
+    "logDate": "2025-08-06T00:00:00.000Z",
+    "author": "Ashley Thomas",
+    "weatherConditions": {
+      "description": "Light rain",
+      "temperature": {
+        "current": 53,
+        "low": 47,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 23,
+        "unit": "mph"
+      },
+      "humidity": 85,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T14:45:35.455Z"
+    },
+    "weatherNotes": "High winds, secured loose materials and equipment. High humidity, extended paint drying times",
+    "structuredNotes": {
+      "progress": "Delivered and staged materials for next phase",
+      "issues": "Building inspector found minor code violation",
+      "materialsDelivered": "Electrical wire and outlets"
+    },
+    "attachments": [],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials"
+    ],
+    "createdAt": "2025-08-06T15:45:35.455Z",
+    "updatedAt": "2025-08-06T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Ashley Thomas",
+      "location": "North Plains, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  },
+  {
+    "id": "dailylog-350",
+    "entityType": "DailyLog",
+    "title": "Completed drywall installation - Urban Village",
+    "summary": "Daily log for Urban Village. Completed drywall installation in living areas. Issues: Utility company delayed connection.",
+    "project": "Urban Village",
+    "client": "Portland State University",
+    "status": "Published",
+    "logDate": "2025-08-19T00:00:00.000Z",
+    "author": "Ashley Thomas",
+    "weatherConditions": {
+      "description": "Cloudy with occasional rain",
+      "temperature": {
+        "current": 76,
+        "low": 64,
+        "unit": "F"
+      },
+      "wind": {
+        "speed": 5,
+        "unit": "mph"
+      },
+      "humidity": 41,
+      "precipitation": {
+        "total": 0,
+        "unit": "in"
+      },
+      "timestamp": "2025-09-24T13:45:35.455Z"
+    },
+    "structuredNotes": {
+      "progress": "Completed drywall installation in living areas",
+      "issues": "Utility company delayed connection",
+      "materialsDelivered": "Lighting fixtures and switches",
+      "additional": "Crew worked efficiently despite challenging conditions. Quality control checks completed."
+    },
+    "attachments": [
+      "permit-065",
+      "report-015"
+    ],
+    "tags": [
+      "Daily Log",
+      "Progress",
+      "Issues",
+      "Materials"
+    ],
+    "createdAt": "2025-08-19T15:45:35.455Z",
+    "updatedAt": "2025-08-19T15:45:35.455Z",
+    "metadata": {
+      "projectPhase": "Planning",
+      "projectManager": "Ashley Thomas",
+      "location": "Yamhill, OR",
+      "logType": "Daily Progress",
+      "weatherImpact": "No"
+    }
+  }
+]

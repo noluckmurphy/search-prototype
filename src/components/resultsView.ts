@@ -1,5 +1,6 @@
 import {
   BuildertrendRecord,
+  DailyLogRecord,
   FacetKey,
   FacetSelectionState,
   FacetValue,
@@ -8,6 +9,7 @@ import {
   SearchResponse,
   SortOption,
   isBuildertrendRecord,
+  isDailyLogRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
@@ -1137,6 +1139,13 @@ async function renderResultCard(item: SearchRecord, query?: string, isMonetarySe
     }
   }
 
+  if (isDailyLogRecord(item)) {
+    const dailyLogContent = renderDailyLogContent(item, query, highlightFn);
+    if (dailyLogContent) {
+      card.append(dailyLogContent);
+    }
+  }
+
   // Add related items and smart actions
   const settings = settingsStore.getState();
   const includeInferred = settings.showInferredRelationships ?? true;
@@ -1847,6 +1856,131 @@ function renderLineItems(item: SearchRecord, query?: string, isMonetarySearch?: 
   // Show line items normally (for show-all-always or when there are matches for matched behaviors)
   // Render the table content using the new function
   renderTableContent();
+
+  return wrapper;
+}
+
+function renderDailyLogContent(item: DailyLogRecord, query?: string, highlightFn?: ((text: string, query: string) => string) | null): HTMLElement | null {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'result-card__daily-log-content';
+
+  // Weather Conditions Section
+  if (item.weatherConditions) {
+    const weatherSection = document.createElement('div');
+    weatherSection.className = 'daily-log__weather';
+    
+    const weatherHeader = document.createElement('h4');
+    weatherHeader.className = 'daily-log__section-header';
+    weatherHeader.textContent = '🌤️ Weather Conditions';
+    weatherSection.append(weatherHeader);
+    
+    const weatherInfo = document.createElement('div');
+    weatherInfo.className = 'daily-log__weather-info';
+    
+    const conditions = document.createElement('div');
+    conditions.className = 'daily-log__weather-condition';
+    const conditionText = `${item.weatherConditions.description} - ${item.weatherConditions.temperature.current}°${item.weatherConditions.temperature.unit} (Low: ${item.weatherConditions.temperature.low}°${item.weatherConditions.temperature.unit})`;
+    conditions.innerHTML = query && highlightFn ? highlightFn(conditionText, query) : conditionText;
+    
+    const windHumidity = document.createElement('div');
+    windHumidity.className = 'daily-log__weather-details';
+    const detailsText = `Wind: ${item.weatherConditions.wind.speed} ${item.weatherConditions.wind.unit} | Humidity: ${item.weatherConditions.humidity}% | Precipitation: ${item.weatherConditions.precipitation.total} ${item.weatherConditions.precipitation.unit}`;
+    windHumidity.innerHTML = query && highlightFn ? highlightFn(detailsText, query) : detailsText;
+    
+    weatherInfo.append(conditions, windHumidity);
+    weatherSection.append(weatherInfo);
+    
+    wrapper.append(weatherSection);
+  }
+
+  // Weather Notes Section
+  if (item.weatherNotes) {
+    const weatherNotesSection = document.createElement('div');
+    weatherNotesSection.className = 'daily-log__weather-notes';
+    
+    const weatherNotesHeader = document.createElement('h4');
+    weatherNotesHeader.className = 'daily-log__section-header';
+    weatherNotesHeader.textContent = '🌦️ Weather Notes';
+    weatherNotesSection.append(weatherNotesHeader);
+    
+    const weatherNotesContent = document.createElement('div');
+    weatherNotesContent.className = 'daily-log__weather-notes-content';
+    weatherNotesContent.innerHTML = query && highlightFn ? highlightFn(item.weatherNotes, query) : item.weatherNotes;
+    weatherNotesSection.append(weatherNotesContent);
+    
+    wrapper.append(weatherNotesSection);
+  }
+
+  // Structured Notes Section
+  const structuredNotesSection = document.createElement('div');
+  structuredNotesSection.className = 'daily-log__structured-notes';
+  
+  const structuredNotesHeader = document.createElement('h4');
+  structuredNotesHeader.className = 'daily-log__section-header';
+  structuredNotesHeader.textContent = '📝 Daily Notes';
+  structuredNotesSection.append(structuredNotesHeader);
+  
+  const notesContainer = document.createElement('div');
+  notesContainer.className = 'daily-log__notes-container';
+
+  // Progress
+  if (item.structuredNotes.progress) {
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'daily-log__note-item';
+    
+    const progressLabel = document.createElement('strong');
+    progressLabel.textContent = 'Progress: ';
+    const progressContent = document.createElement('span');
+    progressContent.innerHTML = query && highlightFn ? highlightFn(item.structuredNotes.progress, query) : item.structuredNotes.progress;
+    
+    progressDiv.append(progressLabel, progressContent);
+    notesContainer.append(progressDiv);
+  }
+
+  // Issues
+  if (item.structuredNotes.issues) {
+    const issuesDiv = document.createElement('div');
+    issuesDiv.className = 'daily-log__note-item daily-log__note-item--issues';
+    
+    const issuesLabel = document.createElement('strong');
+    issuesLabel.textContent = 'Issues: ';
+    const issuesContent = document.createElement('span');
+    issuesContent.innerHTML = query && highlightFn ? highlightFn(item.structuredNotes.issues, query) : item.structuredNotes.issues;
+    
+    issuesDiv.append(issuesLabel, issuesContent);
+    notesContainer.append(issuesDiv);
+  }
+
+  // Materials Delivered
+  if (item.structuredNotes.materialsDelivered) {
+    const materialsDiv = document.createElement('div');
+    materialsDiv.className = 'daily-log__note-item';
+    
+    const materialsLabel = document.createElement('strong');
+    materialsLabel.textContent = 'Materials Delivered: ';
+    const materialsContent = document.createElement('span');
+    materialsContent.innerHTML = query && highlightFn ? highlightFn(item.structuredNotes.materialsDelivered, query) : item.structuredNotes.materialsDelivered;
+    
+    materialsDiv.append(materialsLabel, materialsContent);
+    notesContainer.append(materialsDiv);
+  }
+
+  // Additional Notes
+  if (item.structuredNotes.additional) {
+    const additionalDiv = document.createElement('div');
+    additionalDiv.className = 'daily-log__note-item';
+    
+    const additionalLabel = document.createElement('strong');
+    additionalLabel.textContent = 'Additional: ';
+    const additionalContent = document.createElement('span');
+    additionalContent.innerHTML = query && highlightFn ? highlightFn(item.structuredNotes.additional, query) : item.structuredNotes.additional;
+    
+    additionalDiv.append(additionalLabel, additionalContent);
+    notesContainer.append(additionalDiv);
+  }
+
+  structuredNotesSection.append(notesContainer);
+  wrapper.append(structuredNotesSection);
 
   return wrapper;
 }

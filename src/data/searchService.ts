@@ -1,5 +1,6 @@
 import {
   BuildertrendRecord,
+  DailyLogRecord,
   DocumentRecord,
   FacetKey,
   FacetSelectionState,
@@ -13,6 +14,7 @@ import {
   SearchRecord,
   SearchResponse,
   isBuildertrendRecord,
+  isDailyLogRecord,
   isFinancialRecord,
   isOrganizationRecord,
   isPersonRecord,
@@ -31,6 +33,7 @@ import { RelationshipEngine, Relationship, SmartAction } from '../utils/relation
 const GROUP_ORDER: SearchEntityType[] = [
   'Buildertrend',
   'Document',
+  'DailyLog',
   'Person',
   'Organization',
   'ClientInvoice',
@@ -227,6 +230,18 @@ function buildHaystack(record: SearchRecord): string {
       record.phone,
       record.email,
       record.website ?? '',
+    );
+  } else if (isDailyLogRecord(record)) {
+    base.push(
+      record.author,
+      record.logDate,
+      record.structuredNotes.progress ?? '',
+      record.structuredNotes.issues ?? '',
+      record.structuredNotes.materialsDelivered ?? '',
+      record.structuredNotes.additional ?? '',
+      record.weatherNotes ?? '',
+      record.weatherConditions?.description ?? '',
+      record.attachments.join(' '),
     );
   }
 

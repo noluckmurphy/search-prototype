@@ -1,6 +1,6 @@
 {
-  "totalDocuments": 350,
-  "totalFiles": 12,
+  "totalDocuments": 400,
+  "totalFiles": 14,
   "documentsPerFile": 30,
   "files": [
     {
@@ -334,6 +334,18 @@
       "count": 30,
       "generated": "2025-09-19T01:04:21.588Z",
       "enhanced": true
+    },
+    {
+      "filename": "corpus-part-13.json",
+      "count": 25,
+      "generated": "2025-09-24T15:45:35.457Z",
+      "entityType": "DailyLog"
+    },
+    {
+      "filename": "corpus-part-14.json",
+      "count": 25,
+      "generated": "2025-09-24T15:45:35.457Z",
+      "entityType": "DailyLog"
     }
   ]
 }

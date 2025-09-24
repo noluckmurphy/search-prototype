@@ -2,6 +2,7 @@ import { SearchEntityType } from '../types';
 
 const ENTITY_LABELS: Record<SearchEntityType, { singular: string; plural: string }> = {
   Document: { singular: 'Document', plural: 'Documents' },
+  DailyLog: { singular: 'Daily Log', plural: 'Daily Logs' },
   ClientInvoice: { singular: 'Client Invoice', plural: 'Client Invoices' },
   PurchaseOrder: { singular: 'Purchase Order', plural: 'Purchase Orders' },
   Bill: { singular: 'Bill', plural: 'Bills' },
@@ -9,6 +10,7 @@ const ENTITY_LABELS: Record<SearchEntityType, { singular: string; plural: string
   Payment: { singular: 'Payment', plural: 'Payments' },
   Person: { singular: 'Person', plural: 'People' },
   Organization: { singular: 'Organization', plural: 'Organizations' },
+  Buildertrend: { singular: 'Buildertrend', plural: 'Buildertrend' },
 };
 
 export function formatEntityType(type: SearchEntityType, options?: { plural?: boolean }): string {

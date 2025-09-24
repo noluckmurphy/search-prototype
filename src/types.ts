@@ -7,7 +7,8 @@ export type SearchEntityType =
   | 'Payment'
   | 'Person'
   | 'Organization'
-  | 'Buildertrend';
+  | 'Buildertrend'
+  | 'DailyLog';
 
 export type LineItemType = 'Labor' | 'Material' | 'Subcontractor' | 'Other';
 
@@ -106,12 +107,45 @@ export interface BuildertrendRecord extends SearchRecordBase {
   triggerQueries: string[];
 }
 
+export interface DailyLogRecord extends SearchRecordBase {
+  entityType: 'DailyLog';
+  logDate: string; // ISO date string
+  author: string; // Person who created the log
+  weatherConditions?: {
+    description: string; // "Partly cloudy with isolated showers"
+    temperature: {
+      current: number; // 76
+      low: number; // 58
+      unit: 'F' | 'C'; // 'F'
+    };
+    wind: {
+      speed: number; // 10
+      unit: 'mph' | 'kmh'; // 'mph'
+    };
+    humidity: number; // 97 (percentage)
+    precipitation: {
+      total: number; // 0
+      unit: 'in' | 'mm'; // 'in'
+    };
+    timestamp: string; // When weather was recorded
+  };
+  weatherNotes?: string;
+  structuredNotes: {
+    progress?: string;
+    issues?: string;
+    materialsDelivered?: string;
+    additional?: string; // For other custom note sections
+  };
+  attachments: string[]; // Array of attachment IDs/names
+}
+
 export type SearchRecord =
   | DocumentRecord
   | FinancialRecord
   | PersonRecord
   | OrganizationRecord
-  | BuildertrendRecord;
+  | BuildertrendRecord
+  | DailyLogRecord;
 
 export function isFinancialRecord(record: SearchRecord): record is FinancialRecord {
   return (
@@ -133,6 +167,10 @@ export function isOrganizationRecord(record: SearchRecord): record is Organizati
 
 export function isBuildertrendRecord(record: SearchRecord): record is BuildertrendRecord {
   return record.entityType === 'Buildertrend';
+}
+
+export function isDailyLogRecord(record: SearchRecord): record is DailyLogRecord {
+  return record.entityType === 'DailyLog';
 }
 
 export interface SearchGroup {
