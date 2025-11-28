@@ -1463,8 +1463,12 @@ async function filterRecords({ query, selections, isMonetarySearch }: SearchOpti
     selections: Object.keys(selections || {}),
     isMonetarySearch
   });
-  
-  const { isMonetary, searchQuery } = parseMonetaryQuery(query);
+
+  // Use the passed isMonetary value if provided, otherwise parse
+  // In practice, it should always be provided now from main.ts
+  const { isMonetary, searchQuery } = isMonetarySearch !== undefined
+    ? { isMonetary: isMonetarySearch, searchQuery: isMonetarySearch ? query.trim().slice(1).trim() : query }
+    : parseMonetaryQuery(query);
   
   const corpus = await loadCorpus();
   
@@ -1760,13 +1764,17 @@ export async function runSearch(
     selections: Object.keys(options.selections || {}),
     isMonetarySearch: options.isMonetarySearch
   });
-  
+
   const settings = settingsStore.getState();
   const meanDelay = overrides?.delayMs ?? settings.searchDelayMs;
   const variance = settings.searchDelayVarianceMs;
   const groupLimits = overrides?.groupLimits ?? settings.groupLimits;
 
-  const { isMonetary } = parseMonetaryQuery(options.query);
+  // Use the passed isMonetary value if provided, otherwise parse
+  // In practice, it should always be provided now from main.ts
+  const isMonetary = options.isMonetarySearch !== undefined
+    ? options.isMonetarySearch
+    : parseMonetaryQuery(options.query).isMonetary;
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   
   // Break up the heavy operations to avoid blocking the main thread

@@ -7,6 +7,7 @@ export interface AppState {
   route: ScreenRoute;
   searchQuery: string;
   lastSubmittedQuery: string;
+  isMonetary: boolean;
   facetSelections: FacetSelectionState;
   sortBy: SortOption;
   recentResponse: SearchResponse | null;
@@ -19,6 +20,7 @@ const initialState: AppState = {
   route: 'home',
   searchQuery: '',
   lastSubmittedQuery: '',
+  isMonetary: false,
   facetSelections: {},
   sortBy: 'relevance',
   recentResponse: null,
@@ -48,6 +50,9 @@ export const appState = {
   },
   setSearchQuery(searchQuery: string) {
     store.setState({ searchQuery });
+  },
+  setMonetaryMode(isMonetary: boolean) {
+    store.setState({ isMonetary });
   },
   setDialogOpen(dialogOpen: boolean) {
     store.setState({ dialogOpen });

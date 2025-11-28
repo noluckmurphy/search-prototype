@@ -33,8 +33,18 @@ if (!root) {
 const main = document.createElement('main');
 main.className = 'app-main';
 
+// Search context to capture all parameters atomically
+interface SearchContext {
+  requestId: number;
+  query: string;
+  facetSelections: FacetSelectionState;
+  isMonetary: boolean;
+  timestamp: number;
+}
+
 let activeSearchToken = 0;
 let searchDebounceTimer: number | null = null;
+let currentSearchAbort: AbortController | null = null;
 
 // Optimized debouncing for better performance
 function debouncedSearch(value: string, options: { openDialog?: boolean; updateSubmitted?: boolean }) {
@@ -89,18 +99,22 @@ const header = createHeader({
   onSearchChange: (value) => {
     const currentState = appState.getState();
     const previousQuery = currentState.lastSubmittedQuery || currentState.searchQuery;
-    
+
     // Clear filters if the search query has changed from the last submitted query
     if (value.trim() !== previousQuery.trim()) {
       appState.clearFacets();
     }
-    
-    // Update search query immediately for responsive UI
+
+    // Detect monetary mode ONCE at entry point
+    const isMonetary = isMonetaryQuery(value);
+
+    // Update search query and monetary mode atomically
     appState.setSearchQuery(value);
-    
-    // Set monetary search mode based on query
-    header.setMonetarySearchMode(isMonetaryQuery(value));
-    
+    appState.setMonetaryMode(isMonetary);
+
+    // Set UI monetary search mode
+    header.setMonetarySearchMode(isMonetary);
+
     const isHome = appState.getState().route === 'home';
     debouncedSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
   },
@@ -302,57 +316,75 @@ async function performSearch(
     return;
   }
 
-  const requestId = ++activeSearchToken;
+  // Cancel any in-flight search
+  if (currentSearchAbort) {
+    currentSearchAbort.abort();
+  }
+  currentSearchAbort = new AbortController();
+
+  // Capture ALL search parameters atomically at token assignment
+  const currentState = appState.getState();
+  const searchContext: SearchContext = {
+    requestId: ++activeSearchToken,
+    query: trimmed,
+    facetSelections: { ...currentState.facetSelections },
+    isMonetary: currentState.isMonetary,
+    timestamp: Date.now()
+  };
+
+  console.log('🔍 performSearch - context captured:', {
+    requestId: searchContext.requestId,
+    query: searchContext.query,
+    isMonetary: searchContext.isMonetary,
+    allSelections: Object.keys(searchContext.facetSelections).map(key => ({
+      key,
+      values: Array.from(searchContext.facetSelections[key] || [])
+    }))
+  });
+
   appState.setStatus('loading');
 
   try {
-    const facetSelections = appState.getState().facetSelections;
-    
-    console.log('🔍 performSearch - facetSelections:', {
-      allSelections: Object.keys(facetSelections).map(key => ({
-        key,
-        values: Array.from(facetSelections[key] || [])
-      }))
+    const response = await runSearch({
+      query: searchContext.query,
+      selections: searchContext.facetSelections,
+      isMonetarySearch: searchContext.isMonetary,
     });
-    
-    // Use MessageChannel to defer the heavy search operation
-    const channel = new MessageChannel();
-    channel.port2.onmessage = async () => {
-      try {
-        const response = await runSearch({
-          query: trimmed,
-          selections: facetSelections,
-        });
 
-        if (requestId !== activeSearchToken) {
-          return;
-        }
+    // Check if this search is still the most recent
+    if (searchContext.requestId !== activeSearchToken) {
+      console.log('🔍 Search outdated, discarding results for request', searchContext.requestId);
+      return;
+    }
 
-        appState.setResponse(response);
-        appState.setStatus('ready');
+    // Check if aborted
+    if (currentSearchAbort?.signal.aborted) {
+      console.log('🔍 Search aborted for request', searchContext.requestId);
+      return;
+    }
 
-        if (updateSubmitted) {
-          appState.setLastSubmittedQuery(trimmed);
-          // Record the search in recent searches when it's a submitted query
-          recentSearches.addSearch(trimmed, response.totalResults);
-        }
+    appState.setResponse(response);
+    appState.setStatus('ready');
 
-        if (openDialog && appState.getState().route === 'home') {
-          appState.setDialogOpen(true);
-        }
-      } catch (error) {
-        if (requestId !== activeSearchToken) {
-          return;
-        }
+    if (updateSubmitted) {
+      appState.setLastSubmittedQuery(searchContext.query);
+      // Record the search in recent searches when it's a submitted query
+      recentSearches.addSearch(searchContext.query, response.totalResults);
+    }
 
-        console.error('Search failed', error);
-        appState.setStatus('error', 'Unable to complete search. Try again.');
-      }
-    };
-    channel.port1.postMessage(null);
-    
+    if (openDialog && appState.getState().route === 'home') {
+      appState.setDialogOpen(true);
+    }
   } catch (error) {
-    if (requestId !== activeSearchToken) {
+    // Check if this search is still the most recent
+    if (searchContext.requestId !== activeSearchToken) {
+      console.log('🔍 Search error outdated, ignoring for request', searchContext.requestId);
+      return;
+    }
+
+    // Check if aborted (don't show error for aborted searches)
+    if (currentSearchAbort?.signal.aborted) {
+      console.log('🔍 Search aborted (error path) for request', searchContext.requestId);
       return;
     }
 
@@ -447,11 +479,12 @@ appState.subscribe((state) => {
   }
 
   // Only update search dialog if relevant state changed
-  const dialogStateChanged = !previousState || 
+  const dialogStateChanged = !previousState ||
     previousState.dialogOpen !== state.dialogOpen ||
     previousState.route !== state.route ||
     previousState.searchStatus !== state.searchStatus ||
     previousState.searchQuery !== state.searchQuery ||
+    previousState.isMonetary !== state.isMonetary ||
     previousState.recentResponse !== state.recentResponse;
 
   if (dialogStateChanged) {
@@ -462,7 +495,7 @@ appState.subscribe((state) => {
       status: state.searchStatus,
       query: state.searchQuery,
       response: state.recentResponse,
-      isMonetarySearch: isMonetaryQuery(state.searchQuery),
+      isMonetarySearch: state.isMonetary,
       selectedIndex: queryChanged ? -1 : (previousState?.selectedIndex ?? -1), // Preserve existing selection or default to -1
     });
   }
@@ -475,6 +508,7 @@ appState.subscribe((state) => {
     previousState.searchStatus !== state.searchStatus ||
     previousState.lastSubmittedQuery !== state.lastSubmittedQuery ||
     previousState.searchQuery !== state.searchQuery ||
+    previousState.isMonetary !== state.isMonetary ||
     previousState.errorMessage !== state.errorMessage;
 
   if (resultsStateChanged) {
@@ -488,7 +522,7 @@ appState.subscribe((state) => {
         status: state.searchStatus,
         query: state.lastSubmittedQuery || state.searchQuery,
         errorMessage: state.errorMessage,
-        isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery),
+        isMonetarySearch: state.isMonetary,
       });
     };
     channel.port1.postMessage(null);
@@ -504,9 +538,16 @@ document.addEventListener('mousedown', handleDocumentClick);
 function handleSearchQueryEvent(event: CustomEvent) {
   const query = event.detail?.query;
   if (query && typeof query === 'string') {
-    // Set the search query and trigger a search
+    // Detect monetary mode ONCE at entry point
+    const isMonetary = isMonetaryQuery(query);
+
+    // Set the search query and monetary mode atomically
     appState.setSearchQuery(query);
-    header.setMonetarySearchMode(isMonetaryQuery(query));
+    appState.setMonetaryMode(isMonetary);
+
+    // Set UI monetary search mode
+    header.setMonetarySearchMode(isMonetary);
+
     navigate('results');
     void performSearch(query, { openDialog: false });
   }

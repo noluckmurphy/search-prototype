@@ -4648,7 +4648,7 @@ async function filterRecords({ query, selections, isMonetarySearch }) {
     selections: Object.keys(selections || {}),
     isMonetarySearch
   });
-  const { isMonetary, searchQuery } = parseMonetaryQuery(query);
+  const { isMonetary, searchQuery } = isMonetarySearch !== void 0 ? { isMonetary: isMonetarySearch, searchQuery: isMonetarySearch ? query.trim().slice(1).trim() : query } : parseMonetaryQuery(query);
   const corpus = await loadCorpus();
   const buildertrendMatches = [];
   const otherMatches = [];
@@ -4861,7 +4861,7 @@ async function runSearch(options, overrides) {
   const meanDelay = overrides?.delayMs ?? settings.searchDelayMs;
   const variance = settings.searchDelayVarianceMs;
   const groupLimits = overrides?.groupLimits ?? settings.groupLimits;
-  const { isMonetary } = parseMonetaryQuery(options.query);
+  const isMonetary = options.isMonetarySearch !== void 0 ? options.isMonetarySearch : parseMonetaryQuery(options.query).isMonetary;
   const searchOptions = { ...options, isMonetarySearch: isMonetary };
   const records = await filterRecords(searchOptions);
   console.log("\u{1F4CA} filterRecords returned", records.length, "records");
@@ -7029,6 +7029,7 @@ var initialState2 = {
   route: "home",
   searchQuery: "",
   lastSubmittedQuery: "",
+  isMonetary: false,
   facetSelections: {},
   sortBy: "relevance",
   recentResponse: null,
@@ -7055,6 +7056,9 @@ var appState = {
   },
   setSearchQuery(searchQuery) {
     store2.setState({ searchQuery });
+  },
+  setMonetaryMode(isMonetary) {
+    store2.setState({ isMonetary });
   },
   setDialogOpen(dialogOpen) {
     store2.setState({ dialogOpen });
@@ -7129,6 +7133,7 @@ var main = document.createElement("main");
 main.className = "app-main";
 var activeSearchToken = 0;
 var searchDebounceTimer = null;
+var currentSearchAbort = null;
 function debouncedSearch(value, options) {
   if (searchDebounceTimer) {
     clearTimeout(searchDebounceTimer);
@@ -7171,8 +7176,10 @@ var header = createHeader({
     if (value.trim() !== previousQuery.trim()) {
       appState.clearFacets();
     }
+    const isMonetary = isMonetaryQuery(value);
     appState.setSearchQuery(value);
-    header.setMonetarySearchMode(isMonetaryQuery(value));
+    appState.setMonetaryMode(isMonetary);
+    header.setMonetarySearchMode(isMonetary);
     const isHome = appState.getState().route === "home";
     debouncedSearch(value, { openDialog: isHome, updateSubmitted: !isHome });
   },
@@ -7333,46 +7340,58 @@ async function performSearch(query, options = {}) {
     appState.setResponse(null);
     return;
   }
-  const requestId = ++activeSearchToken;
+  if (currentSearchAbort) {
+    currentSearchAbort.abort();
+  }
+  currentSearchAbort = new AbortController();
+  const currentState = appState.getState();
+  const searchContext = {
+    requestId: ++activeSearchToken,
+    query: trimmed,
+    facetSelections: { ...currentState.facetSelections },
+    isMonetary: currentState.isMonetary,
+    timestamp: Date.now()
+  };
+  console.log("\u{1F50D} performSearch - context captured:", {
+    requestId: searchContext.requestId,
+    query: searchContext.query,
+    isMonetary: searchContext.isMonetary,
+    allSelections: Object.keys(searchContext.facetSelections).map((key) => ({
+      key,
+      values: Array.from(searchContext.facetSelections[key] || [])
+    }))
+  });
   appState.setStatus("loading");
   try {
-    const facetSelections = appState.getState().facetSelections;
-    console.log("\u{1F50D} performSearch - facetSelections:", {
-      allSelections: Object.keys(facetSelections).map((key) => ({
-        key,
-        values: Array.from(facetSelections[key] || [])
-      }))
+    const response = await runSearch({
+      query: searchContext.query,
+      selections: searchContext.facetSelections,
+      isMonetarySearch: searchContext.isMonetary
     });
-    const channel = new MessageChannel();
-    channel.port2.onmessage = async () => {
-      try {
-        const response = await runSearch({
-          query: trimmed,
-          selections: facetSelections
-        });
-        if (requestId !== activeSearchToken) {
-          return;
-        }
-        appState.setResponse(response);
-        appState.setStatus("ready");
-        if (updateSubmitted) {
-          appState.setLastSubmittedQuery(trimmed);
-          recentSearches.addSearch(trimmed, response.totalResults);
-        }
-        if (openDialog && appState.getState().route === "home") {
-          appState.setDialogOpen(true);
-        }
-      } catch (error) {
-        if (requestId !== activeSearchToken) {
-          return;
-        }
-        console.error("Search failed", error);
-        appState.setStatus("error", "Unable to complete search. Try again.");
-      }
-    };
-    channel.port1.postMessage(null);
+    if (searchContext.requestId !== activeSearchToken) {
+      console.log("\u{1F50D} Search outdated, discarding results for request", searchContext.requestId);
+      return;
+    }
+    if (currentSearchAbort?.signal.aborted) {
+      console.log("\u{1F50D} Search aborted for request", searchContext.requestId);
+      return;
+    }
+    appState.setResponse(response);
+    appState.setStatus("ready");
+    if (updateSubmitted) {
+      appState.setLastSubmittedQuery(searchContext.query);
+      recentSearches.addSearch(searchContext.query, response.totalResults);
+    }
+    if (openDialog && appState.getState().route === "home") {
+      appState.setDialogOpen(true);
+    }
   } catch (error) {
-    if (requestId !== activeSearchToken) {
+    if (searchContext.requestId !== activeSearchToken) {
+      console.log("\u{1F50D} Search error outdated, ignoring for request", searchContext.requestId);
+      return;
+    }
+    if (currentSearchAbort?.signal.aborted) {
+      console.log("\u{1F50D} Search aborted (error path) for request", searchContext.requestId);
       return;
     }
     console.error("Search failed", error);
@@ -7439,7 +7458,7 @@ appState.subscribe((state) => {
   if (!previousState || previousState.route !== state.route) {
     header.setActiveRoute(state.route);
   }
-  const dialogStateChanged = !previousState || previousState.dialogOpen !== state.dialogOpen || previousState.route !== state.route || previousState.searchStatus !== state.searchStatus || previousState.searchQuery !== state.searchQuery || previousState.recentResponse !== state.recentResponse;
+  const dialogStateChanged = !previousState || previousState.dialogOpen !== state.dialogOpen || previousState.route !== state.route || previousState.searchStatus !== state.searchStatus || previousState.searchQuery !== state.searchQuery || previousState.isMonetary !== state.isMonetary || previousState.recentResponse !== state.recentResponse;
   if (dialogStateChanged) {
     const queryChanged = !previousState || previousState.searchQuery !== state.searchQuery;
     searchDialog.setState({
@@ -7447,12 +7466,12 @@ appState.subscribe((state) => {
       status: state.searchStatus,
       query: state.searchQuery,
       response: state.recentResponse,
-      isMonetarySearch: isMonetaryQuery(state.searchQuery),
+      isMonetarySearch: state.isMonetary,
       selectedIndex: queryChanged ? -1 : previousState?.selectedIndex ?? -1
       // Preserve existing selection or default to -1
     });
   }
-  const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.sortBy !== state.sortBy || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.errorMessage !== state.errorMessage;
+  const resultsStateChanged = !previousState || previousState.recentResponse !== state.recentResponse || previousState.facetSelections !== state.facetSelections || previousState.sortBy !== state.sortBy || previousState.searchStatus !== state.searchStatus || previousState.lastSubmittedQuery !== state.lastSubmittedQuery || previousState.searchQuery !== state.searchQuery || previousState.isMonetary !== state.isMonetary || previousState.errorMessage !== state.errorMessage;
   if (resultsStateChanged) {
     const channel = new MessageChannel();
     channel.port2.onmessage = () => {
@@ -7463,7 +7482,7 @@ appState.subscribe((state) => {
         status: state.searchStatus,
         query: state.lastSubmittedQuery || state.searchQuery,
         errorMessage: state.errorMessage,
-        isMonetarySearch: isMonetaryQuery(state.lastSubmittedQuery || state.searchQuery)
+        isMonetarySearch: state.isMonetary
       });
     };
     channel.port1.postMessage(null);
@@ -7475,8 +7494,10 @@ document.addEventListener("mousedown", handleDocumentClick);
 function handleSearchQueryEvent(event) {
   const query = event.detail?.query;
   if (query && typeof query === "string") {
+    const isMonetary = isMonetaryQuery(query);
     appState.setSearchQuery(query);
-    header.setMonetarySearchMode(isMonetaryQuery(query));
+    appState.setMonetaryMode(isMonetary);
+    header.setMonetarySearchMode(isMonetary);
     navigate("results");
     void performSearch(query, { openDialog: false });
   }
